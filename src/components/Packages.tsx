@@ -1,47 +1,14 @@
+import { GamePageData } from "@/app/valorant/page";
 import { lato, orbitron } from "@/fonts/fonts";
 
-export default function Packages() {
-  const packages = [
-    {
-      name: "Teammates",
-      subpackage: [
-        {
-          name: "Duo",
-          price: "$7",
-        },
-        {
-          name: "Trio",
-          price: "$14",
-        },
-        {
-          name: "Flex",
-          price: "$21",
-        },
-      ],
-      text: "Play with our top rated players.",
-    },
-    {
-      name: "Coaching",
-      subpackage: [
-        {
-          name: "Coaching",
-          price: "$13",
-        },
-        {
-          name: "Team Coaching",
-          price: "$25",
-        },
-      ],
-      text: "Get team coaching from our top rated players.",
-    },
-  ];
-
+export default function Packages({ data }: { data: GamePageData }) {
+  const packages = data.packages;
   return (
     <div className="pb-20">
       <div className="flex mx-auto justify-center px-4">
         <h2 className="gradient-text">PACKAGES</h2>
       </div>
-      <div className="flex justify-center flex-col lg:flex-row gap-12 mt-16 max-w-2xl w-full px-4 mx-auto">
+      <div className="flex justify-center w-1/2 flex-col lg:flex-row gap-12 mt-16 max-w-8xl w-full px-4 mx-auto">
         {packages.map((indPack, idx) => {
           return (
             <div

@@ -15,7 +15,7 @@ export default function Services() {
       description: `Let top-ranked pros boost your account 
 safely and efficiently to your 
 desired rank.`,
-      imagePath: "/images/Maskgroup1.png",
+      imagePath: "/images/Maskgroup.png",
       buttonText: "EXPLORE TEAMMATE",
     },
   ];
