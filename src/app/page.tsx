@@ -1,9 +1,22 @@
+import Coaching from "@/components/Coaching";
+import Navbar from "@/components/Navbar";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <div>
-      
+      <Navbar />
+      <div className="h-[700px] w-full relative">
+        <Image
+          src="/images/herobackground.png"
+          alt="game background image"
+          fill
+          style={{ objectFit: "cover" }}
+          priority
+        />
+      </div>
+
+      <Coaching />
     </div>
   );
 }
