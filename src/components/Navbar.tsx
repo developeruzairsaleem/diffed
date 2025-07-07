@@ -12,11 +12,21 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div className="main_buttons hidden lg:flex">
           <ul className="main_nav uppercase mt-3 text-md lg:text-lg flex gap-4 lg:gap-6 mr-5 lg:mr-10">
-            <li>Home</li>
-            <li>Games</li>
-            <li>Features</li>
-            <li>Customer Reviews</li>
-            <li>About</li>
+            <li className="cursor-pointer hover:text-gray-200 transition-all">
+              Home
+            </li>
+            <li className="cursor-pointer hover:text-gray-200 transition-all">
+              Games
+            </li>
+            <li className="cursor-pointer hover:text-gray-200 transition-all">
+              Features
+            </li>
+            <li className="cursor-pointer hover:text-gray-200 transition-all">
+              Customer Reviews
+            </li>
+            <li className="cursor-pointer hover:text-gray-200 transition-all">
+              About
+            </li>
           </ul>
           <NavButtons />
         </div>

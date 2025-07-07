@@ -38,11 +38,11 @@ desired rank.`,
         SELECTOR
       </h3>
 
-      <div className="cards flex flex-col  lg:flex-row max-w-6xl w-full m-auto gap-20 justify-center">
+      <div className="cards flex flex-col  lg:flex-row max-w-4xl w-full m-auto gap-20 justify-center">
         {cardData.map((card, idx) => (
           <div
             key={idx}
-            className="p-4  flex flex-col lg:w-1/3 w-2/3 mx-auto border transition-all rounded-lg border-white"
+            className="p-4  flex flex-col lg:w-2/3 w-2/3 mx-auto border transition-all rounded-lg border-white"
             style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
           >
             <img src={card.imagePath} alt="card image" />
