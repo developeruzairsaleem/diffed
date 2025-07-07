@@ -38,7 +38,7 @@ const HowItWorks = () => {
         {/* Step 2 */}
         <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
           <img
-            src="/images/step1.svg"
+            src="/images/step2.svg"
             alt="Choose Game"
             className="w-[50px] sm:w-[70px] md:w-[90px] lg:w-[110px]"
           />
@@ -62,7 +62,7 @@ const HowItWorks = () => {
         {/* Step 3 */}
         <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
           <img
-            src="/images/step1.svg"
+            src="/images/step3.svg"
             alt="Choose Game"
             className="w-[50px] sm:w-[70px] md:w-[90px] lg:w-[110px]"
           />
@@ -86,7 +86,7 @@ const HowItWorks = () => {
         {/* Step 4 */}
         <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
           <img
-            src="/images/step1.svg"
+            src="/images/step4.svg"
             alt="Choose Game"
             className="w-[50px] sm:w-[70px] md:w-[90px] lg:w-[110px]"
           />
