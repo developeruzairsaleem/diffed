@@ -16,3 +16,24 @@ body {
   background: var(--background);
   background-attachment: fixed; 
 }
+
+
+.gradient-text {
+  background: linear-gradient(
+    to right,
+    #EE2C81,
+    #FE0FD0,
+    #58B9E3,
+    #F79FC5
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline;
+  font-family: var(--font-orbitron), sans-serif;
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 700;
+  line-height: 117.5%;
+  letter-spacing: 4%;
+  text-transform: uppercase;
+}

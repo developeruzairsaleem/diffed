@@ -6,7 +6,7 @@ export default function Coaching() {
   return (
     <div className=" flex justify-center relative z-50 -my-12">
       <button
-        className={` ${orbitron.className} relative group`}
+        className={` ${orbitron.className} relative cursor-pointer group`}
         onMouseEnter={() => setHoveredButton("coaching")}
         onMouseLeave={() => setHoveredButton(null)}
       >

@@ -9,7 +9,7 @@ export default function Component() {
     <div className={`flex gap-8 items-center ${orbitron.className} font-thin`}>
       {/* LOGIN Button */}
       <button
-        className="relative group"
+        className="relative group cursor-pointer"
         onMouseEnter={() => setHoveredButton("login")}
         onMouseLeave={() => setHoveredButton(null)}
       >
@@ -44,7 +44,7 @@ export default function Component() {
 
       {/* REGISTER Button */}
       <button
-        className="relative group"
+        className="relative group cursor-pointer"
         onMouseEnter={() => setHoveredButton("register")}
         onMouseLeave={() => setHoveredButton(null)}
       >
