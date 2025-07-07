@@ -80,6 +80,7 @@ body {
 
 .gradient-btn:hover {
   cursor: pointer;
+}
 
 .gradient-text {
   background: linear-gradient(
