@@ -38,20 +38,18 @@ desired rank.`,
         SELECTOR
       </h3>
 
-      <div className="cards flex max-w-6xl w-full m-auto gap-20 justify-center">
+      <div className="cards flex flex-col  lg:flex-row max-w-6xl w-full m-auto gap-20 justify-center">
         {cardData.map((card, idx) => (
           <div
             key={idx}
-            className="p-4  flex flex-col w-1/3 border transition-all rounded-lg border-white"
+            className="p-4  flex flex-col lg:w-1/3 w-2/3 mx-auto border transition-all rounded-lg border-white"
             style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
           >
             <img src={card.imagePath} alt="card image" />
             <h3 className="pt-8 pb-4" style={{ fontSize: "1.5rem" }}>
               {card.title}
             </h3>
-            <p className="pb-4" style={{ fontSize: "1rem" }}>
-              {card.description}
-            </p>
+            <p className="pb-4 text-lg lg:text-lg ">{card.description}</p>
 
             <button
               className={` ${orbitron.className} relative mx-4 mt-6 mb-8 group cursor-pointer`}

@@ -6,7 +6,7 @@ export default function Component() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
   return (
-    <div className={`flex gap-8 items-center ${orbitron.className} font-thin`}>
+    <div className={`flex gap-6 items-center ${orbitron.className} font-thin`}>
       {/* LOGIN Button */}
       <button
         className="relative group cursor-pointer"
@@ -28,7 +28,7 @@ export default function Component() {
             className={`
                 w-full h-full 
                 bg-[#591741]
-                 px-10 py-3
+                 px-8 py-3
                 transition-all duration-300 ease-out
                 ${hoveredButton === "login" ? "bg-opacity-80" : ""}
               `}

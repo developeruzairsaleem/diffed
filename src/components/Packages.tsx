@@ -41,11 +41,11 @@ export default function Packages() {
       <div className="flex mx-auto justify-center px-4">
         <h2 className="gradient-text">PACKAGES</h2>
       </div>
-      <div className="flex justify-center gap-12 mt-16 max-w-2xl w-full px-4 mx-auto">
+      <div className="flex justify-center flex-col lg:flex-row gap-12 mt-16 max-w-2xl w-full px-4 mx-auto">
         {packages.map((indPack, idx) => {
           return (
             <div
-              className="bg-[#13161B] w-1/2 flex flex-col p-4 rounded-2xl"
+              className="bg-[#13161B] w-full mx-auto lg:w-1/2  flex flex-col p-6 rounded-2xl"
               style={{
                 backgroundColor: "rgba(19,22,27,0.3)",
                 minHeight: "400px",

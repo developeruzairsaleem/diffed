@@ -4,7 +4,7 @@ import { orbitron } from "@/fonts/fonts";
 export default function Coaching() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
   return (
-    <div className=" flex justify-center relative z-50 -my-12">
+    <div className=" flex justify-center relative -my-12">
       <button
         className={` ${orbitron.className} relative cursor-pointer group`}
         onMouseEnter={() => setHoveredButton("coaching")}
