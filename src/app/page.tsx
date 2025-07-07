@@ -1,5 +1,6 @@
 import Coaching from "@/components/Coaching";
 import Navbar from "@/components/Navbar";
+import Packages from "@/components/Packages";
 import Services from "@/components/Services";
 import Image from "next/image";
 
@@ -19,6 +20,7 @@ export default function Home() {
 
       <Coaching />
       <Services />
+      <Packages />
     </div>
   );
 }

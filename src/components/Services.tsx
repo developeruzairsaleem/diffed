@@ -41,7 +41,8 @@ desired rank.`,
       <div className="cards flex max-w-6xl w-full m-auto gap-20 justify-center">
         {cardData.map((card, idx) => (
           <div
-            className="p-4  flex flex-col w-1/3 border hover:scale-105 transition-all rounded-lg border-white"
+            key={idx}
+            className="p-4  flex flex-col w-1/3 border transition-all rounded-lg border-white"
             style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
           >
             <img src={card.imagePath} alt="card image" />
