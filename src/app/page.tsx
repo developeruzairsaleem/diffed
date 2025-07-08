@@ -2,6 +2,11 @@ import Link from "next/link";
 import Hero from "@/sections/hero";
 import HowItWorks from "@/sections/howItWorks";
 import Navbar from "@/components/Navbar";
+import Services from "@/sections/services";
+import Choose from "@/sections/choose";
+import WhyUs from "@/sections/whyUs";
+import Reviews from "@/sections/reviews";
+
 
 export default function Home() {
   return (
@@ -9,6 +14,10 @@ export default function Home() {
       <Navbar />
       <Hero />
       <HowItWorks />
+      <Services />
+      <Choose />
+      <WhyUs />
+      <Reviews />
     </div>
   );
 }
