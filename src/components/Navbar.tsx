@@ -21,7 +21,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [gamesOpen, setGamesOpen] = useState(false);
   return (
-    <nav className="w-full">
+    <nav className="w-full sticky top-0 z-50 bg-[#581742]/90 backdrop-blur">
       <div className="flex justify-between max-w-8xl py-8 w-full px-6 mx-auto">
         <img src="/logo/logo.png" alt="Logo image" className="h-10 w-auto" />
 
