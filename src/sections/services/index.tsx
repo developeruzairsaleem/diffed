@@ -5,10 +5,10 @@ const Services = () => {
   return (
     <div className="py-12 flex flex-col items-center w-full gap-[67px]">
       <div className="text-center w-full ">
-        <p className="section-title">
+        <div className="section-title">
           <p className="gradient-text">Services</p>
           <p>Overview</p>
-        </p>
+        </div>
       </div>
 
       <div className="flex flex-wrap px-[20px] lg:w-[912px] justify-center lg:justify-between items-center gap-[20px] ">
@@ -45,7 +45,7 @@ const Services = () => {
         <div className="border-box max-w-[368px] flex flex-col border-[1px] border-white/20 rounded-lg px-[18px] pt-[20px] pb-[43px] backdrop-blur-[50px] shadow-[0_4px_20px_-1px_rgba(0,0,0,0)] bg-white/5">
           <div className="flex justify-center mb-[30px]">
             <Image
-              src="/images/Maskgroup1.png"
+              src="/images/Maskgroup.png"
               alt="service1"
               width={350}
               height={100}
@@ -66,7 +66,7 @@ const Services = () => {
            "
           >
             <p className="text-[16px] font-[700] letter-spacing-[4%] skew-x-20">
-              exlore coaching
+              exlore teammate
             </p>
           </button>
         </div>

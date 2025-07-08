@@ -12,7 +12,7 @@ const HowItWorks = () => {
 
       <div className="flex flex-col gap-1 md:gap-2 w-full ">
         {/* Step 1 */}
-        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px] ">
+        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-md px-[50px] sm:px-[80px] md:px-[100px] lg:px-[175px] py-3 sm:py-6 md:py-8 lg:py-[33px] ">
           <img
             src="/images/step1.svg"
             alt="Choose Game"
@@ -24,7 +24,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="relative bottom-[50px] sm:bottom-[70px] md:bottom-[90px] lg:bottom-[110px] z-10 ml-4 sm:ml-8 md:ml-12 lg:ml-[60px] h-[0px]">
+        <div className="relative bottom-[50px] sm:bottom-[70px] md:bottom-[90px] lg:bottom-[110px] z-10 ml-4 sm:ml-8 md:ml-12 lg:ml-[100px] h-[0px]">
           <Image
             src="/images/arrow.png"
             alt="arrow"
@@ -36,7 +36,7 @@ const HowItWorks = () => {
         </div>
 
         {/* Step 2 */}
-        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
+        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-md px-[50px] sm:px-[80px] md:px-[100px] lg:px-[175px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
           <img
             src="/images/step2.svg"
             alt="Choose Game"
@@ -48,7 +48,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="relative bottom-[50px] sm:bottom-[70px] md:bottom-[90px] lg:bottom-[110px] z-10 ml-4 sm:ml-8 md:ml-12 lg:ml-[60px] h-[0px]">
+        <div className="relative bottom-[50px] sm:bottom-[70px] md:bottom-[90px] lg:bottom-[110px] z-10 ml-4 sm:ml-8 md:ml-12 lg:ml-[100px] h-[0px]">
           <Image
             src="/images/arrow.png"
             alt="arrow"
@@ -60,7 +60,7 @@ const HowItWorks = () => {
         </div>
 
         {/* Step 3 */}
-        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
+        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-md px-[50px] sm:px-[80px] md:px-[100px] lg:px-[175px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
           <img
             src="/images/step3.svg"
             alt="Choose Game"
@@ -72,7 +72,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="relative bottom-[50px] sm:bottom-[70px] md:bottom-[90px] lg:bottom-[110px] z-10 ml-4 sm:ml-8 md:ml-12 lg:ml-[60px] h-[0px]">
+        <div className="relative bottom-[50px] sm:bottom-[70px] md:bottom-[90px] lg:bottom-[110px] z-10 ml-4 sm:ml-8 md:ml-12 lg:ml-[100px] h-[0px]">
           <Image
             src="/images/arrow.png"
             alt="arrow"
@@ -84,7 +84,7 @@ const HowItWorks = () => {
         </div>
 
         {/* Step 4 */}
-        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-xl px-[50px] sm:px-[80px] md:px-[100px] lg:px-[135px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
+        <div className="bg-[#671348DE] bg-opacity-[87%] flex items-start gap-2 md:gap-6 shadow-md px-[50px] sm:px-[80px] md:px-[100px] lg:px-[175px] py-3 sm:py-6 md:py-8 lg:py-[33px]">
           <img
             src="/images/step4.svg"
             alt="Choose Game"

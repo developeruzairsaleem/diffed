@@ -6,6 +6,8 @@ import Services from "@/sections/services";
 import Choose from "@/sections/choose";
 import WhyUs from "@/sections/whyUs";
 import Reviews from "@/sections/reviews";
+import Faqs from "@/sections/faqs";
+import Navbar from "@/components/Navbar";
 
 
 export default function Home() {
@@ -18,6 +20,8 @@ export default function Home() {
       <Choose />
       <WhyUs />
       <Reviews />
+
+      <Faqs />
     </div>
   );
 }
