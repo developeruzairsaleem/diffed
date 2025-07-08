@@ -28,9 +28,12 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div className="main_buttons hidden lg:flex">
           <ul className="main_nav uppercase mt-3 items-center text-md lg:text-lg flex gap-4 lg:gap-6 mr-5 lg:mr-10">
-            <li className="cursor-pointer hover:text-gray-200 transition-all">
+            <Link
+              href={"/"}
+              className="cursor-pointer hover:text-gray-200 transition-all"
+            >
               Home
-            </li>
+            </Link>
             <DropdownMenu open={gamesOpen} onOpenChange={setGamesOpen}>
               <DropdownMenuTrigger asChild>
                 <li className="relative flex items-center cursor-pointer hover:text-gray-200 transition-all select-none">
