@@ -1,5 +1,5 @@
 import { lato, orbitron } from "@/fonts/fonts";
-
+import Link from "next/link";
 export default function RankUp() {
   return (
     <div className="">
@@ -38,12 +38,15 @@ export default function RankUp() {
             hover:scale-105
           `}
           >
-            <div className="flex items-center justify-center h-full p-0.5 transform skew-x-12">
+            <Link
+              href="/checkout"
+              className="flex items-center justify-center h-full p-0.5 transform skew-x-12"
+            >
               <span className="text-white text-lg font-bold tracking-wider">
                 CONTINUE TO
                 <div>CHECKOUT</div>
               </span>
-            </div>
+            </Link>
           </div>
         </button>
       </div>
