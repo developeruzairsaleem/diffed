@@ -48,18 +48,22 @@ const reviewsContent = [
 
 const Reviews = () => {
   return (
-    <div className="py-12 flex flex-col items-center w-full gap-[67px]">
+    <div className="pb-12 pt-[100px] lg:pt-[150px]  flex flex-col items-center w-full gap-[67px]">
       <div className="text-center w-full ">
         <p className="section-title">
-          <span>Why </span>
-          <span className="gradient-text">Choose</span>
-          <span> Us?</span>
+          <p>Trustpilot </p>
+          <p className="gradient-text">REVIEWS</p>
         </p>
       </div>
 
       <div className="flex flex-wrap px-[10px] lg:px-[20px] justify-center  items-center gap-[17px] ">
         {reviewsContent.map((item, index) => (
-          <div  className="max-w-[433px] flex flex-col border-[1px] border-white/20 rounded-lg px-[18px] pt-[33px] pb-[25px] backdrop-blur-[50px] shadow-[0_4px_20px_-1px_rgba(0,0,0,0)] bg-white/5 text-center  justify-between">
+          <div key={index} className="max-w-[433px] flex flex-col border-[1px] border-white/20 rounded-lg px-[18px] pt-[33px] pb-[25px] backdrop-blur-[50px] shadow-[0_4px_20px_-1px_rgba(0,0,0,0)] bg-white/5 text-center  justify-between">
+            <div className="relative -top-[60px] -right-[150px] flex gap-[12px]  justify-center">
+              <Image src="/images/reviews/style1.svg" alt="star" width={30} height={30} />
+              <Image src="/images/reviews/style2.svg" alt="star" width={30} height={30} />
+            </div>
+            <Image className="mb-[14px]" src="/images/reviews/rating.svg" alt="star" width={136} height={30} />
             <div className="flex flex-col gap-[14px] px-[7px] text-justify pb-[20px] border-b-[1px] border-white/70 mb-[20px]">
               <p className="text-[11px] font-normal leading-[2] tracking-wide">
                 {item.review}
@@ -71,12 +75,15 @@ const Reviews = () => {
                 alt="service1"
                 width={44}
                 height={44}
-                className="drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)] rounded-full"
               />
-              <p className="text-[11px] font-[500] leading-[1.3] tracking-wider text-left ">
-                {item.userName} <br />
+              <div>
+              <p className="text-[15px] font-[500] leading-[1.3] tracking-wider text-left ">
+                {item.userName} 
+              </p>
+              <p className="text-[8px] font-[500] leading-[1.3] tracking-wider text-left ">
                 {item.userWorkplace}
               </p>
+              </div>
             </div>
           </div>
         ))}

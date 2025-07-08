@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lato, Orbitron } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/Footer";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -27,7 +28,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${lato.variable} ${orbitron.variable} antialiased`}>
-        {children}
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );

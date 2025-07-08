@@ -36,7 +36,7 @@ const whyUsContent = [
 
 const WhyUs = () => {
   return (
-    <div className="py-12 flex flex-col items-center w-full gap-[67px]">
+    <div className="pb-12 pt-[100px] lg:pt-[150px]  flex flex-col items-center w-full gap-[67px]">
       <div className="text-center w-full ">
         <p className="section-title">
           <span>Why </span>
@@ -47,7 +47,7 @@ const WhyUs = () => {
 
       <div className="flex flex-wrap px-[10px] lg:px-[20px] justify-center  items-center gap-[17px] ">
         {whyUsContent.map((item, index) => (
-          <div  className="w-[278px] h-[200px] flex flex-col border-[1px] border-white/20 rounded-lg px-[18px] pt-[33px] pb-[25px] backdrop-blur-[50px] shadow-[0_4px_20px_-1px_rgba(0,0,0,0)] bg-white/5 text-center capitalize justify-between">
+          <div key={index}  className="w-[278px] h-[200px] flex flex-col border-[1px] border-white/20 rounded-lg px-[18px] pt-[33px] pb-[25px] backdrop-blur-[50px] shadow-[0_4px_20px_-1px_rgba(0,0,0,0)] bg-white/5 text-center capitalize justify-between">
             <div className="flex justify-center  ">
               <Image
                 src={item.image}
