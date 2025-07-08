@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const Index = () => {
   return (
-    <div className="py-[50px] flex flex-col items-center justify-center w-full">
+    <div className="py-[50px] flex flex-col items-center justify-center w-full ">
       <Image
         src="/backgrounds/heroBackground.png"
         alt="bg"
