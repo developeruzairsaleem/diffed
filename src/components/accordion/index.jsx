@@ -34,7 +34,6 @@ const RadixAccordion = () => (
 	<Accordion.Root
 		className={`${styles.Root} flex flex-col gap-[30px] justify-center items-center px-[30px]`}
 		type="single"
-		defaultValue="item-1"
 		collapsible
 	>
 		{accordionItems.map((item) => (

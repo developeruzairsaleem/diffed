@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -12,12 +13,15 @@ const Footer = () => {
       <div className="relative z-20 flex flex-col gap-[50px] items-start justify-center px-[20px] sm:px-[40px] md:px-[60px] lg:px-[100px] py-[60px] md:py-[80px]">
         <div className="flex flex-col items-start justify-center gap-[76px] lg:flex-row ">
           <div className="flex flex-col items-start justify-center gap-[11px]">
-            <Image
-              src="/logo/logoFooter.svg"
-              alt="logo"
-              width={100}
-              height={100}
-            />
+            <Link href="/">
+              <Image
+                src="/logo/logoFooter.svg"
+                alt="logo"
+                width={100}
+                height={100}
+                className="cursor-pointer"
+              />
+            </Link>
             <p className="max-w-[315px] text-[16px] font-[400] leading-[1.85] tracking-widest text-white">
               A well-designed gaming header often incorporates elements such as
               game characters, iconic symbols, vibrant colors, and dynamic visuals
@@ -31,13 +35,13 @@ const Footer = () => {
                 Company
               </h3>
               <ul className="flex flex-col items-start justify-center gap-[18px] md:gap-[32px]">
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Products
                 </li>
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Games
                 </li>
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Features
                 </li>
               </ul>
@@ -47,13 +51,13 @@ const Footer = () => {
                 Help
               </h3>
               <ul className="flex flex-col items-start justify-center gap-[18px] md:gap-[32px]">
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Support
                 </li>
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   About
                 </li>
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Contact Us
                 </li>
               </ul>
@@ -63,13 +67,13 @@ const Footer = () => {
                 Resources
               </h3>
               <ul className="flex flex-col items-start justify-center gap-[18px] md:gap-[32px]">
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Youtube Playlist
                 </li>
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   How to - Blog
                 </li>
-                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white">
+                <li className="text-[16px] font-[400] leading-[1.3] tracking-wide text-white cursor-pointer">
                   Terms & Conditions
                 </li>
               </ul>
@@ -112,6 +116,7 @@ const Footer = () => {
                 alt="instagram"
                 width={28}
                 height={28}
+                className="cursor-pointer"
               />
             </div>
             <div>
@@ -120,6 +125,7 @@ const Footer = () => {
                 alt="twitter"
                 width={28}
                 height={28}
+                className="cursor-pointer"
               />
             </div>
             <div>
@@ -128,6 +134,7 @@ const Footer = () => {
                 alt="linkedin"
                 width={28}
                 height={28}
+                className="cursor-pointer"
               />
             </div>
             <div>
@@ -136,6 +143,7 @@ const Footer = () => {
                 alt="linkedin"
                 width={28}
                 height={20}
+                className="cursor-pointer"
               />
             </div>
           </div>

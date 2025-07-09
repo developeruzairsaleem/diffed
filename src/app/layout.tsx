@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Lato, Orbitron } from "next/font/google";
+import { Lato, Orbitron, Poppins } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
+import SmoothScrollScript from "@/components/SmoothScrollScript";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -11,6 +12,12 @@ const lato = Lato({
 
 const orbitron = Orbitron({
   variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "800", "900"],
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "700", "800", "900"],
 });
@@ -27,7 +34,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${lato.variable} ${orbitron.variable} antialiased`}>
+      <body className={`${lato.variable} ${orbitron.variable} ${poppins.variable} antialiased`}>
+        <SmoothScrollScript />
         <main>{children}</main>
         <Footer />
       </body>
