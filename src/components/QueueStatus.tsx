@@ -1,3 +1,4 @@
+
 import { lato, orbitron } from "@/fonts/fonts";
 export default function QueueStatus() {
   return (
