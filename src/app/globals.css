@@ -5,6 +5,7 @@
   --foreground: #FFFFFF;
   --font-lato: var(--font-lato);
   --font-orbitron: var(--font-orbitron);
+  --font-poppins: var(--font-poppins);
 };
 
 body {
