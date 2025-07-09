@@ -84,25 +84,32 @@ const Footer = () => {
         <div className="flex flex-wrap gap-[20px] md:gap-[30px] lg:gap-[48px] items-center">
           <Image
             src="/images/brandIcons/Group.svg"
-            alt="email"
+            alt="roblox"
             width={150}
             height={150}
           />
           <Image
             src="/images/brandIcons/Group-1.svg"
-            alt="email"
+            alt="canon"
             width={150}
             height={150}
           />
           <Image
             src="/images/brandIcons/Vector-1.svg"
-            alt="email"
+            alt="asus"
             width={150}
             height={150}
           />
+          
           <Image
             src="/images/brandIcons/Vector.svg"
-            alt="email"
+            alt="twitch"
+            width={150}
+            height={150}
+          />
+           <Image
+            src="/images/brandIcons/microsoft.svg"
+            alt="microsoft"
             width={150}
             height={150}
           />
