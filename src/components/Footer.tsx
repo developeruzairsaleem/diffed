@@ -15,7 +15,7 @@ const Footer = () => {
       />
       {/* SVG background (only on large screens) */}
       <div
-        className="hidden lg:block absolute inset-0 z-10 bg-[url('/backgrounds/footer.svg')] bg-contain bg-no-repeat bg-right-bottom opacity-60"
+        className="hidden lg:block absolute inset-0 z-10 bg-[url('/backgrounds/footer.webp')] bg-contain bg-no-repeat bg-right-bottom opacity-60"
         style={{
           WebkitMaskImage:
             "linear-gradient(to right, transparent 0%, black 100%)",
