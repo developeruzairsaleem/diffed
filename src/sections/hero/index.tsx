@@ -5,7 +5,7 @@ const Index = () => {
   return (
     <div className="py-[50px] flex flex-col items-center justify-center w-full ">
       <Image
-        src="/backgrounds/herobg.webg"
+        src="/backgrounds/herobg.webp"
         alt="Hero background"
         width={1000}
         height={1000}
