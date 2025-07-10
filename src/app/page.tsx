@@ -19,7 +19,6 @@ export default function Home() {
       <Choose />
       <WhyUs />
       <Reviews />
-
       <Faqs />
     </div>
   );

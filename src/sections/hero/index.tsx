@@ -6,10 +6,12 @@ const Index = () => {
     <div className="py-[50px] flex flex-col items-center justify-center w-full ">
       <Image
         src="/backgrounds/heroBackground.png"
-        alt="bg"
+        alt="Hero background"
         width={1000}
         height={1000}
+        priority
         style={{ marginInline: "auto" }}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
       />
 
       <div className="flex flex-col items-center justify-center text-center w-full">
