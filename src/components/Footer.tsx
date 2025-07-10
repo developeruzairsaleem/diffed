@@ -6,11 +6,33 @@ const Footer = () => {
   return (
     <div className="relative overflow-hidden">
       {/* Gradient background */}
-      <div className="absolute inset-0 z-0" style={{ background: "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 60%, #58B9E3 100%)" }} />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          background:
+            "linear-gradient(91.18deg, #EE2C81 -12.13%, #FE0FD0 46.02%, #58B9E3 91.86%, #F79FC5 122.66%)",
+        }}
+      />
       {/* SVG background (only on large screens) */}
-      <div className="hidden lg:block absolute inset-0 z-10 bg-[url('/backgrounds/footer.svg')] bg-contain bg-no-repeat bg-right-bottom opacity-30" />
+      <div
+        className="hidden lg:block absolute inset-0 z-10 bg-[url('/backgrounds/footer.svg')] bg-contain bg-no-repeat bg-right-bottom opacity-60"
+        style={{
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0%, black 100%)",
+          maskImage: "linear-gradient(to right, transparent 0%, white 100%)",
+        }}
+      />
+      {/* Gradient overlay on top of image */}
+
+      <div
+        className="hidden lg:block absolute inset-0 z-20 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(90deg, #FA34C5 0%, rgba(255,255,255,0.3) 100%)",
+        }}
+      />
       {/* Content */}
-      <div className="relative z-20 flex flex-col gap-[50px] items-start justify-center px-[20px] sm:px-[40px] md:px-[60px] lg:px-[100px] py-[60px] md:py-[80px]">
+      <div className="relative z-30 flex flex-col gap-[50px] items-start justify-center px-[20px] sm:px-[40px] md:px-[60px] lg:px-[100px] py-[60px] md:py-[80px]">
         <div className="flex flex-col items-start justify-center gap-[76px] lg:flex-row ">
           <div className="flex flex-col items-start justify-center gap-[11px]">
             <Link href="/">
@@ -24,8 +46,8 @@ const Footer = () => {
             </Link>
             <p className="max-w-[315px] text-[16px] font-[400] leading-[1.85] tracking-widest text-white">
               A well-designed gaming header often incorporates elements such as
-              game characters, iconic symbols, vibrant colors, and dynamic visuals
-              .
+              game characters, iconic symbols, vibrant colors, and dynamic
+              visuals .
             </p>
           </div>
 
@@ -100,14 +122,14 @@ const Footer = () => {
             width={150}
             height={150}
           />
-          
+
           <Image
             src="/images/brandIcons/Vector.svg"
             alt="twitch"
             width={150}
             height={150}
           />
-           <Image
+          <Image
             src="/images/brandIcons/microsoft.svg"
             alt="microsoft"
             width={150}
@@ -155,7 +177,9 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <p className="font-light text-[14px]">© Copyright 2023, All Rights Reserved by board</p>
+            <p className="font-light text-[14px]">
+              © Copyright 2023, All Rights Reserved by board
+            </p>
           </div>
         </div>
       </div>
