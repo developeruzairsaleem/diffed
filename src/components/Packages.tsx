@@ -34,7 +34,7 @@ export default function Packages({ data }: { data: GamePageData }) {
               <div>
                 {indPack.subpackage.map((item, idx) => (
                   <div className="flex my-3 items-center gap-2 ">
-                    <img src="images/tick.png" alt="check" />
+                    <img src="/images/tick.png" alt="check" />
                     <div style={{ fontSize: "1rem", fontWeight: 300 }}>
                       {item.name} - {item.price}
                     </div>

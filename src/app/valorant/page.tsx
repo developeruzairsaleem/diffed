@@ -13,7 +13,7 @@ export type GamePageData = {
 };
 
 const data: GamePageData = {
-  image: "/images/herobackground.png",
+  image: "/images/valorant.svg",
   packages: [
     {
       name: "Bundles",
