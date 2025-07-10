@@ -12,7 +12,7 @@ export type GamePageData = {
 };
 
 const data: GamePageData = {
-  image: "/images/gamer-girl.png",
+  image: "/images/gamer-girl.svg",
   packages: [
     {
       name: "Play sessions per game",

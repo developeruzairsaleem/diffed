@@ -12,7 +12,7 @@ export type GamePageData = {
 };
 
 const data: GamePageData = {
-  image: "/images/fortnite.png",
+  image: "/images/fortnite.svg",
   packages: [
     {
       name: "Bundles",

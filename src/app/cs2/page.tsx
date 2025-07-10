@@ -12,7 +12,7 @@ export type GamePageData = {
 };
 
 const data: GamePageData = {
-  image: "/images/cs2.png",
+  image: "/images/cs2.svg",
   packages: [
     {
       name: "Bundles",

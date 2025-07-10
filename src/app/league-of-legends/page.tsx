@@ -12,7 +12,7 @@ export type GamePageData = {
 };
 
 const data: GamePageData = {
-  image: "/images/league-of-legends.png",
+  image: "/images/league-of-legends.svg",
   packages: [
     {
       name: "Bundles",

@@ -2,7 +2,7 @@ import GamePage from "@/components/GamePage";
 import { GamePageData } from "../valorant/page";
 export default function () {
   const data: GamePageData = {
-    image: "/images/marvel-rivals.png",
+    image: "/images/marvel-rivals.svg",
     packages: [
       {
         name: "Teammates",
