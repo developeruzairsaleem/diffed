@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  // output: "export", // Removed to enable dynamic/SSR mode
   trailingSlash: true,
   images: {
     unoptimized: true,

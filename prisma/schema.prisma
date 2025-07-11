@@ -27,6 +27,7 @@ model Game {
   image     String
   teammates Int
   sessions  Int
+  name      String
 
   @@map("games")
 }
