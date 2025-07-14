@@ -4,11 +4,13 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Check } from "lucide-react";
 import { orbitron, roboto } from "@/fonts/fonts";
 import Image from "next/image";
+import { useActionState } from "react";
+import { signup } from "@/actions/auth";
 const ExploreSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
-
+  const [state, action, pending] = useActionState(signup, undefined);
   const {
     register,
     handleSubmit,
@@ -151,6 +153,7 @@ const ExploreSignupForm = () => {
                   {errors.username.message}
                 </p>
               )}
+              {state?.errors?.username && <p>{state.errors.username}</p>}
             </div>
 
             {/* Email Field */}
@@ -177,6 +180,9 @@ const ExploreSignupForm = () => {
                 <p className="text-red-500 text-sm mt-1">
                   {errors.email.message}
                 </p>
+              )}
+              {state?.errors?.email && (
+                <p className="">{state?.errors?.email}</p>
               )}
             </div>
 
@@ -233,6 +239,16 @@ const ExploreSignupForm = () => {
                 <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
                 </p>
+              )}
+              {state?.errors?.password && (
+                <div>
+                  <p>Password must:</p>
+                  <ul>
+                    {state.errors.password.map((error) => (
+                      <li key={error}>- {error}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
               {/* Password Strength Indicator */}
               {password && (
