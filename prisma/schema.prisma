@@ -17,7 +17,6 @@ datasource db {
 enum Role {
   customer
   provider
-  admin
 }
 
 enum Status {
@@ -30,6 +29,7 @@ model User {
   id           String   @id @default(cuid())
   username     String   @unique
   email        String   @unique
+  username     String   @unique
   password     String
   role         Role
   status       Status   @default(active)
@@ -208,32 +208,30 @@ model Game {
   sessions  Int
   name      String
 
-
   orders Order[]
-
 
   @@map("games")
 }
 
 model Order {
-  id                String        @id @default(cuid())
-  customerId        String
-  providerId        String
-  providerServiceId String
-  gameId            String
-  scheduledDate     DateTime
-  status            OrderStatus   @default(pending)
-  paymentStatus     PaymentStatus @default(unpaid)
-  notes             String?
-  cancellationReason  String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  id                 String        @id @default(cuid())
+  customerId         String
+  providerId         String
+  providerServiceId  String
+  gameId             String
+  scheduledDate      DateTime
+  status             OrderStatus   @default(pending)
+  paymentStatus      PaymentStatus @default(unpaid)
+  notes              String?
+  cancellationReason String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   // Relations
-  customer        Customer        @relation(fields: [customerId], references: [id])
-  provider        Provider        @relation(fields: [providerId], references: [id])
-  providerService ProviderService @relation(fields: [providerServiceId], references: [id])
-  game            Game            @relation(fields: [gameId], references: [id])
+  customer        Customer             @relation(fields: [customerId], references: [id])
+  provider        Provider             @relation(fields: [providerId], references: [id])
+  providerService ProviderService      @relation(fields: [providerServiceId], references: [id])
+  game            Game                 @relation(fields: [gameId], references: [id])
   statusHistory   OrderStatusHistory[]
 }
 
@@ -257,17 +255,16 @@ enum OrderActorRole {
 }
 
 model OrderStatusHistory {
-  id             String      @id @default(cuid())
+  id             String         @id @default(cuid())
   orderId        String
   previousStatus OrderStatus
   newStatus      OrderStatus
-  changedByRole  OrderActorRole        
+  changedByRole  OrderActorRole
   reason         String?
-  changedAt      DateTime    @default(now())
+  changedAt      DateTime       @default(now())
 
-  order          Order       @relation(fields: [orderId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
 }
-
 
 model Review {
   id          String @id @default(cuid())
