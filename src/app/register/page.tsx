@@ -4,11 +4,8 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Check } from "lucide-react";
 import { orbitron, roboto } from "@/fonts/fonts";
 import Image from "next/image";
-import { useActionState } from "react";
 import { signup } from "@/actions/auth";
-
-
-
+import { useRouter } from "next/navigation";
 type FormValues = {
   username: string;
   email: string;
@@ -16,13 +13,11 @@ type FormValues = {
   role: "customer" | "provider";
 };
 
-
-const ExploreSignupForm = () => {
+const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
-  const [state, action, pending] = useActionState(signup, undefined);
-
+  const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -31,16 +26,16 @@ const ExploreSignupForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
-      username: "Robert Fox",
-      email: "robert.fox@gmail.com",
+      username: "",
+      email: "",
       password: "",
       role: "customer",
     },
   });
 
   const password = watch("password");
-  const role = watch('role');
-
+  const role = watch("role");
+  const isCustomer = role === "customer";
   // Simple password strength checker
   const getPasswordStrength = (password: string) => {
     if (!password) return { strength: 0, label: "", color: "" };
@@ -60,35 +55,30 @@ const ExploreSignupForm = () => {
 
   const passwordStrength = getPasswordStrength(password);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = handleSubmit(async (data: FormValues) => {
     try {
-      console.log("Form submitted:", data);
-      console.log("Remember me:", rememberMe);
-
-      // Simulate API call
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      setSubmitting(true);
+      setServerError("");
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value);
       });
-  
-      const result = await res.json();
-  
-      if (!res.ok) {
-        alert(result.error || "Registration failed");
-        return;
+      const response = await signup("state", formData); // ✅ This will update `state`
+      if (response?.errors?.message) {
+        return setServerError(response?.errors?.message);
       }
-
-      // Handle successful submission
-      alert(`Registered as ${data.role}`);
+      if (response?.user) {
+        return response?.user?.role === "customer"
+          ? router.push("/dashboard/customer")
+          : router.push("/dashboard/provider");
+      }
     } catch (error) {
-      console.error("Submission error:", error);
-      alert("Registration failed. Please try again.");
+      console.error("something went wront", error);
+      setServerError("Something went wrong!");
+    } finally {
+      setSubmitting(false);
     }
-  };
-
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -113,9 +103,9 @@ const ExploreSignupForm = () => {
             >
               REGISTER
             </h1>
-            {/* <p className={` ${roboto.className} text-gray-200 text-md`}>
+            <p className={` ${roboto.className} text-gray-200 text-md`}>
               This is the start of something good.
-            </p> */}
+            </p>
           </div>
 
           {/* Toggle Buttons */}
@@ -126,11 +116,10 @@ const ExploreSignupForm = () => {
             <div className="flex bg-[#591741] rounded-full p-1">
               <button
                 onClick={() => {
-                  setIsLogin(false);
-                  setValue("role", "customer")
+                  setValue("role", "customer");
                 }}
                 className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                  !isLogin
+                  isCustomer
                     ? "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500  text-white shadow-sm"
                     : "text-white hover:text-gray-100 cursor-pointer"
                 }`}
@@ -139,11 +128,10 @@ const ExploreSignupForm = () => {
               </button>
               <button
                 onClick={() => {
-                  setIsLogin(true);
-                  setValue("role", "provider")
+                  setValue("role", "provider");
                 }}
                 className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                  isLogin
+                  !isCustomer
                     ? "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white shadow-sm"
                     : "text-white hover:text-gray-100 cursor-pointer"
                 }`}
@@ -154,11 +142,7 @@ const ExploreSignupForm = () => {
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-4"
-            autoComplete="off"
-          >
+          <form onSubmit={onSubmit} className="space-y-4" autoComplete="off">
             {/* Username Field */}
             <div>
               <label className="block text-sm font-medium text-gray-100 mb-2">
@@ -188,7 +172,6 @@ const ExploreSignupForm = () => {
                   {errors.username.message}
                 </p>
               )}
-              {state?.errors?.username && <p>{state.errors.username}</p>}
             </div>
 
             {/* Email Field */}
@@ -215,9 +198,6 @@ const ExploreSignupForm = () => {
                 <p className="text-red-500 text-sm mt-1">
                   {errors.email.message}
                 </p>
-              )}
-              {state?.errors?.email && (
-                <p className="">{state?.errors?.email}</p>
               )}
             </div>
 
@@ -275,16 +255,7 @@ const ExploreSignupForm = () => {
                   {errors.password.message}
                 </p>
               )}
-              {state?.errors?.password && (
-                <div>
-                  <p>Password must:</p>
-                  <ul>
-                    {state.errors.password.map((error) => (
-                      <li key={error}>- {error}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+
               {/* Password Strength Indicator */}
               {password && (
                 <div className="mt-2">
@@ -305,35 +276,18 @@ const ExploreSignupForm = () => {
               )}
             </div>
 
-            {/* Remember Me */}
-            {/* <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => setRememberMe(!rememberMe)}
-                className="flex items-center space-x-2"
-              >
-                <div
-                  className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                    rememberMe
-                      ? "bg-purple-600 border-purple-600"
-                      : "border-gray-100"
-                  }`}
-                >
-                  {rememberMe && <Check className="w-3 h-3 text-white" />}
-                </div>
-                <span className="text-sm text-gray-100">Remember me</span>
-              </button>
-            </div> */}
-
+            {serverError && (
+              <p className="text-red-500 text-sm mt-2 mb-2">{serverError}</p>
+            )}
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitting}
               className={`w-full py-3 px-4 cursor-pointer transition-all bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-200 focus:outline-none ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isSubmitting ? "Creating Account..." : "Sign Up"}
+              {submitting ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
         </div>
@@ -342,4 +296,4 @@ const ExploreSignupForm = () => {
   );
 };
 
-export default ExploreSignupForm;
+export default SignupForm;
