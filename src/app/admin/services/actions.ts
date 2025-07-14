@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createService(formData: FormData) {
+  console.log('formData',formData)
   const title = formData.get('title') as string
   const description = formData.get('description') as string
+  const image = formData.get('image') as string
 
   if (!title || !description) {
     throw new Error('Title and description are required')
@@ -16,6 +18,7 @@ export async function createService(formData: FormData) {
     data: {
       title,
       description,
+      image,
     },
   })
 
@@ -26,6 +29,7 @@ export async function createService(formData: FormData) {
 export async function updateService(id: string, formData: FormData) {
   const title = formData.get('title') as string
   const description = formData.get('description') as string
+  const image = formData.get('image') as string
 
   if (!title || !description) {
     throw new Error('Title and description are required')
@@ -36,6 +40,7 @@ export async function updateService(id: string, formData: FormData) {
     data: {
       title,
       description,
+      image,
     },
   })
 

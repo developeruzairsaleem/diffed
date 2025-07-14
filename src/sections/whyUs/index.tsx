@@ -36,7 +36,7 @@ const whyUsContent = [
 
 const WhyUs = () => {
   return (
-    <div className="pb-12 pt-[100px] lg:pt-[150px]  flex flex-col items-center w-full gap-[67px]">
+    <div id="why-us" className="pb-12 pt-[100px] lg:pt-[150px]  flex flex-col items-center w-full gap-[67px]">
       <div className="text-center w-full ">
         <p className="section-title">
           <span>Why </span>

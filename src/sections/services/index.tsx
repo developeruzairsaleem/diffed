@@ -2,6 +2,9 @@ import React from "react";
 import Image from "next/image";
 
 const Services = () => {
+
+  
+
   return (
     <div className="py-12 flex flex-col items-center w-full gap-[67px]">
       <div className="text-center w-full ">
