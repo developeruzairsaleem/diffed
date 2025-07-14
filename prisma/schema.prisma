@@ -207,7 +207,9 @@ model Game {
   sessions  Int
   name      String
 
+
   orders Order[]
+
 
   @@map("games")
 }
