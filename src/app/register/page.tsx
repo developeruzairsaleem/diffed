@@ -4,25 +4,39 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Check } from "lucide-react";
 import { orbitron, roboto } from "@/fonts/fonts";
 import Image from "next/image";
+
+
+type FormValues = {
+  username: string;
+  email: string;
+  password: string;
+  role: "customer" | "provider";
+};
+
+
 const ExploreSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
 
+
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
-  } = useForm({
+  } = useForm<FormValues>({
     defaultValues: {
       username: "Robert Fox",
       email: "robert.fox@gmail.com",
       password: "",
+      role: "customer",
     },
   });
 
   const password = watch("password");
+  const role = watch('role');
 
   // Simple password strength checker
   const getPasswordStrength = (password: string) => {
@@ -49,15 +63,29 @@ const ExploreSignupForm = () => {
       console.log("Remember me:", rememberMe);
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      const result = await res.json();
+  
+      if (!res.ok) {
+        alert(result.error || "Registration failed");
+        return;
+      }
 
       // Handle successful submission
-      alert("Registration successful!");
+      alert(`Registered as ${data.role}`);
     } catch (error) {
       console.error("Submission error:", error);
       alert("Registration failed. Please try again.");
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -82,9 +110,9 @@ const ExploreSignupForm = () => {
             >
               REGISTER
             </h1>
-            <p className={` ${roboto.className} text-gray-200 text-md`}>
+            {/* <p className={` ${roboto.className} text-gray-200 text-md`}>
               This is the start of something good.
-            </p>
+            </p> */}
           </div>
 
           {/* Toggle Buttons */}
@@ -94,24 +122,30 @@ const ExploreSignupForm = () => {
           >
             <div className="flex bg-[#591741] rounded-full p-1">
               <button
-                onClick={() => setIsLogin(false)}
+                onClick={() => {
+                  setIsLogin(false);
+                  setValue("role", "customer")
+                }}
                 className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${
                   !isLogin
                     ? "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500  text-white shadow-sm"
                     : "text-white hover:text-gray-100 cursor-pointer"
                 }`}
               >
-                Register
+                Customer
               </button>
               <button
-                onClick={() => setIsLogin(true)}
+                onClick={() => {
+                  setIsLogin(true);
+                  setValue("role", "provider")
+                }}
                 className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${
                   isLogin
                     ? "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white shadow-sm"
                     : "text-white hover:text-gray-100 cursor-pointer"
                 }`}
               >
-                Login
+                Provider
               </button>
             </div>
           </div>
@@ -246,7 +280,7 @@ const ExploreSignupForm = () => {
                         }}
                       />
                     </div>
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-gray-400">
                       {passwordStrength.label}
                     </span>
                   </div>
@@ -255,7 +289,7 @@ const ExploreSignupForm = () => {
             </div>
 
             {/* Remember Me */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => setRememberMe(!rememberMe)}
@@ -272,7 +306,7 @@ const ExploreSignupForm = () => {
                 </div>
                 <span className="text-sm text-gray-100">Remember me</span>
               </button>
-            </div>
+            </div> */}
 
             {/* Submit Button */}
             <button
@@ -282,7 +316,7 @@ const ExploreSignupForm = () => {
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isSubmitting ? "Creating Account..." : "Get Started"}
+              {isSubmitting ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
         </div>
