@@ -4,81 +4,57 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Check } from "lucide-react";
 import { orbitron, roboto } from "@/fonts/fonts";
 import Image from "next/image";
-
-
+import { login } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 type FormValues = {
   email: string;
   password: string;
 };
 
-
-const ExploreSignupForm = () => {
+const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-
-
+  const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
-      email: "robert.fox@gmail.com",
+      email: "",
       password: "",
     },
   });
 
   const password = watch("password");
 
-  // Simple password strength checker
-  const getPasswordStrength = (password: string) => {
-    if (!password) return { strength: 0, label: "", color: "" };
-
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-    if (strength < 3) return { strength, label: "Weak", color: "bg-red-500" };
-    if (strength < 4)
-      return { strength, label: "Medium", color: "bg-yellow-500" };
-    return { strength, label: "Strong", color: "bg-green-500" };
-  };
-
-  const passwordStrength = getPasswordStrength(password);
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = handleSubmit(async (data: FormValues) => {
     try {
-      console.log("Form submitted:", data);
-      console.log("Remember me:", rememberMe);
-
-      // Simulate API call
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      setSubmitting(true);
+      setServerError("");
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value);
       });
-  
-      const result = await res.json();
-  
-      if (!res.ok) {
-        alert(result.error || "Registration failed");
-        return;
+      const response = await login("state", formData); // ✅ This will update `state`
+      if (response?.errors?.message) {
+        return setServerError(response?.errors?.message);
       }
-
-      // Handle successful submission
-      alert(`logged in sucessfully`);
+      if (response?.user) {
+        return response?.user?.role === "customer"
+          ? router.push("/dashboard/customer")
+          : router.push("/dashboard/provider");
+      }
     } catch (error) {
-      console.error("Submission error:", error);
-      alert("Registration failed. Please try again.");
+      console.error("something went wront", error);
+      setServerError("Something went wrong!");
+    } finally {
+      setSubmitting(false);
     }
-  };
-
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -101,20 +77,15 @@ const ExploreSignupForm = () => {
             <h1
               className={`text-2xl font-bold text-white ${orbitron.className}`}
             >
-              Sign In
+              Login
             </h1>
-            {/* <p className={` ${roboto.className} text-gray-200 text-md`}>
-              This is the start of something good.
-            </p> */}
+            <p className={` ${roboto.className} text-gray-200 text-md`}>
+              Welcome back
+            </p>
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-4"
-            autoComplete="off"
-          >
-
+          <form onSubmit={onSubmit} className="space-y-4" autoComplete="off">
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-100 mb-2">
@@ -135,7 +106,7 @@ const ExploreSignupForm = () => {
                 placeholder="Your email address"
                 autoComplete="off"
               />
-              {errors.email && (
+              {errors?.email && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.email.message}
                 </p>
@@ -151,24 +122,6 @@ const ExploreSignupForm = () => {
                 <input
                   {...register("password", {
                     required: "Password is required",
-                    minLength: {
-                      value: 8,
-                      message: "Invalid password",
-                    },
-                    validate: {
-                      hasUpperCase: (value) =>
-                        /[A-Z]/.test(value) ||
-                        "Invalid password",
-                      hasLowerCase: (value) =>
-                        /[a-z]/.test(value) ||
-                      "Invalid password",
-                      hasNumber: (value) =>
-                        /\d/.test(value) ||
-                      "Invalid password",
-                      hasSpecialChar: (value) =>
-                        /[!@#$%^&*(),.?":{}|<>]/.test(value) ||
-                      "Invalid password",
-                    },
                   })}
                   type={showPassword ? "text" : "password"}
                   className={`w-full px-4 py-3 pr-24 border rounded-lg focus:outline-none  ${
@@ -196,38 +149,20 @@ const ExploreSignupForm = () => {
                   {errors.password.message}
                 </p>
               )}
-              
             </div>
 
-            {/* Remember Me */}
-            {/* <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => setRememberMe(!rememberMe)}
-                className="flex items-center space-x-2"
-              >
-                <div
-                  className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                    rememberMe
-                      ? "bg-purple-600 border-purple-600"
-                      : "border-gray-100"
-                  }`}
-                >
-                  {rememberMe && <Check className="w-3 h-3 text-white" />}
-                </div>
-                <span className="text-sm text-gray-100">Remember me</span>
-              </button>
-            </div> */}
-
+            {serverError && (
+              <p className="text-red-500 text-sm mt-2 mb-2">{serverError}</p>
+            )}
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitting}
               className={`w-full py-3 px-4 cursor-pointer transition-all bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-200 focus:outline-none ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isSubmitting ? "Signing In..." : "Log In"}
+              {submitting ? "Signing in..." : "Log in"}
             </button>
           </form>
         </div>
@@ -236,4 +171,4 @@ const ExploreSignupForm = () => {
   );
 };
 
-export default ExploreSignupForm;
+export default LoginForm;
