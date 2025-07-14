@@ -72,7 +72,7 @@ export async function signup(state: any, formData: FormData) {
   await createSession(user.id, user.role);
 
   // redirect the user to appropriate page
-  redirect("/dashboard");
+  redirect("/dashboard/provider");
 }
 
 // login action
@@ -106,7 +106,7 @@ export async function login(state: any, formData: FormData) {
     return {
       errors: {
         email: {
-          message: "Email is not valid exists",
+          message: "Email does not exist",
         },
       },
     };
