@@ -71,13 +71,19 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
             <li className="cursor-pointer hover:text-gray-200 transition-all">
-              Features
+              <Link href="#why-us" >
+                Features
+              </Link>
             </li>
             <li className="cursor-pointer hover:text-gray-200 transition-all">
-              Customer Reviews
+              <Link href="#customer-reviews">
+                Customer Reviews
+              </Link>
             </li>
             <li className="cursor-pointer hover:text-gray-200 transition-all">
-              About
+              <Link href="/about">
+                About
+              </Link> 
             </li>
           </ul>
           <NavButtons />

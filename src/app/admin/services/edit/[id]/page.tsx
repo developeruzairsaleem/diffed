@@ -13,12 +13,15 @@ export default function EditServicePage() {
   const params = useParams()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(true)
+  const [service, setService] = useState<any>(null)
 
   useEffect(() => {
     const fetchService = async () => {
       try {
         const response = await fetch(`/api/services/${params.id}`)
-        const service = await response.json()
+        const service = await response.json();
+        console.log('service fetch data: ', service)
+        setService(service)
         form.setFieldsValue(service)
       } catch (error) {
         console.error('Error fetching service:', error)
@@ -36,12 +39,16 @@ export default function EditServicePage() {
     const formData = new FormData()
     formData.append('title', values.title)
     formData.append('description', values.description)
-    
+    formData.append('image', values.image)
     await updateService(params.id as string, formData)
   }
 
   if (loading) {
     return <div>Loading...</div>
+  }
+
+  if (!service) {
+    return <div>No service found.</div>
   }
 
   return (
@@ -53,33 +60,31 @@ export default function EditServicePage() {
           </Button>
         </Link>
       </div>
-      
       <Card title="Edit Service">
         <Form
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
           style={{ maxWidth: 600 }}
+          initialValues={service}
         >
+          <Form.Item label='image' name='image'>
+            <Input placeholder='Enter image url' />
+          </Form.Item>
           <Form.Item
             label="Title"
             name="title"
-            rules={[{ required: true, message: 'Please input the service title!' }]}
+            
           >
             <Input placeholder="Enter service title" />
           </Form.Item>
-
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: 'Please input the service description!' }]}
+            
           >
-            <TextArea 
-              rows={4} 
-              placeholder="Enter service description" 
-            />
+            <TextArea rows={4} placeholder="Enter service description" />
           </Form.Item>
-
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Service
