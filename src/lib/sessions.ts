@@ -54,7 +54,7 @@ export async function updateSession() {
     httpOnly: true,
     secure: true,
     path: "/",
-    expires,
+    expires: expires,
     sameSite: "lax",
   });
 }

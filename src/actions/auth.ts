@@ -1,3 +1,4 @@
+"use server";
 import { LoginFormSchema, SignupFormSchema } from "@/lib/definitions";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/sessions";
