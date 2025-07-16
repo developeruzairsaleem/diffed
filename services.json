@@ -1,0 +1,572 @@
+[
+  {
+    "name": "Valorant",
+    "icon": "🎯",
+    "packages": [
+      {
+        "category": "Bundles",
+        "description": "Play 3/5/8 hours with our top rated players.",
+        "items": [
+          {
+            "id": "spike_run",
+            "name": "Spike Run",
+            "duration": "3h",
+            "price": 35,
+            "description": "Short and intense 3-hour gameplay session for improving specific areas like aim, utility usage, or map sense.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "agent_ascension",
+            "name": "Agent Ascension",
+            "duration": "5h",
+            "price": 55,
+            "description": "A mid-range session great for deeper coaching, refining mechanics, and understanding advanced strategies.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "ranked_overload",
+            "name": "Ranked Overload",
+            "duration": "8h",
+            "price": 75,
+            "description": "Long coaching/boosting block ideal for serious rank grind or tournament prep — high intensity.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Teammates",
+        "description": "Get team coaching from our top rated players.",
+        "items": [
+          {
+            "id": "duo_pack",
+            "name": "Duo Pack",
+            "duration": null,
+            "price": 7,
+            "description": "Queue up and play ranked/casual matches alongside a pro — real-time guidance and support.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "trio_pack",
+            "name": "Trio Pack",
+            "duration": null,
+            "price": 14,
+            "description": "Three-player pack — ideal for practicing coordination or duo-trio queue with experienced players.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "flex_pack",
+            "name": "Flex Pack",
+            "duration": null,
+            "price": 7,
+            "description": "A flexible option where the player might rotate among roles or teammates for broader exposure.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Coaching",
+        "description": "Get team coaching from our top rated players.",
+        "items": [
+          {
+            "id": "solo_coaching",
+            "name": "Solo Coaching",
+            "duration": null,
+            "price": 13,
+            "description": "One-on-one coaching session focused on personal development, reviewing past games, or live guidance.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "team_coaching",
+            "name": "Team Coaching",
+            "duration": null,
+            "price": 25,
+            "description": "Group coaching for full squads — includes strategy, communication drills, and role assignments.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "League of Legends",
+    "icon": "🧙‍♂️",
+    "packages": [
+      {
+        "category": "Bundles",
+        "description": "Play 3/5/8 hours with our top rated players.",
+        "items": [
+          {
+            "id": "bronze_breaker",
+            "name": "Bronze Breaker",
+            "duration": "3h",
+            "price": 30,
+            "description": "A quick entry session with pros to help you break out of Bronze and fix basic gameplay patterns.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "elo_elevation",
+            "name": "Elo Elevation",
+            "duration": "5h",
+            "price": 45,
+            "description": "Mid-length session focused on improving your in-game decision-making and teamfighting for faster rank progression.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "lp_ascension",
+            "name": "LP Ascension",
+            "duration": "8h",
+            "price": 70,
+            "description": "An extended session tailored for serious climbers looking to stack LP fast with full coaching or duo play.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Teammates",
+        "description": "Play with our top rated players.",
+        "items": [
+          {
+            "id": "duo_pack",
+            "name": "Duo",
+            "duration": null,
+            "price": 7,
+            "description": "Queue up with a pro to learn real-time decision making while improving your solo queue performance.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "flex_pack",
+            "name": "Flex",
+            "duration": null,
+            "price": 7,
+            "description": "Play with pros in Flex Queue — gain experience with full-team coordination and rotational play.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Coaching",
+        "description": "Get team coaching from our top rated players.",
+        "items": [
+          {
+            "id": "coaching_solo",
+            "name": "Coaching",
+            "duration": null,
+            "price": 13,
+            "description": "1-on-1 strategic and mechanical improvement session including VOD review, laning focus, and macro play.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "team_coaching",
+            "name": "Team Coaching",
+            "duration": null,
+            "price": 25,
+            "description": "Group coaching for pre-made teams focusing on synergy, communication, and competitive performance.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Marvel Rivals",
+    "icon": "🦸‍♂️",
+    "packages": [
+      {
+        "category": "Bundles",
+        "description": "Play 3/5/8 hours with our top rated players.",
+        "items": [
+          {
+            "id": "power_spike",
+            "name": "Power Spike",
+            "duration": "3h",
+            "price": 40,
+            "description": "A quick 3-hour session focused on getting immediate performance boosts or game understanding.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "omega_carry",
+            "name": "Omega Carry",
+            "duration": "5h",
+            "price": 80,
+            "description": "Extended play with pros for rank pushing or improving mechanical skills and rotations.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "endgame_boost",
+            "name": "Endgame Boost",
+            "duration": "8h",
+            "price": 120,
+            "description": "Long boost/grind session designed for end-of-season rank goals or mastery in high-tier matches.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Teammates",
+        "description": "Play with our top rated players.",
+        "items": [
+          {
+            "id": "duo",
+            "name": "Duo",
+            "duration": null,
+            "price": 4,
+            "description": "Partner with a pro for real-time synergy, decision making, and win streaks.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "flex",
+            "name": "Flex",
+            "duration": null,
+            "price": 4,
+            "description": "Play flex roles with skilled players to adapt to different styles and strategies.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Coaching",
+        "description": "Get team coaching from our top rated players.",
+        "items": [
+          {
+            "id": "coaching_solo",
+            "name": "Coaching",
+            "duration": null,
+            "price": 9,
+            "description": "One-on-one coaching to elevate your Marvel Rivals gameplay and understand meta mechanics.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "team_coaching",
+            "name": "Team Coaching",
+            "duration": null,
+            "price": 18,
+            "description": "Train your squad with pro-level strategies, communication, and map control techniques.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Rank Ups",
+        "description": "Extra rank up multipliers on top of base services.",
+        "items": [
+          {
+            "id": "rankup_plat",
+            "name": "Plat",
+            "duration": null,
+            "price": 5,
+            "description": "An additional fee for boosting into Platinum tier due to higher difficulty and effort.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "rankup_diamond",
+            "name": "Diamond",
+            "duration": null,
+            "price": 10,
+            "description": "Challenging tier that requires additional performance and knowledge — hence, premium add-on.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "rankup_grandmaster",
+            "name": "Grandmaster",
+            "duration": null,
+            "price": 15,
+            "description": "Elite skill level gameplay — requires specialized boosters with game mastery.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "rankup_eternity",
+            "name": "Eternity",
+            "duration": null,
+            "price": 35,
+            "description": "Top-tier elite service for one of the rarest ranks in the game — extremely intensive.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "rankup_one_above_all",
+            "name": "One Above All",
+            "duration": null,
+            "price": 40,
+            "description": "The pinnacle of Marvel Rivals ranking — requires full attention from top-tier pros.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Fortnite",
+    "icon": "🏆",
+    "packages": [
+      {
+        "category": "Bundles",
+        "description": "Play 3/5/8 hours with our top rated players.",
+        "items": [
+          {
+            "id": "arena_rush",
+            "name": "Arena Rush",
+            "duration": "3h",
+            "price": 40,
+            "description": "Quick 3-hour session focused on Arena ranking with a pro — perfect for fast-paced progress.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "elite_push",
+            "name": "Elite Push",
+            "duration": "5h",
+            "price": 75,
+            "description": "Medium-length session designed for grinding through divisions or prepping for cash cups.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "fncs_prep",
+            "name": "FNCS Prep",
+            "duration": "8h",
+            "price": 100,
+            "description": "Comprehensive 8-hour prep session tailored for Fortnite Champion Series qualifiers and high-level play.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Teammates",
+        "description": "Play with our top rated players.",
+        "items": [
+          {
+            "id": "squad_duo",
+            "name": "Squad/Duo",
+            "duration": "45m",
+            "price": 10,
+            "description": "Join a squad or duo with a pro for 45 minutes of high-pressure scrims or ranked queue experience.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      },
+      {
+        "category": "Coaching",
+        "description": "Get team coaching from our top rated players.",
+        "items": [
+          {
+            "id": "solo_coaching",
+            "name": "Coaching",
+            "duration": "45m",
+            "price": 13,
+            "description": "One-on-one Fortnite coaching session including drop pathing, edit training, and strategy planning.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "team_coaching",
+            "name": "Team Coaching",
+            "duration": "45m",
+            "price": 25,
+            "description": "Team coaching for trios or squads — improve rotations, synergy, box fighting, and endgame decisions.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CS2",
+    "icon": "🔫",
+    "packages": [
+      {
+        "category": "Bundles",
+        "description": "Boost your CS2 Premier ELO with our elite players. Choose your current and desired ELO to estimate cost.",
+        "items": [
+          {
+            "id": "elo_boosting",
+            "name": "ELO Boosting",
+            "dynamicPricing": true,
+            "basePricePerELO": 0.25,
+            "minELO": 0,
+            "maxELO": 30000,
+            "description": "Dynamic pricing based on ELO gap. Select your current and target ELO using sliders to get an estimate."
+          }
+        ]
+      },
+      {
+        "category": "Coaching",
+        "description": "Get coaching from our top rated players.",
+        "items": [
+          {
+            "id": "coaching",
+            "name": "Coaching",
+            "duration": null,
+            "price": 15,
+            "description": "One-on-one session focused on aim, game sense, and peeking strategies for CS2.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "team_coaching",
+            "name": "Team Coaching",
+            "duration": null,
+            "price": 25,
+            "description": "Full-squad coaching for smokes, entry setups, callouts, and map control.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Gamer Girl",
+    "icon": "💖",
+    "packages": [
+      {
+        "category": "Play Session per Game",
+        "description": "Chill and meet our top rated gamer girls",
+        "items": [
+          {
+            "id": "lol_session",
+            "name": "League of Legends",
+            "duration": null,
+            "price": 6,
+            "description": "Play a chill League of Legends session with one of our top-rated gamer girls and enjoy casual banter and support.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "valorant_session",
+            "name": "Valorant",
+            "duration": null,
+            "price": 5,
+            "description": "Spend a relaxed session in Valorant, queuing with a gamer girl who brings good vibes and helpful callouts.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "marvel_rivals_session",
+            "name": "Marvel Rivals",
+            "duration": null,
+            "price": 4,
+            "description": "Team up in Marvel Rivals for fun matches while casually chatting with one of our rated gamer girls.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          },
+          {
+            "id": "fortnite_session",
+            "name": "Fortnite",
+            "duration": null,
+            "price": 6,
+            "description": "Drop in Fortnite squads or duos for a cozy session with gamer girls — chill, build, and vibe.",
+            "dynamicPricing": false,
+            "basePricePerELO": null,
+            "minELO": null,
+            "maxELO": null
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,127 @@
+{
+  "valorant": {
+    "name": "Valorant",
+    "icon": "🎯",
+    "ranks": [
+      { "id": "iron1", "name": "Iron I", "price": 15 },
+      { "id": "iron2", "name": "Iron II", "price": 18 },
+      { "id": "iron3", "name": "Iron III", "price": 20 },
+      { "id": "bronze1", "name": "Bronze I", "price": 25 },
+      { "id": "bronze2", "name": "Bronze II", "price": 28 },
+      { "id": "bronze3", "name": "Bronze III", "price": 30 },
+      { "id": "silver1", "name": "Silver I", "price": 35 },
+      { "id": "silver2", "name": "Silver II", "price": 38 },
+      { "id": "silver3", "name": "Silver III", "price": 40 },
+      { "id": "gold1", "name": "Gold I", "price": 45 },
+      { "id": "gold2", "name": "Gold II", "price": 48 },
+      { "id": "gold3", "name": "Gold III", "price": 50 },
+      { "id": "platinum1", "name": "Platinum I", "price": 60 },
+      { "id": "platinum2", "name": "Platinum II", "price": 65 },
+      { "id": "platinum3", "name": "Platinum III", "price": 70 },
+      { "id": "diamond1", "name": "Diamond I", "price": 80 },
+      { "id": "diamond2", "name": "Diamond II", "price": 85 },
+      { "id": "diamond3", "name": "Diamond III", "price": 90 },
+      { "id": "ascendant1", "name": "Ascendant I", "price": 100 },
+      { "id": "ascendant2", "name": "Ascendant II", "price": 110 },
+      { "id": "ascendant3", "name": "Ascendant III", "price": 120 },
+      { "id": "immortal1", "name": "Immortal I", "price": 140 },
+      { "id": "immortal2", "name": "Immortal II", "price": 150 },
+      { "id": "immortal3", "name": "Immortal III", "price": 160 },
+      { "id": "radiant", "name": "Radiant", "price": 200 }
+    ]
+  },
+  "fortnite": {
+    "name": "Fortnite",
+    "icon": "🏆",
+    "ranks": [
+      { "id": "bronze1", "name": "Bronze I", "price": 20 },
+      { "id": "bronze2", "name": "Bronze II", "price": 23 },
+      { "id": "bronze3", "name": "Bronze III", "price": 25 },
+      { "id": "silver1", "name": "Silver I", "price": 28 },
+      { "id": "silver2", "name": "Silver II", "price": 30 },
+      { "id": "silver3", "name": "Silver III", "price": 33 },
+      { "id": "gold1", "name": "Gold I", "price": 35 },
+      { "id": "gold2", "name": "Gold II", "price": 38 },
+      { "id": "gold3", "name": "Gold III", "price": 40 },
+      { "id": "platinum1", "name": "Platinum I", "price": 45 },
+      { "id": "platinum2", "name": "Platinum II", "price": 50 },
+      { "id": "platinum3", "name": "Platinum III", "price": 55 },
+      { "id": "diamond", "name": "Diamond", "price": 65 },
+      { "id": "elite", "name": "Elite", "price": 70 },
+      { "id": "champion", "name": "Champion", "price": 90 },
+      { "id": "unreal", "name": "Unreal", "price": 120 }
+    ]
+  },
+  "cs2": {
+    "name": "CS2",
+    "icon": "💣",
+    "ranks": [
+      { "id": "silver1", "name": "Silver I", "price": 20 },
+      { "id": "silver2", "name": "Silver II", "price": 25 },
+      { "id": "silver3", "name": "Silver III", "price": 30 },
+      { "id": "goldnova1", "name": "Gold Nova I", "price": 35 },
+      { "id": "goldnova2", "name": "Gold Nova II", "price": 40 },
+      { "id": "mg1", "name": "Master Guardian I", "price": 50 },
+      { "id": "mg2", "name": "Master Guardian II", "price": 55 },
+      { "id": "dmge", "name": "Distinguished Master Guardian", "price": 60 },
+      { "id": "le", "name": "Legendary Eagle", "price": 70 },
+      { "id": "lem", "name": "Legendary Eagle Master", "price": 80 },
+      { "id": "supreme", "name": "Supreme Master First Class", "price": 90 },
+      { "id": "global", "name": "Global Elite", "price": 120 }
+    ]
+  },
+  "league_of_legends": {
+    "name": "League of Legends",
+    "icon": "🧠",
+    "ranks": [
+      { "id": "iron4", "name": "Iron IV", "price": 15 },
+      { "id": "iron3", "name": "Iron III", "price": 18 },
+      { "id": "iron2", "name": "Iron II", "price": 20 },
+      { "id": "iron1", "name": "Iron I", "price": 22 },
+      { "id": "bronze4", "name": "Bronze IV", "price": 25 },
+      { "id": "bronze3", "name": "Bronze III", "price": 28 },
+      { "id": "bronze2", "name": "Bronze II", "price": 30 },
+      { "id": "bronze1", "name": "Bronze I", "price": 33 },
+      { "id": "silver4", "name": "Silver IV", "price": 35 },
+      { "id": "silver3", "name": "Silver III", "price": 38 },
+      { "id": "silver2", "name": "Silver II", "price": 40 },
+      { "id": "silver1", "name": "Silver I", "price": 43 },
+      { "id": "gold4", "name": "Gold IV", "price": 45 },
+      { "id": "gold3", "name": "Gold III", "price": 48 },
+      { "id": "gold2", "name": "Gold II", "price": 50 },
+      { "id": "gold1", "name": "Gold I", "price": 53 },
+      { "id": "platinum4", "name": "Platinum IV", "price": 60 },
+      { "id": "platinum3", "name": "Platinum III", "price": 65 },
+      { "id": "platinum2", "name": "Platinum II", "price": 70 },
+      { "id": "platinum1", "name": "Platinum I", "price": 75 },
+      { "id": "diamond4", "name": "Diamond IV", "price": 85 },
+      { "id": "diamond3", "name": "Diamond III", "price": 90 },
+      { "id": "diamond2", "name": "Diamond II", "price": 95 },
+      { "id": "diamond1", "name": "Diamond I", "price": 100 },
+      { "id": "master", "name": "Master", "price": 120 },
+      { "id": "grandmaster", "name": "Grandmaster", "price": 150 },
+      { "id": "challenger", "name": "Challenger", "price": 200 }
+    ]
+  },
+  "marvel_rivals": {
+    "name": "Marvel Rivals",
+    "icon": "🦸",
+    "ranks": [
+      { "id": "rookie", "name": "Rookie", "price": 10 },
+      { "id": "pro", "name": "Pro", "price": 30 },
+      { "id": "elite", "name": "Elite", "price": 60 },
+      { "id": "legend", "name": "Legend", "price": 90 }
+    ]
+  },
+  "gamer_girl": {
+    "name": "Gamer Girl",
+    "icon": "🎮",
+    "ranks": [
+      { "id": "noob", "name": "Noob", "price": 5 },
+      { "id": "rookie", "name": "Rookie", "price": 10 },
+      { "id": "pro", "name": "Pro", "price": 25 },
+      { "id": "queen", "name": "Queen", "price": 40 },
+      { "id": "goddess", "name": "Goddess", "price": 60 }
+    ]
+  }
+}
