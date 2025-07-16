@@ -2,6 +2,7 @@
   {
     "isEloBased": false,
     "name": "Valorant",
+    "image": "/images/valorant.svg",
     "icon": "🎯",
     "ranks": [
       { "id": "iron1", "name": "Iron I", "price": 15 },
@@ -33,6 +34,7 @@
   },
   {
     "isEloBased": false,
+    "image": "/images/fortnite.svg",
     "name": "Fortnite",
     "icon": "🏆",
     "ranks": [
@@ -57,6 +59,7 @@
   {
     "isEloBased": true,
     "name": "CS2",
+    "image": "/images/cs2.svg",
     "icon": "💣",
     "ranks": [
       { "id": "silver1", "name": "Silver I", "price": 20 },
@@ -76,6 +79,7 @@
   {
     "isEloBased": false,
     "name": "League of Legends",
+    "image": "/images/league-of-legends.svg",
     "icon": "🧠",
     "ranks": [
       { "id": "iron4", "name": "Iron IV", "price": 15 },
@@ -110,6 +114,7 @@
   {
     "isEloBased": false,
     "name": "Marvel Rivals",
+    "image": "/images/marvel-rivals.svg",
     "icon": "🦸",
     "ranks": [
       { "id": "rookie", "name": "Rookie", "price": 10 },
@@ -121,6 +126,7 @@
   {
     "isEloBased": false,
     "name": "Gamer Girl",
+    "image": "/images/gamer-girl.svg",
     "icon": "🎮",
     "ranks": [
       { "id": "noob", "name": "Noob", "price": 5 },

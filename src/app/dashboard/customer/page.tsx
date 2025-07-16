@@ -37,6 +37,7 @@ import {
   Filter,
   MoreVertical,
   Home,
+  Gamepad2,
   LogOut,
 } from "lucide-react";
 import GamesComponent from "./_components/Games";
@@ -1067,7 +1068,7 @@ const Dashboard = () => {
                     activeTab === "games" ? "rgba(255, 255, 255, 0.15)" : "",
                 }}
               >
-                <Home className="w-5 h-5" />
+                <Gamepad2 className="w-5 h-5" />
                 <span>Games</span>
               </button>
 
