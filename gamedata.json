@@ -1,5 +1,6 @@
-{
-  "valorant": {
+[
+  {
+    "isEloBased": false,
     "name": "Valorant",
     "icon": "🎯",
     "ranks": [
@@ -30,7 +31,8 @@
       { "id": "radiant", "name": "Radiant", "price": 200 }
     ]
   },
-  "fortnite": {
+  {
+    "isEloBased": false,
     "name": "Fortnite",
     "icon": "🏆",
     "ranks": [
@@ -52,7 +54,8 @@
       { "id": "unreal", "name": "Unreal", "price": 120 }
     ]
   },
-  "cs2": {
+  {
+    "isEloBased": true,
     "name": "CS2",
     "icon": "💣",
     "ranks": [
@@ -70,7 +73,8 @@
       { "id": "global", "name": "Global Elite", "price": 120 }
     ]
   },
-  "league_of_legends": {
+  {
+    "isEloBased": false,
     "name": "League of Legends",
     "icon": "🧠",
     "ranks": [
@@ -103,7 +107,8 @@
       { "id": "challenger", "name": "Challenger", "price": 200 }
     ]
   },
-  "marvel_rivals": {
+  {
+    "isEloBased": false,
     "name": "Marvel Rivals",
     "icon": "🦸",
     "ranks": [
@@ -113,7 +118,8 @@
       { "id": "legend", "name": "Legend", "price": 90 }
     ]
   },
-  "gamer_girl": {
+  {
+    "isEloBased": false,
     "name": "Gamer Girl",
     "icon": "🎮",
     "ranks": [
@@ -124,4 +130,4 @@
       { "id": "goddess", "name": "Goddess", "price": 60 }
     ]
   }
-}
+]

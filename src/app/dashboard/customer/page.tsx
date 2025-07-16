@@ -1,6 +1,9 @@
 "use client";
-
+import customers from "../../../../customers.json";
+import formatDate from "./_lib/format-date";
+import getStatusColor from "./_lib/get-status-color";
 import React, { useState } from "react";
+import OrdersTab from "./_components/OrdersTab";
 import {
   User,
   Wallet,
@@ -36,6 +39,10 @@ import {
   Home,
   LogOut,
 } from "lucide-react";
+import GamesComponent from "./_components/Games";
+import OverviewTab from "./_components/OverviewTab";
+import { lato, orbitron } from "@/fonts/fonts";
+import Image from "next/image";
 
 // Sample Data Structure
 const gamesData = {
@@ -273,22 +280,7 @@ const Dashboard = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showAddFunds, setShowAddFunds] = useState(false);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "completed":
-        return "text-green-600 bg-green-100";
-      case "in_progress":
-        return "text-blue-600 bg-blue-100";
-      case "pending":
-        return "text-yellow-600 bg-yellow-100";
-      case "cancelled":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="w-4 h-4" />;
@@ -302,310 +294,6 @@ const Dashboard = () => {
         return <AlertCircle className="w-4 h-4" />;
     }
   };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const OverviewTab = () => (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {sampleOrders.length}
-              </p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <Package className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Active Orders</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {sampleOrders.filter((o) => o.status === "in_progress").length}
-              </p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Activity className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {sampleOrders.filter((o) => o.status === "completed").length}
-              </p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900">
-                €{sampleOrders.reduce((sum, order) => sum + order.price, 0)}
-              </p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <DollarSign className="w-6 h-6 text-yellow-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Orders */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <Clock className="w-5 h-5 mr-2" />
-            Recent Orders
-          </h3>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            {sampleOrders.slice(0, 3).map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="text-2xl">{gamesData[order.game].icon}</div>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      {gamesData[order.game].name} -{" "}
-                      {services[order.service].name}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {
-                        gamesData[order.game].ranks.find(
-                          (r) => r.id === order.currentRank
-                        )?.name
-                      }{" "}
-                      →{" "}
-                      {
-                        gamesData[order.game].ranks.find(
-                          (r) => r.id === order.targetRank
-                        )?.name
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center space-x-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full flex items-center space-x-1 ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {getStatusIcon(order.status)}
-                      <span className="capitalize">
-                        {order.status.replace("_", " ")}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    €{order.price}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const OrdersTab = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Orders</h2>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search orders..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-          </div>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-            <Filter className="w-4 h-4" />
-            <span>Filter</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Order ID
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Game & Service
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Rank Progress
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Booster
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Status
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Price
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Date
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-900">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {sampleOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 font-mono text-sm text-gray-600">
-                    {order.id}
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-xl">
-                        {gamesData[order.game].icon}
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {gamesData[order.game].name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {services[order.service].name}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="text-sm">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-gray-600">
-                          {
-                            gamesData[order.game].ranks.find(
-                              (r) => r.id === order.currentRank
-                            )?.name
-                          }
-                        </span>
-                        <ArrowUpDown className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-900 font-medium">
-                          {
-                            gamesData[order.game].ranks.find(
-                              (r) => r.id === order.targetRank
-                            )?.name
-                          }
-                        </span>
-                      </div>
-                      {order.status === "in_progress" && (
-                        <div className="mt-2">
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${order.progress}%` }}
-                            ></div>
-                          </div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            {order.progress}% complete
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="text-xl">
-                        {boosters.find((b) => b.name === order.booster)?.avatar}
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {order.booster}
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                          <span className="text-xs text-gray-500">
-                            {
-                              boosters.find((b) => b.name === order.booster)
-                                ?.rating
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full flex items-center space-x-1 w-fit ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {getStatusIcon(order.status)}
-                      <span className="capitalize">
-                        {order.status.replace("_", " ")}
-                      </span>
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 font-semibold text-gray-900">
-                    €{order.price}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-500">
-                    {formatDate(order.createdAt)}
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="p-1 text-gray-400 hover:text-purple-600"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="p-1 text-gray-400 hover:text-purple-600">
-                        <MessageCircle className="w-4 h-4" />
-                      </button>
-                      <button className="p-1 text-gray-400 hover:text-purple-600">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
   const WalletTab = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -1312,28 +1000,33 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen ">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <Trophy className="w-5 h-5 text-white" />
+              <div className="flex items-center space-x-4">
+                <Image src="/logo/logo.png" width="80" height="80" />
+                <div
+                  className={`text-2xl uppercase ${orbitron.className} font-bold text-white`}
+                >
+                  Diffed.gg
                 </div>
-                <div className="text-xl font-bold text-gray-900">RankBoost</div>
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-purple-50 px-3 py-1 rounded-full">
-                <Wallet className="w-4 h-4 text-purple-600" />
-                <span className="text-sm font-medium text-purple-600">
+              <div
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+                className="flex items-center space-x-2 px-3 py-1 rounded-full"
+              >
+                <Wallet className="w-4 h-4 text-white" />
+                <span className="text-sm font-medium text-white">
                   €{walletBalance}
                 </span>
               </div>
-              <button className="p-2 text-gray-400 hover:text-gray-600 relative">
+              <button className="p-2 text-white hover:text-gray-100 cursor-pointer relative">
                 <Bell className="w-5 h-5" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
               </button>
@@ -1341,8 +1034,8 @@ const Dashboard = () => {
                 <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-gray-600" />
                 </div>
-                <span className="text-sm font-medium text-gray-900">
-                  GameMaster_2024
+                <span className="text-md font-medium font-semibold text-gray-100">
+                  {customers[0].username}
                 </span>
               </div>
             </div>
@@ -1357,23 +1050,34 @@ const Dashboard = () => {
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left ${
-                  activeTab === "overview"
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`w-full  cursor-pointer flex items-center space-x-3 px-4 py-2 rounded-lg text-white text-left `}
+                style={{
+                  backgroundColor:
+                    activeTab === "overview" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
               >
                 <Home className="w-5 h-5" />
                 <span>Overview</span>
               </button>
+              <button
+                onClick={() => setActiveTab("games")}
+                className={`w-full  cursor-pointer flex items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
+                style={{
+                  backgroundColor:
+                    activeTab === "games" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
+              >
+                <Home className="w-5 h-5" />
+                <span>Games</span>
+              </button>
 
               <button
                 onClick={() => setActiveTab("orders")}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left ${
-                  activeTab === "orders"
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`w-full  cursor-pointer flex items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
+                style={{
+                  backgroundColor:
+                    activeTab === "orders" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
               >
                 <Package className="w-5 h-5" />
                 <span>Orders</span>
@@ -1381,11 +1085,11 @@ const Dashboard = () => {
 
               <button
                 onClick={() => setActiveTab("wallet")}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left ${
-                  activeTab === "wallet"
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`w-full  cursor-pointer flex items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
+                style={{
+                  backgroundColor:
+                    activeTab === "wallet" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
               >
                 <Wallet className="w-5 h-5" />
                 <span>Wallet</span>
@@ -1393,11 +1097,11 @@ const Dashboard = () => {
 
               <button
                 onClick={() => setActiveTab("reviews")}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left ${
-                  activeTab === "reviews"
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`w-full  cursor-pointer flex items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
+                style={{
+                  backgroundColor:
+                    activeTab === "reviews" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
               >
                 <Star className="w-5 h-5" />
                 <span>Reviews</span>
@@ -1405,11 +1109,11 @@ const Dashboard = () => {
 
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left ${
-                  activeTab === "settings"
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`w-full flex cursor-pointer items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
+                style={{
+                  backgroundColor:
+                    activeTab === "settings" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
               >
                 <Settings className="w-5 h-5" />
                 <span>Settings</span>
@@ -1417,9 +1121,16 @@ const Dashboard = () => {
             </nav>
 
             <div className="pt-4 border-t border-gray-200">
-              <button className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left text-gray-600 hover:bg-gray-100">
+              <button
+                className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left      className={` ${lato.className} relative cursor-pointer group
+            bg-gradient-to-r from-pink-500 gap-3 via-purple-500 to-cyan-400
+            transition-all
+            hover:scale-105
+            rounded-4xl
+          `}"
+              >
                 <LogOut className="w-5 h-5" />
-                <span>Sign Out</span>
+                Logout
               </button>
             </div>
           </div>
@@ -1427,7 +1138,10 @@ const Dashboard = () => {
           {/* Main Content */}
           <div className="flex-1">
             {activeTab === "overview" && <OverviewTab />}
-            {activeTab === "orders" && <OrdersTab />}
+            {activeTab === "games" && <GamesComponent />}
+            {activeTab === "orders" && (
+              <OrdersTab setSelectedOrder={setSelectedOrder} />
+            )}
             {activeTab === "wallet" && <WalletTab />}
             {activeTab === "reviews" && <ReviewsTab />}
             {activeTab === "settings" && <SettingsTab />}

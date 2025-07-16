@@ -1,0 +1,85 @@
+[
+  {
+    "id": "cb_001",
+    "name": "ViperGod",
+    "role": "booster",
+    "avatar": "🦂",
+    "rating": 4.9,
+    "experienceYears": 4,
+    "languages": ["English", "Urdu"],
+    "games": ["Valorant", "Fortnite", "Marvel Rivals"],
+    "specialties": ["Rank Boosting", "Bundles", "Duo Queue"],
+    "currentStatus": "available",
+    "completedOrders": 172,
+    "averageCompletionTimeHrs": 2.5,
+    "priorityLevel": "high",
+    "bio": "Radiant booster with tournament experience. Fastest boost from Silver to Immortal within 3 days.",
+    "packagesHandled": [
+      "agent_ascension",
+      "ranked_overload",
+      "duo_pack",
+      "flex_pack"
+    ]
+  },
+  {
+    "id": "cb_002",
+    "name": "MacroQueen",
+    "role": "coach",
+    "avatar": "🧠",
+    "rating": 4.8,
+    "experienceYears": 6,
+    "languages": ["English", "German"],
+    "games": ["League of Legends", "Valorant"],
+    "specialties": ["Solo Coaching", "Team Coaching", "Strategy Planning"],
+    "currentStatus": "busy",
+    "completedOrders": 210,
+    "averageCompletionTimeHrs": 1.8,
+    "priorityLevel": "elite",
+    "bio": "League veteran & Diamond coach — known for developing players from Gold to Masters in under a month.",
+    "packagesHandled": [
+      "solo_coaching",
+      "team_coaching",
+      "bronze_breaker",
+      "elo_elevation"
+    ]
+  },
+  {
+    "id": "cb_003",
+    "name": "KawaiiSniper",
+    "role": "gamer_girl",
+    "avatar": "🎀",
+    "rating": 5.0,
+    "experienceYears": 3,
+    "languages": ["English", "Japanese"],
+    "games": ["Valorant", "LoL", "Fortnite", "Marvel Rivals"],
+    "specialties": ["Chill Play", "Teammates", "Play Session per Game"],
+    "currentStatus": "available",
+    "completedOrders": 93,
+    "averageCompletionTimeHrs": 1.0,
+    "priorityLevel": "normal",
+    "bio": "Soft-spoken with great aim and strategy sense. Perfect for casual and relaxing play sessions.",
+    "packagesHandled": [
+      "lol_session",
+      "fortnite_session",
+      "marvel_rivals_session",
+      "valorant_session"
+    ]
+  },
+  {
+    "id": "cb_004",
+    "name": "CS2ProFessor",
+    "role": "coach",
+    "avatar": "🎯",
+    "rating": 4.6,
+    "experienceYears": 5,
+    "languages": ["English", "Russian"],
+    "games": ["CS2"],
+    "specialties": ["Aim Training", "Demo Review", "Rank Strategy"],
+    "currentStatus": "offline",
+    "completedOrders": 148,
+    "averageCompletionTimeHrs": 2.2,
+    "priorityLevel": "medium",
+    "bio": "Former ESEA main league player — helps players break 2K ELO barrier with structured aim & game sense drills.",
+    "packagesHandled": ["elo_boost", "cs2_team_coaching", "cs2_demo_analysis"]
+  }
+]
