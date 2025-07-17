@@ -1,0 +1,218 @@
+[
+    {
+      "id": "cus_uzair123",
+      "username": "UzairX",
+      "email": "uzair@example.com",
+      "avatar": "🧠",
+      "joinedAt": "2024-08-10T12:00:00Z",
+      "preferredLanguage": "English",
+      "country": "Pakistan",
+      "wallet": {
+        "balance": 30,
+        "currency": "USD",
+        "transactions": [
+          {
+            "id": "txn_001",
+            "type": "topup",
+            "amount": 50,
+            "date": "2025-07-01T15:00:00Z",
+            "status": "completed"
+          },
+          {
+            "id": "txn_002",
+            "type": "purchase",
+            "amount": -20,
+            "packageId": "agent_ascension",
+            "game": "Valorant",
+            "date": "2025-07-02T17:00:00Z",
+            "status": "completed"
+          }
+        ]
+      },
+      "orders": [
+        {
+          "orderId": "ord_001",
+          "game": "Valorant",
+          "packageType": "Bundles",
+          "packageId": "agent_ascension",
+          "packageName": "Agent Ascension",
+          "duration": "5h",
+          "price": 20,
+          "status": "completed",
+          "scheduledAt": "2025-07-03T17:00:00Z",
+          "completedAt": "2025-07-03T22:00:00Z",
+          "boosterId": "cb_001",
+          "feedback": {
+            "rating": 5,
+            "review": "Fast boost and great communication!"
+          }
+        }
+      ],
+      "reviewsGiven": [
+        {
+          "boosterId": "cb_001",
+          "orderId": "ord_001",
+          "rating": 5,
+          "comment": "Pro player. Quick service!"
+        }
+      ],
+      "referrals": {
+        "referralCode": "UZAIREF50",
+        "invitedUsers": ["cus_john445"],
+        "rewardsEarned": 10
+      },
+      "preferences": {
+        "games": ["Valorant", "League of Legends"],
+        "roles": ["Duelist"],
+        "notifications": {
+          "email": true,
+          "sms": false,
+          "inApp": true
+        }
+      }
+    },
+    {
+      "id": "cus_john445",
+      "username": "Deadshot",
+      "email": "john@example.com",
+      "avatar": "🎯",
+      "joinedAt": "2025-03-22T10:30:00Z",
+      "preferredLanguage": "English",
+      "country": "UK",
+      "wallet": {
+        "balance": 0,
+        "currency": "USD",
+        "transactions": [
+          {
+            "id": "txn_005",
+            "type": "topup",
+            "amount": 25,
+            "date": "2025-06-15T13:00:00Z",
+            "status": "completed"
+          },
+          {
+            "id": "txn_006",
+            "type": "purchase",
+            "amount": -25,
+            "packageId": "duo_pack",
+            "game": "League of Legends",
+            "date": "2025-06-17T20:00:00Z",
+            "status": "completed"
+          }
+        ]
+      },
+      "orders": [
+        {
+          "orderId": "ord_003",
+          "game": "League of Legends",
+          "packageType": "Teammates",
+          "packageId": "duo_pack",
+          "packageName": "Duo",
+          "duration": "N/A",
+          "price": 25,
+          "status": "completed",
+          "scheduledAt": "2025-06-17T20:00:00Z",
+          "completedAt": "2025-06-17T21:00:00Z",
+          "boosterId": "cb_002",
+          "feedback": {
+            "rating": 4,
+            "review": "Great teammate, gave good tips!"
+          }
+        }
+      ],
+      "reviewsGiven": [
+        {
+          "boosterId": "cb_002",
+          "orderId": "ord_003",
+          "rating": 4,
+          "comment": "Chill session. Some lag but good overall."
+        }
+      ],
+      "referrals": {
+        "referralCode": "DSHOT99",
+        "invitedUsers": [],
+        "rewardsEarned": 0
+      },
+      "preferences": {
+        "games": ["League of Legends"],
+        "roles": ["Jungle"],
+        "notifications": {
+          "email": true,
+          "sms": true,
+          "inApp": false
+        }
+      }
+    },
+    {
+      "id": "cus_sara300",
+      "username": "SassQueen",
+      "email": "sara@example.com",
+      "avatar": "👑",
+      "joinedAt": "2025-01-10T09:00:00Z",
+      "preferredLanguage": "English",
+      "country": "USA",
+      "wallet": {
+        "balance": 12,
+        "currency": "USD",
+        "transactions": [
+          {
+            "id": "txn_010",
+            "type": "topup",
+            "amount": 18,
+            "date": "2025-07-04T11:00:00Z",
+            "status": "completed"
+          },
+          {
+            "id": "txn_011",
+            "type": "purchase",
+            "amount": -6,
+            "packageId": "fortnite_session",
+            "game": "Gamer Girl",
+            "date": "2025-07-05T12:00:00Z",
+            "status": "completed"
+          }
+        ]
+      },
+      "orders": [
+        {
+          "orderId": "ord_004",
+          "game": "Gamer Girl",
+          "packageType": "Play Session Per Game",
+          "packageId": "fortnite_session",
+          "packageName": "Fortnite Chill",
+          "duration": "1h",
+          "price": 6,
+          "status": "completed",
+          "scheduledAt": "2025-07-05T12:00:00Z",
+          "completedAt": "2025-07-05T13:00:00Z",
+          "boosterId": "cb_003",
+          "feedback": {
+            "rating": 5,
+            "review": "Super fun! Loved the vibes 🥰"
+          }
+        }
+      ],
+      "reviewsGiven": [
+        {
+          "boosterId": "cb_003",
+          "orderId": "ord_004",
+          "rating": 5,
+          "comment": "Loved the energy and vibe, def rebooking!"
+        }
+      ],
+      "referrals": {
+        "referralCode": "QUEENME",
+        "invitedUsers": [],
+        "rewardsEarned": 0
+      },
+      "preferences": {
+        "games": ["Gamer Girl", "Fortnite"],
+        "roles": ["Support", "Flex"],
+        "notifications": {
+          "email": false,
+          "sms": false,
+          "inApp": true
+        }
+      }
+    }
+  ]

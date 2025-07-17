@@ -167,10 +167,7 @@ model Customer {
   id                      String                  @id @default(cuid())
   userId                  String                  @unique
   user                    User                    @relation(fields: [userId], references: [id])
-  firstName               String?
-  lastName                String?
   customerType            CustomerType
-  gamingLevel             GamingLevel
   primaryGames            Json
   currentRanks            Json?
   gamingGoals             Json?
@@ -181,8 +178,6 @@ model Customer {
   communicationPreference CommunicationPreference @default(mixed)
   peakHours               Json?
   riskTolerance           RiskTolerance           @default(medium)
-  totalOrders             Int                     @default(0)
-  totalSpent              Decimal                 @default(0) @db.Decimal(12, 2)
   lifetimeValue           Decimal                 @default(0) @db.Decimal(12, 2)
   satisfactionScore       Decimal                 @default(0) @db.Decimal(3, 2)
   churnRiskScore          Decimal                 @default(0) @db.Decimal(3, 2)
