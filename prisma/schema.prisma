@@ -14,34 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  customer
-  provider
-}
-
-enum Status {
-  active
-  suspended
-  ban
-}
-
-model User {
-  id           String   @id @default(cuid())
-  username     String   @unique
-  email        String   @unique
-  password     String
-  role         Role
-  status       Status   @default(active)
-  profileImage String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  provider Provider? //add customer too when made
-  customer Customer?
-
-  @@map("users")
-}
-
 enum VerificationStatus {
   unverified
   pending
@@ -54,9 +26,82 @@ enum Availability {
   busy
 }
 
+enum CustomerType {
+  casual
+  competitive
+  professional
+  collector
+}
+
+enum GamingLevel {
+  beginner
+  intermediate
+  advanced
+  expert
+}
+
+enum BudgetRange {
+  low
+  medium
+  high
+  premium
+}
+
+enum ActivityPattern {
+  weekend_warrior
+  daily_grinder
+  casual_player
+  seasonal_player
+}
+
+enum LearningStyle {
+  visual
+  hands_on
+  analytical
+  social
+}
+
+enum TransactionType {
+  deposit
+  withdrawal
+  payment
+  refund
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  failed
+  cancelled
+}
+
+enum CommunicationPreference {
+  text_only
+  voice_chat
+  video_call
+  mixed
+}
+
+enum RiskTolerance {
+  low
+  medium
+  high
+}
+
 enum ProviderType {
   coach
   booster
+}
+
+enum Role {
+  customer
+  provider
+}
+
+enum Status {
+  active
+  suspended
+  ban
 }
 
 model Provider {
@@ -113,54 +158,6 @@ model ProviderService {
 
   //relations
   orders Order[]
-}
-
-enum CustomerType {
-  casual
-  competitive
-  professional
-  collector
-}
-
-enum GamingLevel {
-  beginner
-  intermediate
-  advanced
-  expert
-}
-
-enum BudgetRange {
-  low
-  medium
-  high
-  premium
-}
-
-enum ActivityPattern {
-  weekend_warrior
-  daily_grinder
-  casual_player
-  seasonal_player
-}
-
-enum LearningStyle {
-  visual
-  hands_on
-  analytical
-  social
-}
-
-enum CommunicationPreference {
-  text_only
-  voice_chat
-  video_call
-  mixed
-}
-
-enum RiskTolerance {
-  low
-  medium
-  high
 }
 
 model Customer {
@@ -268,4 +265,56 @@ model Review {
   name        String
 
   @@map("reviews")
+}
+
+model User {
+  id               String   @id @default(cuid())
+  username         String   @unique
+  email            String   @unique
+  password         String
+  role             Role
+  status           Status   @default(active)
+  stripeCustomerId String?  @map("stripe_customer_id")
+  profileImage     String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  provider Provider? //add customer too when made
+  customer Customer?
+  wallet   Wallet?
+
+  @@map("users")
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  balance   Decimal  @default(0.00) @db.Decimal(10, 2)
+  currency  String   @default("USD") @db.VarChar(3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  userId       String        @unique @map("user_id")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId], name: "idx_wallets_user_id")
+}
+
+model Transaction {
+  id                    String            @id @default(cuid())
+  walletId              String            @map("wallet_id")
+  type                  TransactionType
+  amount                Decimal           @db.Decimal(10, 2)
+  description           String?
+  stripePaymentIntentId String?           @map("stripe_payment_intent_id")
+  status                TransactionStatus @default(pending)
+  metadata              Json?
+  createdAt             DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId], name: "idx_transactions_wallet_id")
+  @@index([type], name: "idx_transactions_type")
+  @@index([status], name: "idx_transactions_status")
 }
