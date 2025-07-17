@@ -1001,7 +1001,7 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen max-h-screen overflow-hidden ">
       {/* Header */}
       <header className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1123,12 +1123,12 @@ const Dashboard = () => {
 
             <div className="pt-4 border-t border-gray-200">
               <button
-                className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left      className={` ${lato.className} relative cursor-pointer group
+                className={` w-full flex items-center justify-center py-4 ${lato.className} relative cursor-pointer group
             bg-gradient-to-r from-pink-500 gap-3 via-purple-500 to-cyan-400
             transition-all
             hover:scale-105
             rounded-4xl
-          `}"
+          `}
               >
                 <LogOut className="w-5 h-5" />
                 Logout
@@ -1137,7 +1137,14 @@ const Dashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div
+            style={{
+              maxHeight: "80vh",
+              minHeight: "80vh",
+              overflowY: "scroll",
+            }}
+            className="flex-1 scrollbar-hide"
+          >
             {activeTab === "overview" && <OverviewTab />}
             {activeTab === "games" && <GamesComponent />}
             {activeTab === "orders" && (
