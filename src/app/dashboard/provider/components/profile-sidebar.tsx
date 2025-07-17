@@ -11,7 +11,7 @@ const coach = coachData[0];
 
 export function ProfileSidebar() {
   return (
-    <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+    <Card className="bg-black/20 backdrop-blur-sm border-white/10 shadow-2xl">
       <CardContent className="p-6">
         <div className="text-center">
           <div className="relative inline-block">

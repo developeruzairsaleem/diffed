@@ -1,4 +1,5 @@
 import { lato, orbitron, poppins, roboto } from "@/fonts/fonts";
+import EarningChart from "./EarningChart";
 
 export default function Earning() {
   const earningHistory = [
@@ -42,7 +43,7 @@ export default function Earning() {
         <div className="flex md:flex-row flex-col gap-10">
           {/* left card */}
           <div
-            className={` ${orbitron.className} bg-[linear-gradient(90deg,_#EE2C81_0%,_#FE0FD0_60%,_#58B9E3_100%)] bg-opacity-50 h-fit rounded-lg lg:py-10 lg:px-16 md:py-5 md:px-8 pt-5 pb-24 px-8 font-bold text-[22px] lg:text-[27px] w-full md:w-1/2`}
+            className={` ${orbitron.className} bg-[linear-gradient(90deg,_#EE2C81_0%,_#FE0FD0_60%,_#58B9E3_100%)] bg-opacity-50 h-fit rounded-lg lg:py-10 lg:px-16 md:py-5 md:px-8 pt-5 pb-24 px-8 font-bold text-[22px] lg:text-[27px] w-full md:w-1/2 shadow-2xl`}
           >
             <h3>TOTAL EARNING</h3>
             <h3 className="text-[30px] lg:text-[48px]">$12,547.32</h3>
@@ -50,22 +51,22 @@ export default function Earning() {
 
           {/* right card */}
           <div
-            className={` ${orbitron.className} h-fit rounded-lg py-5 font-bold text-[22px] lg:text-[27px] w-full md:w-1/2  `}
+            className={` ${orbitron.className} h-fit rounded-lg py-5 font-bold text-[22px] lg:text-[27px] w-full md:w-1/2  shadow-2xl`}
             style={{
               padding: "1px",
-              background:
-                "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              // background:
+              //   "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
             }}
           >
             <div
               style={{
                 padding: "1px",
-                background:
-                  "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+                // background:
+                //   "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
               }}
-              className=" rounded-lg"
+              className=" rounded-lg "
             >
-              <div className="bg-[#61234A]  h-full rounded-lg px-8 py-6">
+              <div className="bg-black/20  h-full rounded-lg px-8 py-6">
                 <h3>AVAILABLE BALANCE</h3>
 
                 <button
@@ -81,16 +82,16 @@ export default function Earning() {
         <div className="secondRow lg:grid lg:grid-cols-3 gap-8 mt-12">
           {/* Earning History Table (spans 2 columns) */}
           <div
-            className="col-span-2 mb-14 lg:mb-0"
+            className="col-span-2 mb-14 lg:mb-0 shadow-2xl"
             style={{
               borderRadius: "16px",
               border: "1px solid transparent",
-              background:
-                "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              // background:
+              //   "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
               padding: "1px",
             }}
           >
-            <div className="bg-[#5E2047] rounded-[14px] p-8">
+            <div className="bg-black/20 rounded-[14px] p-8">
               <h2
                 className="text-white text-2xl font-bold mb-6 font-[orbitron]"
                 style={{ fontFamily: 'orbitron' }}
@@ -176,20 +177,20 @@ export default function Earning() {
 
           {/* Payout Method Card (spans 1 column) */}
           <div
-            className="col-span-1 h-full"
+            className="col-span-1 h-full shadow-2xl"
             style={{
               borderRadius: "16px",
               border: "1px solid transparent",
-              background:
-                "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              // background:
+              //   "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
               padding: "1px",
             }}
           >
             <div
-              className={`bg-[#5E2047] rounded-[14px] p-8 flex flex-col items-center h-full`}
+              className={`bg-black/20 rounded-[14px] p-8 flex flex-col items-center h-full`}
             >
               <h2
-                className={`text-white text-2xl font-bold mb-8 font-bold ${orbitron.className}`}
+                className={`text-white text-2xl font-bold mb-8 ${orbitron.className}`}
               >
                 PAYOUT METHOD
               </h2>
@@ -223,6 +224,11 @@ export default function Earning() {
             </div>
           </div>
         </div>
+
+        <div className="mt-12">
+          <EarningChart />
+        </div>
+
       </div>
   );
 }

@@ -8,7 +8,7 @@ const coach = coachData[0];
 
 export function CoachStats() {
   return (
-    <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+    <Card className="bg-black/20 backdrop-blur-sm border-white/10 shadow-2xl">
       <CardHeader>
         <CardTitle className="text-lg flex items-center text-white">
           <Trophy className="w-4 h-4 mr-2" />

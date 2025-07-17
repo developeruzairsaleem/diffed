@@ -9,7 +9,7 @@ const coach = coachData[0];
 
 export default function CoachInformation() {
   return (
-    <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+    <Card className="bg-black/20 backdrop-blur-sm border-white/10 shadow-2xl">
       <CardHeader>
         <CardTitle className="flex items-center text-white">
           <User className="w-5 h-5 mr-2" />
