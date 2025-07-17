@@ -20,6 +20,8 @@ import { SecuritySettings } from "./components/security-settings"
 import Earning from "./components/Earning"
 import Orders from "./components/Orders";
 import DemoPage from "./components/orders/page"
+import EarningChart from "./components/EarningChart"
+import GamesComponent from "./components/Services"
 
 export default function GamerCoachProfile() {
   const [activeTab, setActiveTab] = useState("overview")
@@ -66,7 +68,7 @@ export default function GamerCoachProfile() {
           {/* Main Content */}
           <div className="lg:col-span-3 ">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className=" h-[50px] p-1 grid w-full grid-cols-7 bg-black/40 backdrop-blur-sm border-white/10">
+              <TabsList className=" h-[50px] p-1 grid w-full grid-cols-7 bg-black/30 backdrop-blur-sm border-white/10">
                 <TabsTrigger
                   value="overview"
                   className=" text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
@@ -129,7 +131,8 @@ export default function GamerCoachProfile() {
               </TabsContent>
 
               <TabsContent value="services" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <GamesComponent />
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <ServiceCard
                     icon={Target}
                     title="1-on-1 Coaching"
@@ -170,7 +173,7 @@ export default function GamerCoachProfile() {
                     metricColor="text-orange-400"
                     badges={["Detailed Notes", "Video Analysis", "Improvement Plan"]}
                   />
-                </div>
+                </div> */}
               </TabsContent>
 
               <TabsContent value="clients" className="space-y-6">
