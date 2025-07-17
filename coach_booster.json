@@ -2,6 +2,11 @@
   {
     "id": "cb_001",
     "name": "ViperGod",
+    "firstName": "Hiso",
+    "lastName": "Dev",
+    "username": "HisoDev",
+    "email": "uzair@example.com",
+    "image": "/images/userprofile.png",
     "role": "booster",
     "avatar": "🦂",
     "rating": 4.9,

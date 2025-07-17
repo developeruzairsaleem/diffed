@@ -1,0 +1,101 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Mail, Gamepad2, MapPin, Calendar, Camera, Crown } from "lucide-react"
+
+// dummy json data - To be replaced by api
+import coachData from "../../../../coach_booster.json";
+const coach = coachData[0];
+
+export function ProfileSidebar() {
+  return (
+    <Card className="bg-black/20 backdrop-blur-sm border-white/10">
+      <CardContent className="p-6">
+        <div className="text-center">
+          <div className="relative inline-block">
+            <Avatar className="w-24 h-24 mx-auto">
+              <AvatarImage src={coach.image} alt="Profile" />
+              <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">PG</AvatarFallback>
+            </Avatar>
+            <Button
+              size="sm"
+              className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 bg-gradient-to-r from-pink-500 to-purple-600"
+            >
+              <Camera className="w-4 h-4" />
+            </Button>
+          </div>
+          <h3 className="mt-4 text-xl font-semibold text-white">Alex Dev</h3>
+          <p className="text-white/70">Elite Gaming Coach</p>
+          <div className="flex items-center justify-center mt-2">
+            <Badge variant="default" className="bg-gradient-to-r from-purple-600 to-pink-600 border-0 h-8 w-36">
+              <Crown className="w-3 h-3 mr-1" />
+              Grandmaster
+            </Badge>
+          </div>
+        </div>
+
+        <Separator className="my-6 bg-white/10" />
+
+        <div className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <Mail className="w-4 h-4 text-white/60" />
+            <span className="text-sm text-white/80">{coach.email}</span>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Gamepad2 className="w-4 h-4 text-white/60" />
+            <span className="text-sm text-white/80">Discord: ProGamer#1337</span>
+          </div>
+          <div className="flex items-center space-x-3">
+            <MapPin className="w-4 h-4 text-white/60" />
+            <span className="text-sm text-white/80">NA East Server</span>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Calendar className="w-4 h-4 text-white/60" />
+            <span className="text-sm text-white/80">Coaching since 2021</span>
+          </div>
+        </div>
+
+        <Separator className="my-6 bg-white/10" />
+
+        <div className="space-y-3">
+          <h4 className="font-medium text-white">Specializations</h4>
+          <div className="flex flex-wrap gap-2">
+            {coach.specialties.map(((speciality, index) => (
+              <Badge key={index} variant="outline" className="border-white/20 text-white/80 bg-white/5">
+                {speciality}
+            </Badge>
+            )))}
+          </div>
+        </div>
+
+        <Separator className="my-6 bg-white/10" />
+
+        <div className="space-y-3">
+          <h4 className="font-medium text-white">Current Ranks</h4>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/80">Valorant</span>
+              <Badge variant="secondary" className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+                Radiant
+              </Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/80">League of Legends</span>
+              <Badge variant="secondary" className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
+                Challenger
+              </Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/80">CS2</span>
+              <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+                Global Elite
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
