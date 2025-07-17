@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 
 // dummy json data - To be replaced by api
-import ordersData from "../../../../orders.json";
+import ordersData from "../../../../../orders.json";
 const orders = ordersData;
 // end of dummy json data
 

@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator"
 import { Mail, Gamepad2, MapPin, Calendar, Camera, Crown } from "lucide-react"
 
 // dummy json data - To be replaced by api
-import coachData from "../../../../coach_booster.json";
+import coachData from "../../../../../coach_booster.json";
 const coach = coachData[0];
 
 export function ProfileSidebar() {

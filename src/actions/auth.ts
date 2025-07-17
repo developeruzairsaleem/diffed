@@ -78,7 +78,6 @@ export async function signup(state: any, formData: FormData) {
     await createSession(user.id, user.role);
     return { user };
   } catch (error) {
-    console.error("something went wrong", error);
     return {
       errors: {
         message: "Something went wrong registering",

@@ -1,6 +1,6 @@
 import { columns, Order } from "./columns"
 import { DataTable } from "./data-table";
-import data from '../../../../../orders.json';
+import data from '../../../../../../orders.json';
 
 async function getData(): Promise<Order[]> {
   // Fetch data from your API here.

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, Star } from "lucide-react";
 
 // dummy json data - To be replaced by api
-import coachData from "../../../../coach_booster.json";
+import coachData from "../../../../../coach_booster.json";
 const coach = coachData[0];
 // end of dummy json data
 
