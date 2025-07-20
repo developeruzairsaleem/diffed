@@ -20,6 +20,7 @@ const protectedRoutes = [
   "/dashboard",
   "/dashboard/customer",
   "/dashboard/provider",
+  "/sample-page",
 ];
 
 // Secret key for verifying token
@@ -39,7 +40,7 @@ export async function middleware(request: NextRequest) {
   // Decrypt the session from the cookie
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
-  
+
   // redirect the user to login if the user is not authenticated
   if (isProtected && !session?.userId) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
@@ -53,12 +54,38 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect("/login");
     }
   }
+
+  // Allow authenticated users to access protected routes with role-based restrictions
+  if (isProtected && session?.userId) {
+    // Prevent customers from accessing provider dashboard
+    if (
+      pathname.startsWith("/dashboard/provider") &&
+      session.role === "customer"
+    ) {
+      return NextResponse.redirect(
+        new URL("/dashboard/customer", request.nextUrl)
+      );
+    }
+
+    // Prevent providers from accessing customer dashboard
+    if (
+      pathname.startsWith("/dashboard/customer") &&
+      session.role === "provider"
+    ) {
+      return NextResponse.redirect(
+        new URL("/dashboard/provider", request.nextUrl)
+      );
+    }
+
+    return NextResponse.next();
+  }
+
+  // Redirect authenticated users from public routes to their dashboard
   if (
     isPublic &&
     session?.userId &&
     !request.nextUrl.pathname.startsWith("/dashboard")
   ) {
-    // 5. Redirect to /dashboard if the user is authenticated
     if (session.role === "customer") {
       return NextResponse.redirect(
         new URL("/dashboard/customer", request.nextUrl)

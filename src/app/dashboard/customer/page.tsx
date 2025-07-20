@@ -2,8 +2,10 @@
 import customers from "../../../../customers.json";
 import formatDate from "./_lib/format-date";
 import getStatusColor from "./_lib/get-status-color";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OrdersTab from "./_components/OrdersTab";
+import { useStore } from "@/store/useStore";
+import WalletTab from "./_components/WalletTab";
 import {
   User,
   Wallet,
@@ -44,6 +46,7 @@ import GamesComponent from "./_components/Games";
 import OverviewTab from "./_components/OverviewTab";
 import { lato, orbitron } from "@/fonts/fonts";
 import Image from "next/image";
+import AddFundss from "./_components/ALLPAYMENT";
 
 // Sample Data Structure
 const gamesData = {
@@ -280,6 +283,49 @@ const Dashboard = () => {
   const [walletBalance, setWalletBalance] = useState(145);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showAddFunds, setShowAddFunds] = useState(false);
+  const store = useStore();
+  // effect for getting the user dashboard info
+  // TODO FOR SETTING THE STATE OF THE DASHBOARD
+  useEffect(() => {
+    async function getCustomerDashboard() {
+      // API response
+      const user = await fetch("/api/user/me").then((res) => res.json());
+      const userData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        isLoggedIn: true,
+      };
+      console.log(userData);
+      store.setUser(userData);
+      const wallet = await fetch("/api/wallet").then((res) => res.json());
+
+      const walletData = {
+        id: wallet.id,
+        balance: wallet.balance,
+        currency: wallet.currency,
+      };
+      console.log(walletData);
+      store.setWallet(walletData);
+      const tx = await fetch("/api/transaction/me").then((res) => res.json());
+      const txData = tx.map((idTx: any) => {
+        return {
+          id: idTx.id,
+          type: idTx.type,
+          amount: idTx.amount,
+          walletId: idTx.walletId,
+          createdAt: idTx.createdAt,
+          description: idTx.description,
+          status: idTx.status,
+        };
+      });
+
+      console.log(txData);
+      store.setTransactions(txData);
+    }
+
+    getCustomerDashboard();
+  }, []);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -295,148 +341,6 @@ const Dashboard = () => {
         return <AlertCircle className="w-4 h-4" />;
     }
   };
-  const WalletTab = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Wallet</h2>
-        <button
-          onClick={() => setShowAddFunds(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Funds</span>
-        </button>
-      </div>
-
-      {/* Balance Card */}
-      <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-purple-200 text-sm">Current Balance</p>
-            <p className="text-3xl font-bold">€{walletBalance}</p>
-          </div>
-          <div className="p-3 bg-purple-500 bg-opacity-50 rounded-full">
-            <Wallet className="w-8 h-8" />
-          </div>
-        </div>
-        <div className="mt-4 flex items-center space-x-4">
-          <div className="text-sm">
-            <span className="text-purple-200">Available for orders</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-100 rounded-full">
-              <Plus className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <div className="font-medium text-gray-900">Add Funds</div>
-              <div className="text-sm text-gray-500">Top up your wallet</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <ArrowUpDown className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <div className="font-medium text-gray-900">
-                Transaction History
-              </div>
-              <div className="text-sm text-gray-500">View all transactions</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-yellow-100 rounded-full">
-              <Download className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div>
-              <div className="font-medium text-gray-900">Export</div>
-              <div className="text-sm text-gray-500">Download statements</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Transaction History */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <Activity className="w-5 h-5 mr-2" />
-            Recent Transactions
-          </h3>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            {walletTransactions.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={`p-2 rounded-full ${
-                      transaction.type === "deposit"
-                        ? "bg-green-100"
-                        : transaction.type === "payment"
-                        ? "bg-red-100"
-                        : "bg-blue-100"
-                    }`}
-                  >
-                    {transaction.type === "deposit" ? (
-                      <Plus
-                        className={`w-4 h-4 ${
-                          transaction.type === "deposit"
-                            ? "text-green-600"
-                            : transaction.type === "payment"
-                            ? "text-red-600"
-                            : "text-blue-600"
-                        }`}
-                      />
-                    ) : transaction.type === "payment" ? (
-                      <Minus className="w-4 h-4 text-red-600" />
-                    ) : (
-                      <Gift className="w-4 h-4 text-blue-600" />
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      {transaction.description}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {formatDate(transaction.timestamp)} • {transaction.method}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div
-                    className={`font-semibold ${
-                      transaction.amount > 0 ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {transaction.amount > 0 ? "+" : ""}€
-                    {Math.abs(transaction.amount)}
-                  </div>
-                  <div className="text-sm text-gray-500 capitalize">
-                    {transaction.status}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const ReviewsTab = () => (
     <div className="space-y-6">
@@ -770,84 +674,6 @@ const Dashboard = () => {
     </div>
   );
 
-  // Add Funds Modal
-  const AddFundsModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Add Funds to Wallet
-          </h3>
-          <button
-            onClick={() => setShowAddFunds(false)}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XCircle className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Amount
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                €
-              </span>
-              <input
-                type="number"
-                placeholder="0.00"
-                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Payment Method
-            </label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="card"
-                  defaultChecked
-                />
-                <CreditCard className="w-5 h-5 text-gray-600" />
-                <span>Credit/Debit Card</span>
-              </div>
-              <div className="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg">
-                <input type="radio" name="payment" value="paypal" />
-                <Wallet className="w-5 h-5 text-gray-600" />
-                <span>PayPal</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex space-x-3 pt-4">
-            <button
-              onClick={() => setShowAddFunds(false)}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                setWalletBalance((prev) => prev + 50);
-                setShowAddFunds(false);
-              }}
-              className="flex-1 py-2 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-            >
-              Add Funds
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   // Order Detail Modal
   const OrderDetailModal = ({ order }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1109,6 +935,17 @@ const Dashboard = () => {
               </button>
 
               <button
+                onClick={() => setActiveTab("funds")}
+                className={`w-full  cursor-pointer flex items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
+                style={{
+                  backgroundColor:
+                    activeTab === "reviews" ? "rgba(255, 255, 255, 0.15)" : "",
+                }}
+              >
+                <Star className="w-5 h-5" />
+                <span>Add Funds</span>
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`w-full flex cursor-pointer items-center space-x-3 px-4 py-2 rounded-lg text-left text-white`}
                 style={{
@@ -1153,12 +990,13 @@ const Dashboard = () => {
             {activeTab === "wallet" && <WalletTab />}
             {activeTab === "reviews" && <ReviewsTab />}
             {activeTab === "settings" && <SettingsTab />}
+            {activeTab === "funds" && <AddFundss />}
           </div>
         </div>
       </div>
 
       {/* Modals */}
-      {showAddFunds && <AddFundsModal />}
+      {/* {showAddFunds && <AddFundsModal />} */}
       {selectedOrder && <OrderDetailModal order={selectedOrder} />}
     </div>
   );

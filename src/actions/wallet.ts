@@ -1,24 +1,29 @@
 "use server";
 
 import { stripe, formatAmountForStripe } from "@/lib/stripe";
-import { createServerClient } from "@/lib/supabase";
+import { prisma } from "@/lib/prisma";
 import { updateWalletBalance, createTransaction } from "@/lib/wallet";
 import { revalidatePath } from "next/cache";
 
 const DEMO_USER_ID = "550e8400-e29b-41d4-a716-446655440000";
 
-export async function addFunds(amount: number) {
+// adjusting add funds
+export async function addFunds(amount: number, userId: string) {
   try {
-    const supabase = createServerClient();
+    // get wallet id using prisma
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        userId: userId,
+      },
+    });
 
-    // Get wallet ID
-    const { data: wallet } = await supabase
-      .from("wallets")
-      .select("id")
-      .eq("user_id", DEMO_USER_ID)
-      .single();
-
-    if (!wallet) throw new Error("Wallet not found");
+    // check if the wallet is there
+    if (!wallet) {
+      return {
+        success: false,
+        error: "Wallet not found for this user",
+      };
+    }
 
     // Create Stripe payment intent
     const paymentIntent = await stripe.paymentIntents.create({
@@ -26,11 +31,12 @@ export async function addFunds(amount: number) {
       currency: "usd",
       metadata: {
         type: "wallet_deposit",
-        user_id: DEMO_USER_ID,
+        user_id: userId,
         wallet_id: wallet.id,
       },
     });
 
+    // return response to the client with payment intent info
     return {
       success: true,
       clientSecret: paymentIntent.client_secret,
@@ -45,24 +51,25 @@ export async function addFunds(amount: number) {
   }
 }
 
+// checking weather the funds are added or not
 export async function confirmFundsAdded(
   paymentIntentId: string,
-  amount: number
+  amount: number,
+  userId: string
 ) {
   try {
-    const supabase = createServerClient();
-
     // Get wallet
-    const { data: wallet } = await supabase
-      .from("wallets")
-      .select("id")
-      .eq("user_id", DEMO_USER_ID)
-      .single();
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        userId: userId,
+      },
+    });
 
+    // check for the error if the wallet not exist
     if (!wallet) throw new Error("Wallet not found");
 
     // Update wallet balance
-    await updateWalletBalance(DEMO_USER_ID, amount, "add");
+    await updateWalletBalance(userId, amount, "add");
 
     // Create transaction record
     await createTransaction(
@@ -73,7 +80,7 @@ export async function confirmFundsAdded(
       paymentIntentId
     );
 
-    revalidatePath("/wallet");
+    revalidatePath("/sample-page");
     return { success: true };
   } catch (error) {
     console.error("Confirm funds error:", error);
@@ -87,22 +94,20 @@ export async function confirmFundsAdded(
 export async function withdrawFunds(
   amount: number,
   accountNumber: string,
-  routingNumber: string
+  routingNumber: string,
+  userId: string
 ) {
   try {
-    const supabase = createServerClient();
-
-    // Get wallet
-    const { data: wallet } = await supabase
-      .from("wallets")
-      .select("id")
-      .eq("user_id", DEMO_USER_ID)
-      .single();
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        userId,
+      },
+    });
 
     if (!wallet) throw new Error("Wallet not found");
 
     // Update wallet balance (subtract)
-    await updateWalletBalance(DEMO_USER_ID, amount, "subtract");
+    await updateWalletBalance(userId, amount, "subtract");
 
     // Create transaction record
     await createTransaction(
@@ -126,88 +131,88 @@ export async function withdrawFunds(
   }
 }
 
-export async function processCheckout(
-  items: any[],
-  paymentMethod: "wallet" | "card",
-  cardPaymentIntentId?: string
-) {
-  try {
-    const supabase = createServerClient();
+// export async function processCheckout(
+//   items: any[],
+//   paymentMethod: "wallet" | "card",
+//   cardPaymentIntentId?: string
+// ) {
+//   try {
+//     const supabase = createServerClient();
 
-    const total = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+//     const total = items.reduce(
+//       (sum, item) => sum + item.price * item.quantity,
+//       0
+//     );
 
-    // Get wallet
-    const { data: wallet } = await supabase
-      .from("wallets")
-      .select("id")
-      .eq("user_id", DEMO_USER_ID)
-      .single();
+//     // Get wallet
+//     const { data: wallet } = await supabase
+//       .from("wallets")
+//       .select("id")
+//       .eq("user_id", DEMO_USER_ID)
+//       .single();
 
-    if (!wallet) throw new Error("Wallet not found");
+//     if (!wallet) throw new Error("Wallet not found");
 
-    if (paymentMethod === "wallet") {
-      // Pay with wallet balance
-      await updateWalletBalance(DEMO_USER_ID, total, "subtract");
+//     if (paymentMethod === "wallet") {
+//       // Pay with wallet balance
+//       await updateWalletBalance(DEMO_USER_ID, total, "subtract");
 
-      await createTransaction(
-        wallet.id,
-        "payment",
-        total,
-        `Purchase: ${items.map((i) => i.name).join(", ")}`,
-        undefined,
-        { items, paymentMethod: "wallet" }
-      );
-    } else {
-      // Pay with card - payment already processed via Stripe
-      await createTransaction(
-        wallet.id,
-        "payment",
-        total,
-        `Purchase: ${items.map((i) => i.name).join(", ")}`,
-        cardPaymentIntentId,
-        { items, paymentMethod: "card" }
-      );
-    }
+//       await createTransaction(
+//         wallet.id,
+//         "payment",
+//         total,
+//         `Purchase: ${items.map((i) => i.name).join(", ")}`,
+//         undefined,
+//         { items, paymentMethod: "wallet" }
+//       );
+//     } else {
+//       // Pay with card - payment already processed via Stripe
+//       await createTransaction(
+//         wallet.id,
+//         "payment",
+//         total,
+//         `Purchase: ${items.map((i) => i.name).join(", ")}`,
+//         cardPaymentIntentId,
+//         { items, paymentMethod: "card" }
+//       );
+//     }
 
-    revalidatePath("/wallet");
-    return { success: true };
-  } catch (error) {
-    console.error("Checkout error:", error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to process checkout",
-    };
-  }
-}
+//     revalidatePath("/wallet");
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Checkout error:", error);
+//     return {
+//       success: false,
+//       error:
+//         error instanceof Error ? error.message : "Failed to process checkout",
+//     };
+//   }
+// }
 
-export async function createCheckoutPaymentIntent(amount: number) {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: formatAmountForStripe(amount),
-      currency: "usd",
-      metadata: {
-        type: "checkout_payment",
-        user_id: DEMO_USER_ID,
-      },
-    });
+// export async function createCheckoutPaymentIntent(amount: number) {
+//   try {
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: formatAmountForStripe(amount),
+//       currency: "usd",
+//       metadata: {
+//         type: "checkout_payment",
+//         user_id: DEMO_USER_ID,
+//       },
+//     });
 
-    return {
-      success: true,
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-    };
-  } catch (error) {
-    console.error("Create checkout payment intent error:", error);
-    return {
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to create payment intent",
-    };
-  }
-}
+//     return {
+//       success: true,
+//       clientSecret: paymentIntent.client_secret,
+//       paymentIntentId: paymentIntent.id,
+//     };
+//   } catch (error) {
+//     console.error("Create checkout payment intent error:", error);
+//     return {
+//       success: false,
+//       error:
+//         error instanceof Error
+//           ? error.message
+//           : "Failed to create payment intent",
+//     };
+//   }
+// }

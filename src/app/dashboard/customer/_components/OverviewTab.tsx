@@ -224,7 +224,6 @@ const OverviewTab = () => {
             "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
         }}
       >
-        {" "}
         <div
           style={{
             padding: "1px",
@@ -233,33 +232,23 @@ const OverviewTab = () => {
           }}
           className="h-full rounded-lg"
         >
-          {" "}
-          {/* middle card */}{" "}
           <div className="rounded-lg bg-[#52103A]">
-            {" "}
             <div
               style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
               className=" rounded-lg shadow-sm w-full"
             >
-              {" "}
               <div className="p-6 border-gray-200">
-                {" "}
                 <h3 className="text-xl font-semibold text-white flex items-center">
-                  {" "}
-                  <Clock className="w-5 h-5 mr-2" /> Recent Orders{" "}
-                </h3>{" "}
-              </div>{" "}
+                  <Clock className="w-5 h-5 mr-2" /> Recent Orders
+                </h3>
+              </div>
               <div className="p-6">
-                {" "}
                 <div className="overflow-x-auto w-full">
-                  {" "}
                   <table
                     className="w-full min-w-[600px] text-left"
                     style={{ borderCollapse: "separate", borderSpacing: 0 }}
                   >
-                    {" "}
                     <thead>
-                      {" "}
                       <tr
                         style={{
                           borderBottom: "3px solid",
@@ -267,30 +256,23 @@ const OverviewTab = () => {
                             "linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%) 1",
                         }}
                       >
-                        {" "}
                         <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          {" "}
-                          Game{" "}
-                        </th>{" "}
+                          Game
+                        </th>
                         <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          {" "}
-                          Package{" "}
-                        </th>{" "}
+                          Package
+                        </th>
                         <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          {" "}
-                          Price{" "}
-                        </th>{" "}
+                          Price
+                        </th>
                         <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          {" "}
-                          Status{" "}
-                        </th>{" "}
-                      </tr>{" "}
-                    </thead>{" "}
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
                     <tbody>
-                      {" "}
                       {orders.slice(0, 3).map((order, idx) => (
                         <tr key={order.orderId}>
-                          {" "}
                           <td
                             className={`py-3 px-4 text-[#E1E1E1] ${
                               idx !== orders.slice(0, 3).length - 1
@@ -298,22 +280,19 @@ const OverviewTab = () => {
                                 : ""
                             }`}
                           >
-                            {" "}
                             <div className="flex items-center space-x-3">
-                              {" "}
                               <div className="text-2xl">
-                                {" "}
                                 {
                                   (
                                     gamesData.find(
                                       (game) => game.name === order.game
                                     ) || {}
                                   ).icon
-                                }{" "}
-                              </div>{" "}
-                              <span>{order.game}</span>{" "}
-                            </div>{" "}
-                          </td>{" "}
+                                }
+                              </div>
+                              <span>{order.game}</span>
+                            </div>
+                          </td>
                           <td
                             className={`py-3 px-4 text-[#E1E1E1] ${
                               idx !== orders.slice(0, 3).length - 1
@@ -321,9 +300,8 @@ const OverviewTab = () => {
                                 : ""
                             }`}
                           >
-                            {" "}
-                            {order.packageName}{" "}
-                          </td>{" "}
+                            {order.packageName}
+                          </td>
                           <td
                             className={`py-3 px-4 text-[#E1E1E1] ${
                               idx !== orders.slice(0, 3).length - 1
@@ -331,9 +309,8 @@ const OverviewTab = () => {
                                 : ""
                             }`}
                           >
-                            {" "}
-                            €{order.price}{" "}
-                          </td>{" "}
+                            ${order.price}
+                          </td>
                           <td
                             className={`py-3 px-4 text-[#E1E1E1] ${
                               idx !== orders.slice(0, 3).length - 1
@@ -341,30 +318,27 @@ const OverviewTab = () => {
                                 : ""
                             }`}
                           >
-                            {" "}
                             <span
                               className={`px-2 py-1 text-xs rounded-full flex items-center space-x-1 ${getStatusColor(
                                 order.status
                               )}`}
                             >
-                              {" "}
-                              {getStatusIcon(order.status)}{" "}
+                              {getStatusIcon(order.status)}
                               <span className="capitalize">
-                                {" "}
-                                {order.status.replace("_", " ")}{" "}
-                              </span>{" "}
-                            </span>{" "}
-                          </td>{" "}
+                                {order.status.replace("_", " ")}
+                              </span>
+                            </span>
+                          </td>
                         </tr>
-                      ))}{" "}
-                    </tbody>{" "}
-                  </table>{" "}
-                </div>{" "}
-              </div>{" "}
-            </div>{" "}
-          </div>{" "}
-        </div>{" "}
-      </div>{" "}
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

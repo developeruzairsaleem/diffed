@@ -2,6 +2,7 @@
 import { LoginFormSchema, SignupFormSchema } from "@/lib/definitions";
 import { prisma } from "@/lib/prisma";
 import { createSession, deleteSession } from "@/lib/sessions";
+import { createWallet, getWallet } from "@/lib/wallet";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
@@ -74,6 +75,9 @@ export async function signup(state: any, formData: FormData) {
         },
       };
     }
+
+    // create user wallet entry in the database
+    const wallet = await createWallet(user.id);
     // create the session
     await createSession(user.id, user.role);
     return { user };
