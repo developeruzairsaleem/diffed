@@ -1,32 +1,66 @@
-import { verifyToken } from "@/lib/auth";
+import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
 
-// REGISTER CUSTOMER PROFILE
 export async function POST(request: NextRequest) {
-    try {
-        const cookieUserInfo = await verifyToken(request);
-        if(!cookieUserInfo) {
-            return NextResponse.json('user access not authorized, log In', {status: 401});
-        }
+  try {
+    const body = await request.json();
+    const { name, email, avatar, phone } = body;
 
-        const existingCustomerProfile = await prisma.customer.findFirst({
-            where: {userId: cookieUserInfo.id}
-        });
+    // Check if customer already exists
+    const existingCustomer = await prisma.customer.findUnique({
+      where: { email },
+    });
 
-        if(existingCustomerProfile) {
-            return NextResponse.json({error: 'You already have a provider profile!'}, {status: 400})
-        }
-
-        const body = await request.json();
-        const customer = await prisma.customer.create({
-            data: {
-                ...body,
-                user: {connect: {id: cookieUserInfo.id}}
-            }
-        });
-        return NextResponse.json(customer, {status: 201});
-    } catch(err: any) {
-        return NextResponse.json({error: err.message}, {status: 500})
+    if (existingCustomer) {
+      return NextResponse.json(existingCustomer);
     }
+
+    const customer = await prisma.customer.create({
+      data: {
+        name,
+        email,
+        avatar,
+        phone,
+      },
+    });
+
+    return NextResponse.json(customer);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create customer" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email");
+
+    if (email) {
+      const customer = await prisma.customer.findUnique({
+        where: { email },
+        include: {
+          orders: {
+            orderBy: { createdAt: "desc" },
+            include: {
+              provider: true,
+            },
+          },
+        },
+      });
+      return NextResponse.json(customer);
+    }
+
+    const customers = await prisma.customer.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(customers);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch customers" },
+      { status: 500 }
+    );
+  }
 }

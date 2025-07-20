@@ -112,3 +112,55 @@ export default function AdminLayout({
     </AntdRegistry>
   );
 }
+
+// "use client"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+// import { GamesTab } from "@/components/admin/games-tab"
+// import { ServicesTab } from "@/components/admin/services-tab"
+// import { SubpackagesTab } from "@/components/admin/subpackages-tab"
+// import { ProvidersTab } from "@/components/admin/providers-tab"
+// import { OrdersTab } from "@/components/admin/orders-tab"
+// import { CustomersTab } from "@/components/admin/customers-tab"
+
+// export default function AdminDashboard() {
+//   return (
+//     <div className="container mx-auto py-8">
+//       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+
+//       <Tabs defaultValue="games" className="w-full">
+//         <TabsList className="grid w-full grid-cols-6">
+//           <TabsTrigger value="games">Games</TabsTrigger>
+//           <TabsTrigger value="services">Services</TabsTrigger>
+//           <TabsTrigger value="subpackages">Subpackages</TabsTrigger>
+//           <TabsTrigger value="providers">Providers</TabsTrigger>
+//           <TabsTrigger value="customers">Customers</TabsTrigger>
+//           <TabsTrigger value="orders">Orders</TabsTrigger>
+//         </TabsList>
+
+//         <TabsContent value="games">
+//           <GamesTab />
+//         </TabsContent>
+
+//         <TabsContent value="services">
+//           <ServicesTab />
+//         </TabsContent>
+
+//         <TabsContent value="subpackages">
+//           <SubpackagesTab />
+//         </TabsContent>
+
+//         <TabsContent value="providers">
+//           <ProvidersTab />
+//         </TabsContent>
+
+//         <TabsContent value="customers">
+//           <CustomersTab />
+//         </TabsContent>
+
+//         <TabsContent value="orders">
+//           <OrdersTab />
+//         </TabsContent>
+//       </Tabs>
+//     </div>
+//   )
+// }

@@ -48,11 +48,11 @@ export async function middleware(request: NextRequest) {
 
   // if is admin route than check for admin role
   if (pathname.startsWith("/admin")) {
-    if (session?.role === "admin") {
-      return NextResponse.next();
-    } else {
-      return NextResponse.redirect("/login");
-    }
+    // if (session?.role === "admin") {
+    return NextResponse.next();
+    // } else {
+    // return NextResponse.redirect("/login");
+    // }
   }
 
   // Allow authenticated users to access protected routes with role-based restrictions
