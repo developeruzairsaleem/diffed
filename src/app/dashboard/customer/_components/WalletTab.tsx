@@ -14,6 +14,32 @@ import formatDate from "../_lib/format-date";
 import AddFundsCard from "./AddFundCard";
 const WalletTab = () => {
   const store = useStore();
+
+  // refresh Wallet Data so we can reuse it in the dashboard rendering
+  const refreshWalletData = async () => {
+    const wallet = await fetch("/api/wallet").then((res) => res.json());
+
+    const walletData = {
+      id: wallet.id,
+      balance: wallet.balance,
+      currency: wallet.currency,
+    };
+    store.setWallet(walletData);
+    const tx = await fetch("/api/transaction/me").then((res) => res.json());
+    const txData = tx.map((idTx: any) => {
+      return {
+        id: idTx.id,
+        type: idTx.type,
+        amount: idTx.amount,
+        walletId: idTx.walletId,
+        createdAt: idTx.createdAt,
+        description: idTx.description,
+        status: idTx.status,
+      };
+    });
+    store.setTransactions(txData);
+  };
+
   const walletTransactions = store.transactions;
   console.log("transactions", walletTransactions);
   const [showAddFunds, setShowAddFunds] = useState(false);
@@ -30,7 +56,12 @@ const WalletTab = () => {
         </button>
       </div>
 
-      {showAddFunds && <AddFundsCard handleAddShow={setShowAddFunds} />}
+      {showAddFunds && (
+        <AddFundsCard
+          refreshWalletData={refreshWalletData}
+          handleAddShow={setShowAddFunds}
+        />
+      )}
       {/* Balance Card */}
       <div
         style={{ padding: "2px" }}

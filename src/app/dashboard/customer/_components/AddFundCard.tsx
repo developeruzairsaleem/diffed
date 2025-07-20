@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, CreditCard } from "lucide-react";
 import {
@@ -31,8 +30,10 @@ const stripePromise = loadStripe(
 
 function AddFundsForm({
   handleAddShow,
+  refreshWalletData,
 }: {
   handleAddShow: (arg: boolean) => void;
+  refreshWalletData: () => void;
 }) {
   // local state
   const [amount, setAmount] = useState("");
@@ -105,8 +106,8 @@ function AddFundsForm({
       if (!confirmResult.success) {
         throw new Error(confirmResult.error);
       }
-
       handleSuccess("Funds added successfully!");
+      refreshWalletData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add funds");
     } finally {
@@ -125,9 +126,9 @@ function AddFundsForm({
           <CardHeader>
             {/* if the funds added successfully show the following message */}
             {showSuccess && (
-              <Alert className="mb-6 border-green-200 bg-green-50">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800">
+              <Alert className="mb-6 border-green-200">
+                <CheckCircle className="h-4 w-4 text-green-400" />
+                <AlertDescription className="text-green-500">
                   {successMessage}
                 </AlertDescription>
               </Alert>
@@ -216,8 +217,10 @@ function AddFundsForm({
 
 export default function FundsFormProvider({
   handleAddShow,
+  refreshWalletData,
 }: {
   handleAddShow: (arg: boolean) => void;
+  refreshWalletData: () => void;
 }) {
   return (
     <div
@@ -228,7 +231,10 @@ export default function FundsFormProvider({
       className="w-screen h-screen fixed top-0 left-0 flex items-center justify-center overflow-hidden"
     >
       <Elements stripe={stripePromise}>
-        <AddFundsForm handleAddShow={handleAddShow} />
+        <AddFundsForm
+          handleAddShow={handleAddShow}
+          refreshWalletData={refreshWalletData}
+        />
       </Elements>
     </div>
   );
