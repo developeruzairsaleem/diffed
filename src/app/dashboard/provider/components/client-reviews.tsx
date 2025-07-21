@@ -3,7 +3,7 @@ import { Star } from "lucide-react"
 
 export function ClientReviews() {
   return (
-    <Card className="bg-black/30 backdrop-blur-sm border-white/10">
+    <Card className="bg-black/30 backdrop-blur-sm border-white/10 shadow-2xl">
       <CardHeader>
         <CardTitle className="text-white">Client Reviews</CardTitle>
         <CardDescription className="text-white/70">Recent feedback from coached players</CardDescription>
