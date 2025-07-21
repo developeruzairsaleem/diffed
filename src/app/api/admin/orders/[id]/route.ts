@@ -7,45 +7,26 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { status, providerId, scheduledTime, completionTime, notes } = body;
+    const { status, scheduledTime, completionTime, notes } = body;
 
-    const updateData: any = {
-      status,
-      notes,
-    };
-
-    if (providerId !== undefined) {
-      updateData.providerId = providerId;
-      if (providerId && status === "ASSIGNED") {
-        // Update provider's total orders count
-        await prisma.provider.update({
-          where: { id: providerId },
-          data: {
-            totalOrders: {
-              increment: 1,
-            },
-          },
-        });
-      }
-    }
-
-    if (scheduledTime) {
-      updateData.scheduledTime = new Date(scheduledTime);
-    }
-
-    if (completionTime) {
-      updateData.completionTime = new Date(completionTime);
-    }
-
-    const order = await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: params.id },
-      data: updateData,
+      data: {
+        status,
+        notes,
+        scheduledTime: scheduledTime ? new Date(scheduledTime) : null,
+        completionTime: completionTime ? new Date(completionTime) : null,
+      },
       include: {
-        provider: true,
+        orderUsers: {
+          include: {
+            User: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json(order);
+    return NextResponse.json(updatedOrder);
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to update order" },
@@ -54,11 +35,18 @@ export async function PUT(
   }
 }
 
+// delete endpoint function
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Delete all linked users (customers/providers)
+    await prisma.orderUser.deleteMany({
+      where: { orderId: params.id },
+    });
+
+    // Delete the actual order
     await prisma.order.delete({
       where: { id: params.id },
     });

@@ -73,6 +73,9 @@ export function CustomersTab() {
     try {
       const response = await fetch("/api/admin/customers");
       const data = await response.json();
+      if (data?.error) {
+        return setCustomers([]);
+      }
       setCustomers(data);
     } catch (error) {
       console.error("Failed to fetch customers", error);

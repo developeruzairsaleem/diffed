@@ -73,6 +73,9 @@ export function ProvidersTab() {
     try {
       const response = await fetch("/api/admin/providers");
       const data = await response.json();
+      if (data?.error) {
+        return setProviders([]);
+      }
       setProviders(data);
     } catch (error) {
       console.error("Failed to fetch providers", error);
@@ -83,6 +86,9 @@ export function ProvidersTab() {
     try {
       const response = await fetch("/api/admin/games");
       const data = await response.json();
+      if (data?.error) {
+        return setGames([]);
+      }
       setGames(data);
     } catch (error) {
       console.error("Failed to fetch games", error);

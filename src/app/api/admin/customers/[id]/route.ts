@@ -6,13 +6,21 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const customer = await prisma.customer.findUnique({
-      where: { id: params.id },
+    const customer = await prisma.user.findFirst({
+      where: {
+        id: params.id,
+        role: "customer",
+      },
       include: {
-        orders: {
-          orderBy: { createdAt: "desc" },
+        wallet: true,
+        orderUsers: {
           include: {
-            provider: true,
+            Order: true,
+          },
+        },
+        _count: {
+          select: {
+            orderUsers: true,
           },
         },
       },
@@ -27,35 +35,9 @@ export async function GET(
 
     return NextResponse.json(customer);
   } catch (error) {
+    console.error("GET /api/customer/[id]:", error);
     return NextResponse.json(
       { error: "Failed to fetch customer" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const body = await request.json();
-    const { name, email, avatar, phone } = body;
-
-    const customer = await prisma.customer.update({
-      where: { id: params.id },
-      data: {
-        name,
-        email,
-        avatar,
-        phone,
-      },
-    });
-
-    return NextResponse.json(customer);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update customer" },
       { status: 500 }
     );
   }
@@ -66,12 +48,24 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.customer.delete({
+    const customer = await prisma.user.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!customer || customer.role !== "customer") {
+      return NextResponse.json(
+        { error: "Customer not found or invalid role" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.user.delete({
       where: { id: params.id },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("DELETE /api/customer/[id]:", error);
     return NextResponse.json(
       { error: "Failed to delete customer" },
       { status: 500 }

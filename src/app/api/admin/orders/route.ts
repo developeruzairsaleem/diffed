@@ -5,8 +5,11 @@ export async function GET() {
   try {
     const orders = await prisma.order.findMany({
       include: {
-        provider: true,
-        customer: true,
+        orderUsers: {
+          include: {
+            User: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -22,51 +25,37 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      customerId,
-      customerName,
-      customerEmail,
-      gameId,
-      serviceName,
-      subpackageName,
-      price,
-      scheduledTime,
-      notes,
-    } = body;
-
-    let finalCustomerId = customerId;
-
-    // If no customerId provided, create or find customer
-    if (!customerId && customerName && customerEmail) {
-      let customer = await prisma.customer.findUnique({
-        where: { email: customerEmail },
-      });
-
-      if (!customer) {
-        customer = await prisma.customer.create({
-          data: {
-            name: customerName,
-            email: customerEmail,
-          },
-        });
-      }
-
-      finalCustomerId = customer.id;
-    }
+    const { customerId, subPackageId, price, scheduledTime, notes } = body;
 
     const order = await prisma.order.create({
       data: {
-        customerId: finalCustomerId,
-        gameId,
-        serviceName,
-        subpackageName,
+        subPackageId,
         price,
         scheduledTime: scheduledTime ? new Date(scheduledTime) : null,
         notes,
+        orderUsers: {
+          create: [
+            {
+              userId: customerId,
+            },
+          ],
+        },
       },
       include: {
-        provider: true,
-        customer: true,
+        orderUsers: {
+          include: {
+            User: true,
+          },
+        },
+        subpackage: {
+          include: {
+            service: {
+              include: {
+                game: true,
+              },
+            },
+          },
+        },
       },
     });
 

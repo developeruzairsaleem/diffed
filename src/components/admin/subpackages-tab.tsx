@@ -112,6 +112,9 @@ export function SubpackagesTab() {
     try {
       const response = await fetch("/api/admin/subpackages");
       const data = await response.json();
+      if (data?.error) {
+        return setSubpackages([]);
+      }
       setSubpackages(data);
     } catch (error) {
       console.error("Failed to fetch subpackages", error);
@@ -122,6 +125,9 @@ export function SubpackagesTab() {
     try {
       const response = await fetch("/api/admin/games");
       const data = await response.json();
+      if (data?.error) {
+        return setGames([]);
+      }
       setGames(data);
     } catch (error) {
       console.error("Failed to fetch games", error);

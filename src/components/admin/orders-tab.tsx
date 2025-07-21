@@ -39,7 +39,6 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
-// import { useToast } from "@/hooks/use-toast"
 
 interface Game {
   id: string;
@@ -129,6 +128,9 @@ export function OrdersTab() {
     try {
       const response = await fetch("/api/admin/orders");
       const data = await response.json();
+      if (data?.error) {
+        return setOrders([]);
+      }
       setOrders(data);
     } catch (error) {
       console.error("Failed to fetch orders");
@@ -139,6 +141,9 @@ export function OrdersTab() {
     try {
       const response = await fetch("/api/admin/games");
       const data = await response.json();
+      if (data?.error) {
+        return setGames([]);
+      }
       setGames(data);
     } catch (error) {
       console.error("Failed to fetch games");
@@ -149,7 +154,10 @@ export function OrdersTab() {
     try {
       const response = await fetch("/api/admin/providers");
       const data = await response.json();
-      setProviders(data.filter((p: Provider) => p.isActive));
+      setProviders(data.filter((p: Provider) => p));
+      if (data?.error) {
+        setProviders([]);
+      }
     } catch (error) {
       console.error("Failed to fetch providers");
     }
@@ -159,7 +167,10 @@ export function OrdersTab() {
     try {
       const response = await fetch("/api/admin/customers");
       const data = await response.json();
-      setCustomers(data);
+      if (data?.error) {
+        return setCustomers([]);
+      }
+      return setCustomers(data);
     } catch (error) {
       console.error("Failed to fetch customers");
     }

@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 
@@ -20,8 +20,7 @@ export async function PUT(
       serviceId,
     } = body;
 
-    // Get existing subpackage
-    const existingSubpackage = await prisma.subpackage.findUnique({
+    const existing = await prisma.subpackage.findUnique({
       where: { id: params.id },
       include: {
         service: {
@@ -30,38 +29,33 @@ export async function PUT(
       },
     });
 
-    if (!existingSubpackage) {
+    if (!existing) {
       return NextResponse.json(
         { error: "Subpackage not found" },
         { status: 404 }
       );
     }
 
-    // Update Stripe product
-    if (existingSubpackage.stripeProductId) {
-      await stripe.products.update(existingSubpackage.stripeProductId, {
-        name: `${existingSubpackage.service.game.name} - ${existingSubpackage.service.name} - ${name}`,
-        description: description,
+    // Update Stripe product name/description
+    if (existing.stripeProductId) {
+      await stripe.products.update(existing.stripeProductId, {
+        name: `${existing.service.game.name} - ${existing.service.name} - ${name}`,
+        description,
       });
 
-      // Update price if not dynamic pricing and price changed
-      if (!dynamicPricing && price !== existingSubpackage.price) {
-        // Archive old price
-        if (existingSubpackage.stripePriceId) {
-          await stripe.prices.update(existingSubpackage.stripePriceId, {
-            active: false,
-          });
+      // Update Stripe price if not dynamic pricing
+      if (!dynamicPricing && price !== existing.price) {
+        if (existing.stripePriceId) {
+          await stripe.prices.update(existing.stripePriceId, { active: false });
         }
 
-        // Create new price
-        const stripePrice = await stripe.prices.create({
-          product: existingSubpackage.stripeProductId,
+        const newPrice = await stripe.prices.create({
+          product: existing.stripeProductId,
           unit_amount: Math.round(price * 100),
           currency: "usd",
         });
 
-        // Update subpackage with new price ID
-        const subpackage = await prisma.subpackage.update({
+        const updated = await prisma.subpackage.update({
           where: { id: params.id },
           data: {
             name,
@@ -73,7 +67,7 @@ export async function PUT(
             minELO,
             maxELO,
             serviceId,
-            stripePriceId: stripePrice.id,
+            stripePriceId: newPrice.id,
           },
           include: {
             service: {
@@ -82,11 +76,12 @@ export async function PUT(
           },
         });
 
-        return NextResponse.json(subpackage);
+        return NextResponse.json(updated);
       }
     }
 
-    const subpackage = await prisma.subpackage.update({
+    // If price unchanged or dynamicPricing true
+    const updated = await prisma.subpackage.update({
       where: { id: params.id },
       data: {
         name,
@@ -106,15 +101,15 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(subpackage);
+    return NextResponse.json(updated);
   } catch (error) {
+    console.error("PUT /subpackages error:", error);
     return NextResponse.json(
       { error: "Failed to update subpackage" },
       { status: 500 }
     );
   }
 }
-
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -124,8 +119,14 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    if (subpackage?.stripeProductId) {
-      // Archive Stripe product
+    if (!subpackage) {
+      return NextResponse.json(
+        { error: "Subpackage not found" },
+        { status: 404 }
+      );
+    }
+
+    if (subpackage.stripeProductId) {
       await stripe.products.update(subpackage.stripeProductId, {
         active: false,
       });
@@ -137,6 +138,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("DELETE /subpackages error:", error);
     return NextResponse.json(
       { error: "Failed to delete subpackage" },
       { status: 500 }

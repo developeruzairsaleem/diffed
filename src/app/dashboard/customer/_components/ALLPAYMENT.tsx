@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 // import { WalletDashboard } from "@/components/wallet-dashboard";
-import { AddFunds } from "@/components/add-funds";
+// import { AddFunds } from "@/components/add-funds";
 // import { WithdrawFunds } from "@/components/withdraw-funds";
 // import { Checkout } from "@/components/checkout"
 import { Alert, AlertDescription } from "@/components/ui/alert";

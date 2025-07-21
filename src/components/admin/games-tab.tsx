@@ -30,7 +30,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown, Edit, Trash2, Plus } from "lucide-react";
-// import { useToast } from "@/hooks/use-toast" // Commented out for now
 
 interface Game {
   id: string;
@@ -53,7 +52,6 @@ export function GamesTab() {
     isEloBased: false,
     ranks: "",
   });
-  // const { toast } = useToast()
 
   useEffect(() => {
     fetchGames();
@@ -63,6 +61,11 @@ export function GamesTab() {
     try {
       const response = await fetch("/api/admin/games");
       const data = await response.json();
+      console.log("hello reached");
+      console.log(data, "data");
+      if (data?.error) {
+        return setGames([]);
+      }
       setGames(data);
     } catch (error) {
       console.log("Error: Failed to fetch games");

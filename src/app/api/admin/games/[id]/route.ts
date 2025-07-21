@@ -7,13 +7,12 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { name, icon, image, isEloBased, ranks } = body;
+    const { name, image, isEloBased, ranks } = body;
 
     const game = await prisma.game.update({
       where: { id: params.id },
       data: {
         name,
-        icon,
         image,
         isEloBased,
         ranks: ranks || null,

@@ -1,6 +1,6 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -14,15 +14,19 @@ export async function GET() {
       },
       orderBy: { createdAt: "desc" },
     });
+
     return NextResponse.json(subpackages);
   } catch (error) {
+    console.error("GET /subpackages error:", error);
     return NextResponse.json(
       { error: "Failed to fetch subpackages" },
       { status: 500 }
     );
   }
 }
-
+// ---------------------------------------
+// post request for creating a new service
+// ---------------------------------------
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -38,7 +42,13 @@ export async function POST(request: NextRequest) {
       serviceId,
     } = body;
 
-    // Get service and game info for Stripe product
+    if (!name || !description || !serviceId) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
     const service = await prisma.service.findUnique({
       where: { id: serviceId },
       include: { game: true },
@@ -48,10 +58,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 });
     }
 
-    // Create Stripe product
     const stripeProduct = await stripe.products.create({
       name: `${service.game.name} - ${service.name} - ${name}`,
-      description: description,
+      description,
       metadata: {
         gameId: service.game.id,
         serviceName: service.name,
@@ -59,12 +68,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create Stripe price (only if not dynamic pricing)
-    let stripePriceId = null;
+    let stripePriceId: string | null = null;
     if (!dynamicPricing) {
       const stripePrice = await stripe.prices.create({
         product: stripeProduct.id,
-        unit_amount: Math.round(price * 100), // Convert to cents
+        unit_amount: Math.round(price * 100),
         currency: "usd",
       });
       stripePriceId = stripePrice.id;
@@ -86,16 +94,14 @@ export async function POST(request: NextRequest) {
       },
       include: {
         service: {
-          include: {
-            game: true,
-          },
+          include: { game: true },
         },
       },
     });
 
     return NextResponse.json(subpackage);
   } catch (error) {
-    console.error("Error creating subpackage:", error);
+    console.error("POST /subpackages error:", error);
     return NextResponse.json(
       { error: "Failed to create subpackage" },
       { status: 500 }

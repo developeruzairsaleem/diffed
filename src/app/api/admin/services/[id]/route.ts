@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -9,7 +8,14 @@ export async function PUT(
     const body = await request.json();
     const { name, description, gameId } = body;
 
-    const service = await prisma.service.update({
+    if (!name || !description || !gameId) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const updated = await prisma.service.update({
       where: { id: params.id },
       data: {
         name,
@@ -17,12 +23,15 @@ export async function PUT(
         gameId,
       },
       include: {
-        game: true,
+        game: {
+          select: { id: true, name: true },
+        },
       },
     });
 
-    return NextResponse.json(service);
+    return NextResponse.json(updated);
   } catch (error) {
+    console.error("PUT /services failed:", error);
     return NextResponse.json(
       { error: "Failed to update service" },
       { status: 500 }
@@ -30,6 +39,7 @@ export async function PUT(
   }
 }
 
+// delete route
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -41,6 +51,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("DELETE /services failed:", error);
     return NextResponse.json(
       { error: "Failed to delete service" },
       { status: 500 }
