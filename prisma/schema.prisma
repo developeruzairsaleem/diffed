@@ -100,8 +100,8 @@ enum Role {
 
 enum Status {
   active
+  inactive
   suspended
-  ban
 }
 
 enum PaymentStatus {
