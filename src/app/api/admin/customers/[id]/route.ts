@@ -1,153 +1,112 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { CustomerService } from "@/lib/customer.service";
+import type {
+  ApiResponse,
+  CustomerDetailDto,
+  CustomerUpdateRequest,
+} from "@/types/customer.dto";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // get the customer detail including basic profile, total orders, order details
-    const customer = await prisma.user.findFirst({
-      where: {
-        id: params.id,
-      },
-      include: {
-        wallet: true,
-        orderUsers: {
-          include: {
-            Order: true,
-          },
-        },
-        _count: {
-          select: {
-            orderUsers: true,
-          },
-        },
-      },
-    });
+    const customer = await CustomerService.getCustomerById(params.id);
 
     if (!customer) {
-      return NextResponse.json(
-        { error: "Customer not found" },
-        { status: 404 }
-      );
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Customer not found",
+      };
+      return NextResponse.json(response, { status: 404 });
     }
-    return NextResponse.json(customer);
+
+    const response: ApiResponse<CustomerDetailDto> = {
+      success: true,
+      data: customer,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error("GET /api/admin/customer/[id]:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch customer" },
-      { status: 500 }
-    );
+    console.error("Error fetching customer:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch customer",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
 
-// ------------------------
-// deleting the customer
-// --------------------------
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body: CustomerUpdateRequest = await request.json();
+
+    const updatedCustomer = await CustomerService.updateCustomer(
+      params.id,
+      body
+    );
+
+    if (!updatedCustomer) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Customer not found",
+      };
+      return NextResponse.json(response, { status: 404 });
+    }
+
+    const response: ApiResponse<CustomerDetailDto> = {
+      success: true,
+      data: updatedCustomer,
+      message: "Customer updated successfully",
+    };
+
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("Error updating customer:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to update customer",
+    };
+
+    return NextResponse.json(response, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const customer = await prisma.user.findUnique({
-      where: { id: params.id },
-    });
+    const success = await CustomerService.deleteCustomer(params.id);
 
-    if (!customer || customer.role !== "customer") {
-      return NextResponse.json(
-        { error: "Customer not found or invalid role" },
-        { status: 404 }
-      );
+    if (!success) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Failed to delete customer",
+      };
+      return NextResponse.json(response, { status: 400 });
     }
 
-    await prisma.user.delete({
-      where: { id: params.id },
-    });
+    const response: ApiResponse<never> = {
+      success: true,
+      message: "Customer deleted successfully",
+    };
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(response);
   } catch (error) {
-    console.error("DELETE /api/admin/customer/[id]:", error);
-    return NextResponse.json(
-      { error: "Failed to delete customer" },
-      { status: 500 }
-    );
-  }
-}
+    console.error("Error deleting customer:", error);
 
-// ----------------------------
-// updating the customer status
-// -----------------------------
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const body = await req.json();
-    const status = body?.status;
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to delete customer",
+    };
 
-    // valid status for customers
-    const validStatus = ["active", "inactive", "suspended"];
-
-    // If status is not valid return error to the user
-    if (!(status && validStatus.includes(status))) {
-      return NextResponse.json(
-        {
-          error: "Please provider a valid status to update customer",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    // Check if customer exists and has customer role
-    const existingCustomer = await prisma.user.findUnique({
-      where: { id: params.id },
-    });
-
-    // if the customer is not valid return error 404
-    if (!existingCustomer || existingCustomer?.role !== "customer") {
-      return NextResponse.json(
-        {
-          error: "Customer not found or not a valid role",
-        },
-        {
-          status: 404,
-        }
-      );
-    }
-    // Update customer status
-    const updatedCustomer = await prisma.user.update({
-      where: {
-        id: params.id,
-        role: "customer",
-      },
-      data: {
-        status: status,
-        updatedAt: new Date(),
-      },
-      include: {
-        wallet: true,
-        orderUsers: {
-          include: {
-            Order: true,
-          },
-        },
-        _count: {
-          select: {
-            orderUsers: true,
-          },
-        },
-      },
-    });
-
-    return NextResponse.json(updatedCustomer);
-  } catch (error) {
-    console.error("UPDATE /api/admin/customer/[id]:", error);
-    return NextResponse.json(
-      { error: "Something went wrong updating" },
-      { status: 500 }
-    );
+    return NextResponse.json(response, { status: 500 });
   }
 }

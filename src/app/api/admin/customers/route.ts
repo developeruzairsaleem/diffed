@@ -1,54 +1,53 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { CustomersDTO } from "@/DTO/admin/customers.dto";
-import { CustomerArraySchema } from "@/validations/admin/customers.validator";
-import { ZodError } from "zod";
-export async function GET() {
+import { CustomerService } from "@/lib/customer.service";
+import type {
+  CustomersListRequest,
+  ApiResponse,
+  CustomersListResponse,
+} from "@/types/customer.dto";
+
+export async function GET(request: NextRequest) {
   try {
-    // ------------------------------------------------------------------
-    // raw customers from db with orderUsers count in the orderUsers table
-    // ------------------------------------------------------------------
-    const customers = await prisma.user.findMany({
-      where: { role: "customer" },
-      include: {
-        wallet: true,
-        _count: {
-          select: {
-            orderUsers: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    // ---------------------------------------------------------
-    // tranform customers so they can be parsed for validations
-    // ----------------------------------------------------------
-    const transformedCustomers = customers.map((c: any) => new CustomersDTO(c));
-    // ---------------------------------
-    // validated customer after parsing
-    // ----------------------------------
-    const parsedCustomers = CustomerArraySchema.parse(transformedCustomers);
-    return NextResponse.json(parsedCustomers);
+    const { searchParams } = new URL(request.url);
+
+    const params: CustomersListRequest = {
+      page: searchParams.get("page")
+        ? Number.parseInt(searchParams.get("page")!)
+        : 1,
+      limit: searchParams.get("limit")
+        ? Number.parseInt(searchParams.get("limit")!)
+        : 10,
+      status: (searchParams.get("status") as any) || undefined,
+      search: searchParams.get("search") || undefined,
+      sortBy: (searchParams.get("sortBy") as any) || "createdAt",
+      sortOrder: (searchParams.get("sortOrder") as any) || "desc",
+      hasOrders: searchParams.get("hasOrders")
+        ? searchParams.get("hasOrders") === "true"
+        : undefined,
+      minSpent: searchParams.get("minSpent")
+        ? Number.parseFloat(searchParams.get("minSpent")!)
+        : undefined,
+      maxSpent: searchParams.get("maxSpent")
+        ? Number.parseFloat(searchParams.get("maxSpent")!)
+        : undefined,
+    };
+
+    const result = await CustomerService.getCustomers(params);
+
+    const response: ApiResponse<CustomersListResponse> = {
+      success: true,
+      data: result,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    // -------------------------------------------------
-    // check if the error occured is the validation error
-    // ------------------------------------------------
-    if (error instanceof ZodError) {
-      console.error("Validation error:", error.errors);
-      return NextResponse.json(
-        {
-          error: "validation Error",
-        },
-        {
-          status: 400,
-        }
-      );
-    } else {
-      console.error("General error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch customers" },
-        { status: 500 }
-      );
-    }
+    console.error("Error fetching customers:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch customers",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
