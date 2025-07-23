@@ -123,7 +123,7 @@ model Service {
   name        String
   description String
   gameId      String
-  game        Game         @relation(fields: [gameId], references: [id])
+  game        Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
   subpackages Subpackage[]
 }
 
@@ -138,7 +138,7 @@ model Subpackage {
   minELO          Int?
   maxELO          Int?
   serviceId       String
-  service         Service @relation(fields: [serviceId], references: [id])
+  service         Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   stripeProdId    String? @unique
   stripePriceId   String? @unique
   orders          Order[]
@@ -150,7 +150,7 @@ model Order {
   customerId    String
   customer      User        @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
   subpackageId  String
-  subpackage    Subpackage  @relation(fields: [subpackageId], references: [id])
+  subpackage    Subpackage  @relation(fields: [subpackageId], references: [id], onDelete: Cascade)
   price         Float
   status        OrderStatus @default(PENDING)
   notes         String?
@@ -180,7 +180,7 @@ model OrderAssignment {
   reviewText   String?
 
   order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider User  @relation(fields: [providerId], references: [id])
+  provider User  @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
   @@unique([orderId, providerId])
 }
