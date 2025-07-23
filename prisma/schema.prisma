@@ -148,7 +148,7 @@ model Order {
   id            String      @id @default(cuid())
   orderNumber   String      @unique @default(cuid())
   customerId    String
-  customer      User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  customer      User        @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
   subpackageId  String
   subpackage    Subpackage  @relation(fields: [subpackageId], references: [id])
   price         Float
