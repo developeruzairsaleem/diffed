@@ -166,19 +166,20 @@ model Order {
 }
 
 model OrderAssignment {
-  id           String   @id @default(cuid())
+  id           String                @id @default(cuid())
   orderId      String
   providerId   String
-  claimedAt    DateTime @default(now())
-  approved     Boolean  @default(false)
-  completed    Boolean  @default(false)
-  leftEarly    Boolean  @default(false)
-  progress     Float    @default(0.0) // percentage 0-100
+  claimedAt    DateTime              @default(now())
+  status       OrderAssignmentStatus @default(PENDING)
+  approved     Boolean               @default(false)
+  completed    Boolean               @default(false)
+  leftEarly    Boolean               @default(false)
+  progress     Float                 @default(0.0) // percentage 0-100
   proofUrl     String?
   reviewRating Int?
   reviewText   String?
 
-  order    Order @relation(fields: [orderId], references: [id])
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   provider User  @relation(fields: [providerId], references: [id])
 
   @@unique([orderId, providerId])
@@ -191,8 +192,8 @@ model Chat {
   message  String
   sentAt   DateTime @default(now())
 
-  order  Order @relation(fields: [orderId], references: [id])
-  sender User  @relation(fields: [senderId], references: [id])
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sender User  @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 enum OrderStatus {
@@ -200,4 +201,12 @@ enum OrderStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+enum OrderAssignmentStatus {
+  REPLACED
+  PENDING
+  APPROVED
+  COMPLETED
+  VERIFIED
 }

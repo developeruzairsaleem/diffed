@@ -1,5 +1,5 @@
 "use client";
-
+import "@ant-design/v5-patch-for-react-19";
 import React, { useState } from "react";
 import { Layout, Menu, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
@@ -14,7 +14,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const { Header, Sider, Content } = Layout;
-
+import "antd/dist/reset.css";
 export default function AdminLayout({
   children,
 }: {

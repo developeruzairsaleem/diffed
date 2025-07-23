@@ -1,61 +1,110 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { OrderService } from "@/lib/order.service";
+import type {
+  ApiResponse,
+  OrderDetailDto,
+  OrderUpdateRequest,
+} from "@/types/order.dto";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const order = await OrderService.getOrderById(params.id);
+
+    if (!order) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Order not found",
+      };
+      return NextResponse.json(response, { status: 404 });
+    }
+
+    const response: ApiResponse<OrderDetailDto> = {
+      success: true,
+      data: order,
+    };
+
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch order",
+    };
+
+    return NextResponse.json(response, { status: 500 });
+  }
+}
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json();
-    const { status, scheduledTime, completionTime, notes } = body;
+    const body: OrderUpdateRequest = await request.json();
 
-    const updatedOrder = await prisma.order.update({
-      where: { id: params.id },
-      data: {
-        status,
-        notes,
-        scheduledTime: scheduledTime ? new Date(scheduledTime) : null,
-        completionTime: completionTime ? new Date(completionTime) : null,
-      },
-      include: {
-        orderUsers: {
-          include: {
-            User: true,
-          },
-        },
-      },
-    });
+    const updatedOrder = await OrderService.updateOrder(params.id, body);
 
-    return NextResponse.json(updatedOrder);
+    if (!updatedOrder) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Order not found",
+      };
+      return NextResponse.json(response, { status: 404 });
+    }
+
+    const response: ApiResponse<OrderDetailDto> = {
+      success: true,
+      data: updatedOrder,
+      message: "Order updated successfully",
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update order" },
-      { status: 500 }
-    );
+    console.error("Error updating order:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to update order",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
 
-// delete endpoint function
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  console.log("params", params.id);
   try {
-    // Delete all linked users (customers/providers)
-    await prisma.orderUser.deleteMany({
-      where: { orderId: params.id },
-    });
+    const success = await OrderService.deleteOrder(params.id);
 
-    // Delete the actual order
-    await prisma.order.delete({
-      where: { id: params.id },
-    });
+    if (!success) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Failed to delete order",
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
 
-    return NextResponse.json({ success: true });
+    const response: ApiResponse<never> = {
+      success: true,
+      message: "Order deleted successfully",
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete order" },
-      { status: 500 }
-    );
+    console.error("Error deleting order:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to delete order",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }

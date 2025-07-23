@@ -1,0 +1,134 @@
+import type {
+  OrderStatus,
+  OrderAssignmentStatus,
+  Role,
+} from "@/generated/prisma";
+
+// Base DTOs
+export interface UserDto {
+  id: string;
+  username: string;
+  email: string;
+  role: Role;
+  profileImage?: string;
+}
+
+export interface SubpackageDto {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  duration?: string;
+  service: {
+    id: string;
+    name: string;
+    game: {
+      id: string;
+      name: string;
+      image: string;
+    };
+  };
+}
+
+export interface OrderAssignmentDto {
+  id: string;
+  providerId: string;
+  claimedAt: Date;
+  status: OrderAssignmentStatus;
+  approved: boolean;
+  completed: boolean;
+  leftEarly: boolean;
+  progress: number;
+  proofUrl?: string;
+  reviewRating?: number;
+  reviewText?: string;
+  provider: UserDto;
+}
+
+export interface ChatDto {
+  id: string;
+  senderId: string;
+  message: string;
+  sentAt: Date;
+  sender: UserDto;
+}
+
+// Order DTOs
+export interface OrderListDto {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customer: UserDto;
+  subpackage: SubpackageDto;
+  price: number;
+  status: OrderStatus;
+  rerollsLeft: number;
+  approvedCount: number;
+  requiredCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  assignmentsCount: number;
+}
+
+export interface OrderDetailDto {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customer: UserDto;
+  subpackage: SubpackageDto;
+  price: number;
+  status: OrderStatus;
+  notes?: string;
+  rerollsLeft: number;
+  approvedCount: number;
+  requiredCount: number;
+  stripeSessId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  assignments: OrderAssignmentDto[];
+  chats: ChatDto[];
+}
+
+// API Request/Response DTOs
+export interface OrdersListRequest {
+  page?: number;
+  limit?: number;
+  status?: OrderStatus;
+  customerId?: string;
+  gameId?: string;
+  search?: string;
+  sortBy?: "createdAt" | "updatedAt" | "price";
+  sortOrder?: "asc" | "desc";
+}
+
+export interface OrdersListResponse {
+  orders: OrderListDto[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface OrderUpdateRequest {
+  status?: OrderStatus;
+  notes?: string;
+  rerollsLeft?: number;
+  requiredCount?: number;
+}
+
+export interface AssignmentUpdateRequest {
+  status?: OrderAssignmentStatus;
+  approved?: boolean;
+  completed?: boolean;
+  progress?: number;
+  proofUrl?: string;
+  reviewRating?: number;
+  reviewText?: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}

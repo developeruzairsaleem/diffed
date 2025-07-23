@@ -1,69 +1,46 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { OrderService } from "@/lib/order.service";
+import type {
+  OrdersListRequest,
+  ApiResponse,
+  OrdersListResponse,
+} from "@/types/order.dto";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const orders = await prisma.order.findMany({
-      include: {
-        orderUsers: {
-          include: {
-            User: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json(orders);
+    const { searchParams } = new URL(request.url);
+
+    const params: OrdersListRequest = {
+      page: searchParams.get("page")
+        ? Number.parseInt(searchParams.get("page")!)
+        : 1,
+      limit: searchParams.get("limit")
+        ? Number.parseInt(searchParams.get("limit")!)
+        : 10,
+      status: (searchParams.get("status") as any) || undefined,
+      customerId: searchParams.get("customerId") || undefined,
+      gameId: searchParams.get("gameId") || undefined,
+      search: searchParams.get("search") || undefined,
+      sortBy: (searchParams.get("sortBy") as any) || "createdAt",
+      sortOrder: (searchParams.get("sortOrder") as any) || "desc",
+    };
+
+    const result = await OrderService.getOrders(params);
+
+    const response: ApiResponse<OrdersListResponse> = {
+      success: true,
+      data: result,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 }
-    );
-  }
-}
+    console.error("Error fetching orders:", error);
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { customerId, subPackageId, price, scheduledTime, notes } = body;
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch orders",
+    };
 
-    const order = await prisma.order.create({
-      data: {
-        subPackageId,
-        price,
-        scheduledTime: scheduledTime ? new Date(scheduledTime) : null,
-        notes,
-        orderUsers: {
-          create: [
-            {
-              userId: customerId,
-            },
-          ],
-        },
-      },
-      include: {
-        orderUsers: {
-          include: {
-            User: true,
-          },
-        },
-        subpackage: {
-          include: {
-            service: {
-              include: {
-                game: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return NextResponse.json(order);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 }
-    );
+    return NextResponse.json(response, { status: 500 });
   }
 }
