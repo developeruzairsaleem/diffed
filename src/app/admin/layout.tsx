@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 
 const { Header, Sider, Content } = Layout;
 import "antd/dist/reset.css";
+import { LuGamepad } from "react-icons/lu";
 export default function AdminLayout({
   children,
 }: {
@@ -39,7 +40,7 @@ export default function AdminLayout({
     },
     {
       key: "/admin/games",
-      icon: "0 ",
+      icon: <LuGamepad />,
       label: <Link href="/admin/games">Games</Link>,
     },
     {

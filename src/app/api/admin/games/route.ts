@@ -1,71 +1,81 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { GameService } from "@/lib/game.service";
+import type {
+  GamesListRequest,
+  ApiResponse,
+  GamesListResponse,
+  GameCreateRequest,
+} from "@/types/game.dto";
 
-// GET /api/game
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const games = await prisma.game.findMany({
-      include: {
-        services: {
-          include: {
-            subpackages: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const { searchParams } = new URL(request.url);
 
-    return NextResponse.json(games, { status: 200 });
+    const params: GamesListRequest = {
+      page: searchParams.get("page")
+        ? Number.parseInt(searchParams.get("page")!)
+        : 1,
+      limit: searchParams.get("limit")
+        ? Number.parseInt(searchParams.get("limit")!)
+        : 10,
+      search: searchParams.get("search") || undefined,
+      sortBy: (searchParams.get("sortBy") as any) || "createdAt",
+      sortOrder: (searchParams.get("sortOrder") as any) || "desc",
+      isEloBased: searchParams.get("isEloBased")
+        ? searchParams.get("isEloBased") === "true"
+        : undefined,
+      hasOrders: searchParams.get("hasOrders")
+        ? searchParams.get("hasOrders") === "true"
+        : undefined,
+      minRevenue: searchParams.get("minRevenue")
+        ? Number.parseFloat(searchParams.get("minRevenue")!)
+        : undefined,
+      maxRevenue: searchParams.get("maxRevenue")
+        ? Number.parseFloat(searchParams.get("maxRevenue")!)
+        : undefined,
+    };
+
+    const result = await GameService.getGames(params);
+
+    const response: ApiResponse<GamesListResponse> = {
+      success: true,
+      data: result,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error("Failed to fetch games:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch games" },
-      { status: 500 }
-    );
+    console.error("Error fetching games:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch games",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
 
-// POST /api/game
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, image, isEloBased = false, ranks = null } = body;
+    const body: GameCreateRequest = await request.json();
 
-    if (!name || !image) {
-      return NextResponse.json(
-        { error: "Missing required fields: name or image" },
-        { status: 400 }
-      );
-    }
+    const game = await GameService.createGame(body);
 
-    const existingGame = await prisma.game.findUnique({
-      where: { name },
-    });
+    const response: ApiResponse<typeof game> = {
+      success: true,
+      data: game,
+      message: "Game created successfully",
+    };
 
-    if (existingGame) {
-      return NextResponse.json(
-        { error: "Game with this name already exists" },
-        { status: 409 }
-      );
-    }
-
-    const newGame = await prisma.game.create({
-      data: {
-        name,
-        image,
-        isEloBased,
-        ranks,
-      },
-    });
-
-    return NextResponse.json(newGame, { status: 201 });
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error("Failed to create game:", error);
-    return NextResponse.json(
-      { error: "Failed to create game" },
-      { status: 500 }
-    );
+    console.error("Error creating game:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to create game",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }

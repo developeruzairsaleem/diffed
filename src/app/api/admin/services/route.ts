@@ -1,65 +1,70 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { GameService } from "@/lib/game.service";
+import type {
+  ServicesListRequest,
+  ApiResponse,
+  ServicesListResponse,
+  ServiceCreateRequest,
+} from "@/types/game.dto";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const services = await prisma.service.findMany({
-      include: {
-        game: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            isEloBased: true,
-          },
-        },
-        subpackages: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const { searchParams } = new URL(request.url);
 
-    return NextResponse.json(services);
+    const params: ServicesListRequest = {
+      page: searchParams.get("page")
+        ? Number.parseInt(searchParams.get("page")!)
+        : 1,
+      limit: searchParams.get("limit")
+        ? Number.parseInt(searchParams.get("limit")!)
+        : 10,
+      gameId: searchParams.get("gameId") || undefined,
+      search: searchParams.get("search") || undefined,
+      sortBy: (searchParams.get("sortBy") as any) || "createdAt",
+      sortOrder: (searchParams.get("sortOrder") as any) || "desc",
+    };
+
+    const result = await GameService.getServices(params);
+
+    const response: ApiResponse<ServicesListResponse> = {
+      success: true,
+      data: result,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error("GET /services failed:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch services" },
-      { status: 500 }
-    );
+    console.error("Error fetching services:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch services",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
 
-// post request for creating a service
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, description, gameId } = body;
+    const body: ServiceCreateRequest = await request.json();
 
-    if (!name || !description || !gameId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    const service = await GameService.createService(body);
 
-    const service = await prisma.service.create({
-      data: {
-        name,
-        description,
-        gameId,
-      },
-      include: {
-        game: {
-          select: { id: true, name: true },
-        },
-      },
-    });
+    const response: ApiResponse<typeof service> = {
+      success: true,
+      data: service,
+      message: "Service created successfully",
+    };
 
-    return NextResponse.json(service);
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error("POST /services failed:", error);
-    return NextResponse.json(
-      { error: "Failed to create service" },
-      { status: 500 }
-    );
+    console.error("Error creating service:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to create service",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }

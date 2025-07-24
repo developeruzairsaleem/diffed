@@ -1,110 +1,171 @@
-import { stripe } from "@/lib/stripe";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { GameService } from "@/lib/game.service";
 import { prisma } from "@/lib/prisma";
+import type { ApiResponse, SubpackageCreateRequest } from "@/types/game.dto";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const subpackages = await prisma.subpackage.findMany({
-      include: {
-        service: {
-          include: {
-            game: true,
+    const { searchParams } = new URL(request.url);
+
+    const params = {
+      page: searchParams.get("page")
+        ? Number.parseInt(searchParams.get("page")!)
+        : 1,
+      limit: searchParams.get("limit")
+        ? Number.parseInt(searchParams.get("limit")!)
+        : 10,
+      serviceId: searchParams.get("serviceId") || undefined,
+      gameId: searchParams.get("gameId") || undefined,
+      search: searchParams.get("search") || undefined,
+      sortBy: (searchParams.get("sortBy") as any) || "createdAt",
+      sortOrder: (searchParams.get("sortOrder") as any) || "desc",
+      dynamicPricing: searchParams.get("dynamicPricing")
+        ? searchParams.get("dynamicPricing") === "true"
+        : undefined,
+      minPrice: searchParams.get("minPrice")
+        ? Number.parseFloat(searchParams.get("minPrice")!)
+        : undefined,
+      maxPrice: searchParams.get("maxPrice")
+        ? Number.parseFloat(searchParams.get("maxPrice")!)
+        : undefined,
+    };
+
+    const skip = (params.page - 1) * params.limit;
+
+    const where: any = {
+      ...(params.serviceId && { serviceId: params.serviceId }),
+      ...(params.gameId && { service: { gameId: params.gameId } }),
+      ...(params.search && {
+        OR: [
+          { name: { contains: params.search, mode: "insensitive" as const } },
+          {
+            description: {
+              contains: params.search,
+              mode: "insensitive" as const,
+            },
+          },
+        ],
+      }),
+      ...(params.dynamicPricing !== undefined && {
+        dynamicPricing: params.dynamicPricing,
+      }),
+      ...(params.minPrice !== undefined && { price: { gte: params.minPrice } }),
+      ...(params.maxPrice !== undefined && { price: { lte: params.maxPrice } }),
+    };
+
+    const [subpackages, total] = await Promise.all([
+      prisma.subpackage.findMany({
+        where,
+        skip,
+        take: params.limit,
+        orderBy: { [params.sortBy]: params.sortOrder },
+        include: {
+          service: {
+            include: {
+              game: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+          },
+          orders: {
+            select: {
+              id: true,
+              price: true,
+              status: true,
+              createdAt: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
+      }),
+      prisma.subpackage.count({ where }),
+    ]);
+
+    const subpackageDtos = subpackages.map((subpackage) => {
+      const ordersCount = subpackage.orders.length;
+      const totalRevenue = subpackage.orders.reduce(
+        (sum, order) => sum + order.price,
+        0
+      );
+      const completedOrders = subpackage.orders.filter(
+        (order) => order.status === "COMPLETED"
+      ).length;
+      const completionRate =
+        ordersCount > 0 ? (completedOrders / ordersCount) * 100 : 0;
+
+      return {
+        id: subpackage.id,
+        name: subpackage.name,
+        description: subpackage.description,
+        price: subpackage.price,
+        duration: subpackage.duration,
+        dynamicPricing: subpackage.dynamicPricing,
+        basePricePerELO: subpackage.basePricePerELO,
+        minELO: subpackage.minELO,
+        maxELO: subpackage.maxELO,
+        serviceId: subpackage.serviceId,
+        service: {
+          id: subpackage.service.id,
+          name: subpackage.service.name,
+          description: subpackage.service.description,
+          game: subpackage.service.game,
+        },
+        ordersCount,
+        totalRevenue,
+        completionRate,
+        createdAt: subpackage.createdAt,
+        updatedAt: subpackage.updatedAt,
+      };
     });
 
-    return NextResponse.json(subpackages);
+    const response: ApiResponse<any> = {
+      success: true,
+      data: {
+        subpackages: subpackageDtos,
+        total,
+        page: params.page,
+        limit: params.limit,
+        totalPages: Math.ceil(total / params.limit),
+      },
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error("GET /subpackages error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch subpackages" },
-      { status: 500 }
-    );
+    console.error("Error fetching subpackages:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to fetch subpackages",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
-// ---------------------------------------
-// post request for creating a new service
-// ---------------------------------------
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const {
-      name,
-      description,
-      price,
-      duration,
-      dynamicPricing,
-      basePricePerELO,
-      minELO,
-      maxELO,
-      serviceId,
-    } = body;
+    const body: SubpackageCreateRequest = await request.json();
 
-    if (!name || !description || !serviceId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    const subpackage = await GameService.createSubpackage(body);
 
-    const service = await prisma.service.findUnique({
-      where: { id: serviceId },
-      include: { game: true },
-    });
+    const response: ApiResponse<typeof subpackage> = {
+      success: true,
+      data: subpackage,
+      message: "Subpackage created successfully",
+    };
 
-    if (!service) {
-      return NextResponse.json({ error: "Service not found" }, { status: 404 });
-    }
-
-    const stripeProduct = await stripe.products.create({
-      name: `${service.game.name} - ${service.name} - ${name}`,
-      description,
-      metadata: {
-        gameId: service.game.id,
-        serviceName: service.name,
-        subpackageName: name,
-      },
-    });
-
-    let stripePriceId: string | null = null;
-    if (!dynamicPricing) {
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: Math.round(price * 100),
-        currency: "usd",
-      });
-      stripePriceId = stripePrice.id;
-    }
-
-    const subpackage = await prisma.subpackage.create({
-      data: {
-        name,
-        description,
-        price,
-        duration,
-        dynamicPricing,
-        basePricePerELO,
-        minELO,
-        maxELO,
-        serviceId,
-        stripeProductId: stripeProduct.id,
-        stripePriceId,
-      },
-      include: {
-        service: {
-          include: { game: true },
-        },
-      },
-    });
-
-    return NextResponse.json(subpackage);
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error("POST /subpackages error:", error);
-    return NextResponse.json(
-      { error: "Failed to create subpackage" },
-      { status: 500 }
-    );
+    console.error("Error creating subpackage:", error);
+
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to create subpackage",
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }
