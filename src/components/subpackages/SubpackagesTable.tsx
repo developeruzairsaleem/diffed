@@ -41,7 +41,8 @@ const { TextArea } = Input;
 export default function SubpackagesTable() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
-
+  const [currentGameId, setCurrentGameId] = useState("");
+  const [currentService, setCurrentService] = useState("");
   const { data, loading, error, refetch } = useSubpackages();
 
   const handleCreateSubpackage = async (values: SubpackageCreateRequest) => {
@@ -328,16 +329,34 @@ export default function SubpackagesTable() {
             <TextArea rows={3} />
           </Form.Item>
           <Form.Item
+            label="Game"
+            rules={[{ required: true, message: "Game is required" }]}
+          >
+            <Select onChange={setCurrentGameId} placeholder="Select a Game">
+              {data?.allGames.map((game) => (
+                <Option value={game.id} key={game.id}>
+                  {game.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
             name="serviceId"
             label="Service"
             rules={[{ required: true, message: "Service is required" }]}
           >
-            <Select placeholder="Select a service">
-              {/* You would populate this with actual services */}
-              <Option value="service1">Service 1</Option>
-              <Option value="service2">Service 2</Option>
+            <Select onChange={setCurrentService} placeholder="Select a Service">
+              {data?.allGames
+                ?.filter((g) => g.id === currentGameId)[0]
+                ?.services.map((service) => (
+                  <Option value={service.id} key={service.id}>
+                    {service.name}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
+
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item

@@ -191,9 +191,7 @@ export default function ServicesTable() {
               <Button type="text" icon={<EyeOutlined />} size="small" />
             </Link>
           </Tooltip>
-          <Tooltip title="Edit">
-            <Button type="text" icon={<EditOutlined />} size="small" />
-          </Tooltip>
+      
           <Tooltip title="Delete">
             <Button
               type="text"
@@ -265,9 +263,13 @@ export default function ServicesTable() {
               style={{ width: 200 }}
               onChange={handleGameFilter}
             >
-              {/* You would populate this with actual games */}
-              <Option value="game1">Game 1</Option>
-              <Option value="game2">Game 2</Option>
+              {data?.games.map((game) => {
+                return (
+                  <Option value={game?.id} key={game?.id}>
+                    {game?.name}
+                  </Option>
+                );
+              })}
             </Select>
             <Button icon={<FilterOutlined />}>More Filters</Button>
           </Space>
@@ -327,9 +329,13 @@ export default function ServicesTable() {
             rules={[{ required: true, message: "Game selection is required" }]}
           >
             <Select placeholder="Select a game">
-              {/* You would populate this with actual games */}
-              <Option value="game1">Game 1</Option>
-              <Option value="game2">Game 2</Option>
+              {data?.games.map((game) => {
+                return (
+                  <Option key={game.id} value={game.id}>
+                    {game.name}
+                  </Option>
+                );
+              })}
             </Select>
           </Form.Item>
           <Form.Item>

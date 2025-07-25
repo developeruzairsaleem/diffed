@@ -15,7 +15,7 @@ export default function ServicesPage() {
           Monitor and manage all services and their subpackages across all games
         </p>
       </div>
-      <div>Hello</div>
+
       <ServicesTable />
     </div>
   );

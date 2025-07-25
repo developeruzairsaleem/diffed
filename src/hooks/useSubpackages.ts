@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { ApiResponse } from "@/types/game.dto";
+import { string } from "zod";
 
 export interface SubpackageDetailDto {
   id: string;
@@ -49,6 +50,7 @@ export interface SubpackageDetailDto {
     averageRating: number;
     averageOrderValue: number;
   };
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -86,6 +88,16 @@ export interface SubpackageListResponse {
   page: number;
   limit: number;
   totalPages: number;
+  allGames: Array<{
+    id: string;
+    name: string;
+    image: string;
+    services: Array<{
+      id: string;
+      name: string;
+      description: string;
+    }>;
+  }>;
 }
 
 export interface PricingCalculation {

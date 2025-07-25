@@ -197,27 +197,6 @@ export default function GameDetail({ gameId }: GameDetailProps) {
         </span>
       ),
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record: any) => (
-        <Space size="small">
-          <Button
-            size="small"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setSelectedServiceId(record.id);
-              setSubpackageModalVisible(true);
-            }}
-          >
-            Add Subpackage
-          </Button>
-          <Button size="small" icon={<EditOutlined />}>
-            Edit
-          </Button>
-        </Space>
-      ),
-    },
   ];
 
   const subpackageColumns: ColumnsType<any> = [
@@ -423,15 +402,7 @@ export default function GameDetail({ gameId }: GameDetailProps) {
               display: "flex",
               justifyContent: "flex-end",
             }}
-          >
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setServiceModalVisible(true)}
-            >
-              Add Service
-            </Button>
-          </div>
+          ></div>
           <Table
             columns={serviceColumns}
             dataSource={game.services}

@@ -18,6 +18,7 @@ import {
   Modal,
   Form,
   Switch,
+  message,
 } from "antd";
 import {
   EyeOutlined,
@@ -52,7 +53,7 @@ export default function GamesTable() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-
+  const [deletingId, setDeletingId] = useState("");
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -79,6 +80,32 @@ export default function GamesTable() {
     } catch (err) {
       console.error("Error creating game:", err);
     }
+  };
+
+  // hnadle delete game
+  const handleDeleteGame = async (id: string) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete the current game.",
+      okText: "Delete",
+      cancelText: "Cancel",
+      onOk: async function () {
+        try {
+          const res = await fetch(`/api/admin/games/${id}`, {
+            method: "DELETE",
+          });
+
+          if (!res.ok) throw new Error("Failed to delete Game");
+          else {
+            await refetch();
+            message.success("Game deleted");
+          }
+        } catch (err) {
+          message.error("Error deleting game");
+        } finally {
+          setDeletingId("");
+        }
+      },
+    });
   };
 
   const columns: ColumnsType<GameListDto> = [
@@ -225,11 +252,16 @@ export default function GamesTable() {
               <Button type="text" icon={<EyeOutlined />} size="small" />
             </Link>
           </Tooltip>
-          <Tooltip title="Edit">
-            <Button type="text" icon={<EditOutlined />} size="small" />
-          </Tooltip>
+
           <Tooltip title="Delete">
-            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+            <Button
+              disabled={record.id === deletingId}
+              onClick={() => handleDeleteGame(record.id)}
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              size="small"
+            />
           </Tooltip>
         </Space>
       ),

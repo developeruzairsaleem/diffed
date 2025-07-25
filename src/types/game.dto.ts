@@ -137,6 +137,11 @@ export interface ServiceDetailDto {
     completedOrders: number;
     completionRate: number;
   };
+  allGames: Array<{
+    id: string;
+    name: string;
+    image: string;
+  }>;
 }
 
 // API Request/Response DTOs
@@ -193,6 +198,11 @@ export interface ServicesListResponse {
     totalRevenue: number;
     createdAt: Date;
     updatedAt: Date;
+  }>;
+  games: Array<{
+    id: string;
+    name: string;
+    image: string;
   }>;
   total: number;
   page: number;

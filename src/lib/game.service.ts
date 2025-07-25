@@ -370,7 +370,7 @@ export class GameService {
       }),
     };
 
-    const [services, total] = await Promise.all([
+    const [services, total, games] = await Promise.all([
       prisma.service.findMany({
         where,
         skip,
@@ -397,6 +397,13 @@ export class GameService {
         },
       }),
       prisma.service.count({ where }),
+      prisma.game.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      }),
     ]);
 
     const serviceDtos = services.map((service) => {
@@ -432,11 +439,12 @@ export class GameService {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
+      games,
     };
   }
 
   static async getServiceById(id: string): Promise<ServiceDetailDto | null> {
-    const service = await prisma.service.findUnique({
+    const getServices = prisma.service.findUnique({
       where: { id },
       include: {
         game: {
@@ -461,6 +469,16 @@ export class GameService {
         },
       },
     });
+    const [service, games] = await Promise.all([
+      getServices,
+      prisma.game.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      }),
+    ]);
 
     if (!service) return null;
 
@@ -532,6 +550,7 @@ export class GameService {
         completedOrders,
         completionRate,
       },
+      allGames: games,
     };
   }
 

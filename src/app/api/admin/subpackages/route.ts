@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       ...(params.maxPrice !== undefined && { price: { lte: params.maxPrice } }),
     };
 
-    const [subpackages, total] = await Promise.all([
+    const [subpackages, total, allGames] = await Promise.all([
       prisma.subpackage.findMany({
         where,
         skip,
@@ -82,6 +82,20 @@ export async function GET(request: NextRequest) {
         },
       }),
       prisma.subpackage.count({ where }),
+      prisma.game.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          services: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+            },
+          },
+        },
+      }),
     ]);
 
     const subpackageDtos = subpackages.map((subpackage) => {
@@ -129,6 +143,7 @@ export async function GET(request: NextRequest) {
         page: params.page,
         limit: params.limit,
         totalPages: Math.ceil(total / params.limit),
+        allGames,
       },
     };
 
