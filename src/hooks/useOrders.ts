@@ -6,6 +6,8 @@ import type {
   OrdersListResponse,
   OrderDetailDto,
   ApiResponse,
+  CustomerOrderListDto,
+  CustomerOrderListResponse,
 } from "@/types/order.dto";
 
 export function useOrders(params: OrdersListRequest) {
@@ -41,6 +43,50 @@ export function useOrders(params: OrdersListRequest) {
   };
 
   useEffect(() => {
+    fetchOrders();
+  }, [JSON.stringify(params)]);
+
+  return { data, loading, error, refetch: fetchOrders };
+}
+
+export function useCustomerOrders(params: OrdersListRequest) {
+  const [data, setData] = useState<CustomerOrderListResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+
+      const response = await fetch(`/api/customer/orders?${searchParams}`);
+      const result: ApiResponse<CustomerOrderListResponse> =
+        await response.json();
+
+      if (result.success && result.data) {
+        setData(result.data);
+      } else {
+        setError(result.error || "Failed to fetch orders");
+      }
+    } catch (err) {
+      setError("Network error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!params?.customerId) {
+      return;
+    }
+
     fetchOrders();
   }, [JSON.stringify(params)]);
 

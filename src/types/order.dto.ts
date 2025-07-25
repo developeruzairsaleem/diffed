@@ -70,6 +70,27 @@ export interface OrderListDto {
   assignmentsCount: number;
 }
 
+// Order DTOs
+export interface CustomerOrderListDto {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  subpackage: SubpackageDto;
+  price: number;
+  status: OrderStatus;
+  rerollsLeft: number;
+  approvedCount: number;
+  requiredCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  providers: Array<{
+    id: string;
+    username: string;
+    email: string;
+    status: string;
+  }>;
+}
+
 export interface OrderDetailDto {
   id: string;
   orderNumber: string;
@@ -104,6 +125,17 @@ export interface OrdersListRequest {
 export interface OrdersListResponse {
   orders: OrderListDto[];
   total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CustomerOrderListResponse {
+  orders: CustomerOrderListDto[];
+  total: number;
+  active: number;
+  completed: number;
+  totalSpent: number;
   page: number;
   limit: number;
   totalPages: number;

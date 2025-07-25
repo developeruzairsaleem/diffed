@@ -9,26 +9,53 @@ import {
 } from "lucide-react";
 import gamesData from "../../../../../gamedata.json";
 import orders from "../../../../../orders.json";
-import getStatusColor from "../_lib/get-status-color";
-
+import { useCustomerOrders } from "@/hooks/useOrders";
+import { useStore } from "@/store/useStore";
+import { CustomerOrderListDto } from "@/types/order.dto";
+import { Spinner } from "flowbite-react";
 const OverviewTab = () => {
+  const { user } = useStore();
+  //  renaming hooks name for recent orders
+  const {
+    data: ordersData,
+    error: ordersError,
+    refetch: refetchOrders,
+    loading: loadingOrders,
+  } = useCustomerOrders({
+    customerId: user?.id,
+  });
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "completed":
+      case "COMPLETED":
         return <CheckCircle className="w-4 h-4" />;
-      case "in_progress":
+      case "IN_PROGRESS":
         return <Activity className="w-4 h-4" />;
-      case "pending":
+      case "PENDING":
         return <Clock className="w-4 h-4" />;
-      case "cancelled":
+      case "CANCELLED":
         return <XCircle className="w-4 h-4" />;
       default:
         return <AlertCircle className="w-4 h-4" />;
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "COMPLETED":
+        return "text-green-600 border-green-600 border-2 bg-transparent";
+      case "IN_PROGRESS":
+        return "text-blue-600 border-blue-600 border-2 bg-transparent";
+      case "PENDING":
+        return "text-yellow-600 border-2 border-yellow-600 bg-transparent";
+      case "CANCELLED":
+        return "text-red-600 border-red-600 border-2 bg-transparent";
+      default:
+        return "text-gray-600 border-gray-600 border-2 bg-transparent";
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex h-full flex-col">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* outer cards */}
@@ -60,7 +87,11 @@ const OverviewTab = () => {
                   <div>
                     <p className="text-sm text-gray-200">Total Orders</p>
                     <p className="text-2xl font-bold text-gray-100">
-                      {orders.length}
+                      {loadingOrders ? (
+                        <Spinner color="pink" />
+                      ) : (
+                        ordersData?.total
+                      )}
                     </p>
                   </div>
                   <div
@@ -106,7 +137,11 @@ const OverviewTab = () => {
                   <div>
                     <p className="text-sm text-gray-100">Active Orders</p>
                     <p className="text-2xl font-bold text-white">
-                      {orders.filter((o) => o.status === "in_progress").length}
+                      {loadingOrders ? (
+                        <Spinner color="pink" />
+                      ) : (
+                        ordersData?.active
+                      )}
                     </p>
                   </div>
                   <div
@@ -150,7 +185,11 @@ const OverviewTab = () => {
                   <div>
                     <p className="text-sm text-gray-100">Completed</p>
                     <p className="text-2xl font-bold text-white">
-                      {orders.filter((o) => o.status === "completed").length}
+                      {loadingOrders ? (
+                        <Spinner color="pink" />
+                      ) : (
+                        ordersData?.completed
+                      )}
                     </p>
                   </div>
                   <div
@@ -196,7 +235,11 @@ const OverviewTab = () => {
                   <div>
                     <p className="text-sm text-gray-100">Total Spent</p>
                     <p className="text-2xl font-bold text-white">
-                      €{orders.reduce((sum, order) => sum + order.price, 0)}
+                      {loadingOrders ? (
+                        <Spinner color="pink" />
+                      ) : (
+                        <div>${ordersData?.totalSpent}</div>
+                      )}
                     </p>
                   </div>
                   <div
@@ -217,7 +260,7 @@ const OverviewTab = () => {
       {/* END OF THE FIRST ROW */}
       {/* NOW STARTS THE TABLE */}
       <div
-        className={` rounded-lg `}
+        className={` rounded-lg flex-1 h-full mt-auto `}
         style={{
           padding: "1px",
           background:
@@ -232,10 +275,10 @@ const OverviewTab = () => {
           }}
           className="h-full rounded-lg"
         >
-          <div className="rounded-lg bg-[#52103A]">
+          <div className="rounded-lg h-full bg-[#52103A]">
             <div
               style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
-              className=" rounded-lg shadow-sm w-full"
+              className=" rounded-lg h-full shadow-sm w-full"
             >
               <div className="p-6 border-gray-200">
                 <h3 className="text-xl font-semibold text-white flex items-center">
@@ -244,95 +287,121 @@ const OverviewTab = () => {
               </div>
               <div className="p-6">
                 <div className="overflow-x-auto w-full">
-                  <table
-                    className="w-full min-w-[600px] text-left"
-                    style={{ borderCollapse: "separate", borderSpacing: 0 }}
-                  >
-                    <thead>
-                      <tr
-                        style={{
-                          borderBottom: "3px solid",
-                          borderImage:
-                            "linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%) 1",
-                        }}
-                      >
-                        <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          Game
-                        </th>
-                        <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          Package
-                        </th>
-                        <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          Price
-                        </th>
-                        <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.slice(0, 3).map((order, idx) => (
-                        <tr key={order.orderId}>
-                          <td
-                            className={`py-3 px-4 text-[#E1E1E1] ${
-                              idx !== orders.slice(0, 3).length - 1
-                                ? "border-b border-white"
-                                : ""
-                            }`}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className="text-2xl">
-                                {
-                                  (
-                                    gamesData.find(
-                                      (game) => game.name === order.game
-                                    ) || {}
-                                  ).icon
-                                }
-                              </div>
-                              <span>{order.game}</span>
-                            </div>
-                          </td>
-                          <td
-                            className={`py-3 px-4 text-[#E1E1E1] ${
-                              idx !== orders.slice(0, 3).length - 1
-                                ? "border-b border-white"
-                                : ""
-                            }`}
-                          >
-                            {order.packageName}
-                          </td>
-                          <td
-                            className={`py-3 px-4 text-[#E1E1E1] ${
-                              idx !== orders.slice(0, 3).length - 1
-                                ? "border-b border-white"
-                                : ""
-                            }`}
-                          >
-                            ${order.price}
-                          </td>
-                          <td
-                            className={`py-3 px-4 text-[#E1E1E1] ${
-                              idx !== orders.slice(0, 3).length - 1
-                                ? "border-b border-white"
-                                : ""
-                            }`}
-                          >
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full flex items-center space-x-1 ${getStatusColor(
-                                order.status
-                              )}`}
-                            >
-                              {getStatusIcon(order.status)}
-                              <span className="capitalize">
-                                {order.status.replace("_", " ")}
-                              </span>
-                            </span>
-                          </td>
+                  {loadingOrders ? (
+                    <Spinner
+                      color="pink"
+                      className="my-5 mx-auto block"
+                      aria-label="Pink spinner example"
+                    />
+                  ) : !ordersData?.orders?.length ? (
+                    <h3 className="text-white text-center my-5 text-2xl">
+                      No Orders Found
+                    </h3>
+                  ) : (
+                    <table
+                      className="w-full min-w-[600px] text-left"
+                      style={{ borderCollapse: "separate", borderSpacing: 0 }}
+                    >
+                      <thead>
+                        <tr
+                          style={{
+                            borderBottom: "3px solid",
+                            borderImage:
+                              "linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%) 1",
+                          }}
+                        >
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            Game
+                          </th>
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            Service
+                          </th>
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            Package
+                          </th>
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            Boosters/Coaches
+                          </th>
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            Price
+                          </th>
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            Status
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {ordersData?.orders?.map(
+                          (order: CustomerOrderListDto, idx: number) => (
+                            <tr className="" key={order?.id}>
+                              <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                <div className="flex items-center space-x-3">
+                                  {order?.subpackage?.service?.game?.image ? (
+                                    <img
+                                      src={
+                                        order?.subpackage?.service?.game?.image
+                                      }
+                                      className="w-8 h-8"
+                                    />
+                                  ) : (
+                                    <div className="w-8 h-8"></div>
+                                  )}
+                                  <span>
+                                    {order?.subpackage?.service?.game?.name}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                {order?.subpackage?.service?.name}
+                              </td>
+
+                              <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                {order?.subpackage?.name}
+                              </td>
+
+                              <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                {(() => {
+                                  console.log(order);
+                                  const filtered =
+                                    order?.providers?.filter((provider) =>
+                                      [
+                                        "APPROVED",
+                                        "COMPLETED",
+                                        "VERIFIED",
+                                      ].includes(provider?.status)
+                                    ) || [];
+
+                                  const first = filtered[0];
+
+                                  if (!first) return "No Providers"; // or return "No providers" or fallback
+
+                                  return (
+                                    <span>
+                                      {first.username}
+                                      {filtered.length > 1 && " and more"}
+                                    </span>
+                                  );
+                                })()}
+                              </td>
+
+                              <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                $ {order?.price}
+                              </td>
+
+                              <td
+                                className={`py-1  flex px-4 text-[#E1E1E1] ${getStatusColor(
+                                  order?.status
+                                )} items-center  gap-2 rounded-xl font-bold `}
+                              >
+                                {getStatusIcon(order?.status)} {order?.status}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </div>
             </div>
