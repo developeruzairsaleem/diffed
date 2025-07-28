@@ -5,6 +5,8 @@ interface User {
   username: string;
   email: string;
   isLoggedIn: boolean;
+  role: "customer" | "provider" | "admin";
+  avatar?: string;
 }
 
 interface Wallet {
@@ -33,19 +35,17 @@ interface DashboardState {
   clearDashboard: () => void;
 }
 
-export const useStore = create<DashboardState>(
-  devtools((set) => ({
-    user: null,
-    wallet: null,
-    transactions: [],
-    setUser: (user) => set({ user }),
-    setWallet: (wallet) => set({ wallet }),
-    setTransactions: (transactions) => set({ transactions }),
-    clearDashboard: () =>
-      set({
-        user: null,
-        wallet: null,
-        transactions: [],
-      }),
-  }))
-);
+export const useStore = create<DashboardState>((set) => ({
+  user: null,
+  wallet: null,
+  transactions: [],
+  setUser: (user) => set({ user }),
+  setWallet: (wallet) => set({ wallet }),
+  setTransactions: (transactions) => set({ transactions }),
+  clearDashboard: () =>
+    set({
+      user: null,
+      wallet: null,
+      transactions: [],
+    }),
+}));

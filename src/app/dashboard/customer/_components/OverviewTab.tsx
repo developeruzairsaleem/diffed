@@ -7,12 +7,14 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import gamesData from "../../../../../gamedata.json";
 import orders from "../../../../../orders.json";
 import { useCustomerOrders } from "@/hooks/useOrders";
 import { useStore } from "@/store/useStore";
 import { CustomerOrderListDto } from "@/types/order.dto";
 import { Spinner } from "flowbite-react";
+import Link from "next/link";
 const OverviewTab = () => {
   const { user } = useStore();
   //  renaming hooks name for recent orders
@@ -55,7 +57,7 @@ const OverviewTab = () => {
   };
 
   return (
-    <div className="space-y-6 flex h-full flex-col">
+    <div className="space-y-6 flex mb-20 flex-col">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* outer cards */}
@@ -76,30 +78,41 @@ const OverviewTab = () => {
             className="h-full rounded-lg"
           >
             {/* middle card */}
-            <div className="rounded-lg bg-[#52103A]">
+            <div className="rounded-lg h-full bg-[#52103A]">
               {/* starts inner card */}
 
               <div
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
-                className=" rounded-lg p-6 shadow-sm"
+                className="h-full rounded-lg p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-200">Total Orders</p>
+                    {loadingOrders ? (
+                      <Skeleton className="h-4 w-24 bg-pink-700" />
+                    ) : (
+                      <p className="text-sm text-gray-200">Total Orders</p>
+                    )}
                     <p className="text-2xl font-bold text-gray-100">
                       {loadingOrders ? (
-                        <Spinner color="pink" />
+                        <Skeleton className="h-4 w-8 mt-4 rounded-full bg-pink-700" />
                       ) : (
                         ordersData?.total
                       )}
                     </p>
                   </div>
-                  <div
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
-                    className="p-3 bg-purple-100  rounded-full"
-                  >
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
+
+                  {loadingOrders ? (
+                    <div className="p-3 bg-pink-700 rounded-full">
+                      <Skeleton className="h-6 w-6 rounded-full bg-pink-700" />
+                    </div>
+                  ) : (
+                    <div
+                      className="p-3 bg-blue-100 rounded-full"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+                    >
+                      <Package className="w-6 h-6 text-white" />
+                    </div>
+                  )}
                 </div>
               </div>
               {/* end inner card */}
@@ -126,30 +139,42 @@ const OverviewTab = () => {
             className="h-full rounded-lg"
           >
             {/* middle card */}
-            <div className="rounded-lg bg-[#52103A]">
+            <div className="rounded-lg h-full bg-[#52103A]">
               {/* starts inner card */}
 
               <div
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
-                className=" rounded-lg p-6 shadow-sm"
+                className="h-full rounded-lg p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-100">Active Orders</p>
+                    {loadingOrders ? (
+                      <Skeleton className="h-4 w-24 bg-pink-700" />
+                    ) : (
+                      <p className="text-sm text-gray-100">Active Orders</p>
+                    )}
+
                     <p className="text-2xl font-bold text-white">
                       {loadingOrders ? (
-                        <Spinner color="pink" />
+                        <Skeleton className="h-4 w-8 mt-4 rounded-full bg-pink-700" />
                       ) : (
                         ordersData?.active
                       )}
                     </p>
                   </div>
-                  <div
-                    className="p-3 bg-blue-100 rounded-full"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
-                  >
-                    <Activity className="w-6 h-6 text-white" />
-                  </div>
+
+                  {loadingOrders ? (
+                    <div className="p-3 bg-pink-700 rounded-full">
+                      <Skeleton className="h-6 w-6 rounded-full bg-pink-700" />
+                    </div>
+                  ) : (
+                    <div
+                      className="p-3 bg-blue-100 rounded-full"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+                    >
+                      <Activity className="w-6 h-6 text-white" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -174,30 +199,41 @@ const OverviewTab = () => {
             className="h-full rounded-lg"
           >
             {/* middle card */}
-            <div className="rounded-lg bg-[#52103A]">
+            <div className="rounded-lg h-full bg-[#52103A]">
               {/* starts inner card */}
 
               <div
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
-                className=" rounded-lg p-6 shadow-sm "
+                className=" h-full rounded-lg p-6 shadow-sm "
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-100">Completed</p>
+                    {loadingOrders ? (
+                      <Skeleton className="h-4 w-24 bg-pink-700" />
+                    ) : (
+                      <p className="text-sm text-gray-100">Completed</p>
+                    )}
                     <p className="text-2xl font-bold text-white">
                       {loadingOrders ? (
-                        <Spinner color="pink" />
+                        <Skeleton className="h-4 w-8 mt-4 rounded-full bg-pink-700" />
                       ) : (
                         ordersData?.completed
                       )}
                     </p>
                   </div>
-                  <div
-                    className="p-3 bg-green-100 rounded-full"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
-                  >
-                    <CheckCircle className="w-6 h-6 text-white" />
-                  </div>
+
+                  {loadingOrders ? (
+                    <div className="p-3 bg-pink-700 rounded-full">
+                      <Skeleton className="h-6 w-6 rounded-full bg-pink-700" />
+                    </div>
+                  ) : (
+                    <div
+                      className="p-3 bg-blue-100 rounded-full"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+                    >
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -233,20 +269,32 @@ const OverviewTab = () => {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-100">Total Spent</p>
+                    {loadingOrders ? (
+                      <Skeleton className="h-4 w-24 bg-pink-700" />
+                    ) : (
+                      <p className="text-sm text-gray-100">Total Spent</p>
+                    )}
                     <p className="text-2xl font-bold text-white">
                       {loadingOrders ? (
-                        <Spinner color="pink" />
+                        <Skeleton className="h-4 w-8 mt-4 rounded-full bg-pink-700" />
                       ) : (
-                        <div>${ordersData?.totalSpent}</div>
+                        ordersData?.totalSpent
                       )}
                     </p>
                   </div>
-                  <div
-                    className="p-3 rounded-full"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
-                  >
-                    <DollarSign className="w-6 h-6 text-white" />
+                  <div className=" rounded-full">
+                    {loadingOrders ? (
+                      <div className="p-3 bg-pink-700 rounded-full">
+                        <Skeleton className="h-6 w-6 rounded-full bg-pink-700" />
+                      </div>
+                    ) : (
+                      <div
+                        className="p-3 bg-blue-100 rounded-full"
+                        style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+                      >
+                        <DollarSign className="w-6 h-6 text-white" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -260,7 +308,7 @@ const OverviewTab = () => {
       {/* END OF THE FIRST ROW */}
       {/* NOW STARTS THE TABLE */}
       <div
-        className={` rounded-lg flex-1 h-full mt-auto `}
+        className={` rounded-lg flex-1  mt-auto `}
         style={{
           padding: "1px",
           background:
@@ -275,24 +323,30 @@ const OverviewTab = () => {
           }}
           className="h-full rounded-lg"
         >
-          <div className="rounded-lg h-full bg-[#52103A]">
+          <div className="rounded-lg  h-full bg-[#52103A]">
             <div
               style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
-              className=" rounded-lg h-full shadow-sm w-full"
+              className="  rounded-lg h-full shadow-sm w-full"
             >
               <div className="p-6 border-gray-200">
-                <h3 className="text-xl font-semibold text-white flex items-center">
-                  <Clock className="w-5 h-5 mr-2" /> Recent Orders
-                </h3>
+                {loadingOrders ? (
+                  <Skeleton className="h-5 w-28 bg-pink-700" />
+                ) : (
+                  <h3 className="text-xl font-semibold text-white flex items-center">
+                    <Clock className="w-5 h-5 mr-2" /> Recent Orders
+                  </h3>
+                )}
               </div>
               <div className="p-6">
-                <div className="overflow-x-auto w-full">
+                <div className="overflow-x-auto hide-scrollbar scrollbar-hide w-full">
                   {loadingOrders ? (
-                    <Spinner
-                      color="pink"
-                      className="my-5 mx-auto block"
-                      aria-label="Pink spinner example"
-                    />
+                    <>
+                      <Skeleton className="bg-pink-700 h-4 my-4 w-60 rounded-full" />
+
+                      <Skeleton className="bg-pink-700 h-4 my-4 w-72 rounded-full" />
+                      <Skeleton className="bg-pink-700 h-4 my-4 w-96 rounded-full" />
+                      <Skeleton className="bg-pink-700 h-4 my-4 w-96 rounded-full" />
+                    </>
                   ) : !ordersData?.orders?.length ? (
                     <h3 className="text-white text-center my-5 text-2xl">
                       No Orders Found
@@ -327,6 +381,9 @@ const OverviewTab = () => {
                           </th>
                           <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
                             Status
+                          </th>
+                          <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                            View
                           </th>
                         </tr>
                       </thead>
@@ -395,6 +452,14 @@ const OverviewTab = () => {
                                 )} items-center  gap-2 rounded-xl font-bold `}
                               >
                                 {getStatusIcon(order?.status)} {order?.status}
+                              </td>
+                              <td>
+                                <Link
+                                  className="bg-indigo-500 p-3 whitespace-nowrape rounded-xl"
+                                  href={`/dashboard/customer/orders/${order.id}`}
+                                >
+                                  View Detail
+                                </Link>
                               </td>
                             </tr>
                           )
