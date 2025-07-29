@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   --background: linear-gradient(
@@ -20,6 +23,7 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+
 body {
   color: var(--foreground);
   font-family: var(--font-lato), sans-serif;
@@ -106,4 +110,35 @@ body {
   line-height: 117.5%;
   letter-spacing: 4%;
   text-transform: uppercase;
+}
+
+
+
+/* Custom Scrollbar Styles */
+/* For Webkit browsers (Chrome, Safari, Edge, Opera) */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+  height: 8px; /* Height of horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* Darker, slightly transparent track */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #5d1a45, #4e0d37); /* Gradient thumb matching your theme */
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #6a2050, #5a1040); /* Slightly brighter on hover */
+}
+
+/* For Firefox */
+/* Note: Firefox styling is more limited than Webkit */
+* {
+  scrollbar-width: thin; /* "auto" or "none" */
+  scrollbar-color: #5d1a45 rgba(0, 0, 0, 0.1); /* thumb color track color */
 }

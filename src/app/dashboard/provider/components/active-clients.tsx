@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export function ActiveClients() {
   return (
-    <Card className="bg-black/30 backdrop-blur-sm border-white/10">
+    <Card className="bg-black/30 backdrop-blur-sm border-white/10 shadow-2xl">
       <CardHeader>
         <CardTitle className="text-white">Active Clients</CardTitle>
       </CardHeader>

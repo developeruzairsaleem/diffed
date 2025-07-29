@@ -5,7 +5,7 @@ import { DollarSign } from "lucide-react"
 
 export function PricingSettings() {
   return (
-    <Card className="bg-black/30 backdrop-blur-sm border-white/10">
+    <Card className="bg-black/30 backdrop-blur-sm border-white/10 shadow-2xl">
       <CardHeader>
         <CardTitle className="flex items-center text-white">
           <DollarSign className="w-5 h-5 mr-2" />
