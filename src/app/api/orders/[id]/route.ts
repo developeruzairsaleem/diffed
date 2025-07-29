@@ -6,6 +6,9 @@ import type {
   OrderUpdateRequest,
 } from "@/types/order.dto";
 
+// ---------------------------------
+// GET the individual order details
+// ---------------------------------
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -38,7 +41,9 @@ export async function GET(
     return NextResponse.json(response, { status: 500 });
   }
 }
-
+// ---------------------------
+// update the individual order
+// ----------------------------
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

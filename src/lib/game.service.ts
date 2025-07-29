@@ -509,6 +509,7 @@ export class GameService {
         basePricePerELO: subpackage.basePricePerELO || undefined,
         minELO: subpackage.minELO || undefined,
         maxELO: subpackage.maxELO || undefined,
+        requiredProviders: subpackage.requiredProviders,
         ordersCount,
         totalRevenue,
         averageRating,
@@ -636,6 +637,7 @@ export class GameService {
     return await prisma.subpackage.create({
       data: {
         ...data,
+        requiredProviders: Number(data.requiredProviders),
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -647,6 +649,9 @@ export class GameService {
       where: { id },
       data: {
         ...data,
+        ...(data.requiredProviders && {
+          requiredProviders: Number(data.requiredProviders),
+        }),
         updatedAt: new Date(),
       },
     });

@@ -51,6 +51,8 @@ interface Service {
 interface Subpackage {
   id: string;
   name: string;
+  requiredProviders: number;
+
   description: string;
   price: number;
   duration?: string;
@@ -88,6 +90,7 @@ export function SubpackagesTab() {
     dynamicPricing: false,
     basePricePerELO: "",
     minELO: "",
+    requiredProviders: 1,
     maxELO: "",
     gameId: "",
     serviceId: "",
@@ -178,6 +181,7 @@ export function SubpackagesTab() {
     setFormData({
       name: subpackage.name,
       description: subpackage.description,
+      requiredProviders: subpackage.requiredProviders,
       price: subpackage.price.toString(),
       duration: subpackage.duration || "",
       dynamicPricing: subpackage.dynamicPricing,
@@ -218,6 +222,7 @@ export function SubpackagesTab() {
       minELO: "",
       maxELO: "",
       gameId: "",
+      requiredProviders: 1,
       serviceId: "",
     });
     setEditingSubpackage(null);

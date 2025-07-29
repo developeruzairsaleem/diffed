@@ -27,6 +27,7 @@ export interface SubpackageDto {
   duration?: string;
   dynamicPricing: boolean;
   basePricePerELO?: number;
+  requiredProviders: number;
   minELO?: number;
   maxELO?: number;
   serviceId: string;
@@ -120,6 +121,7 @@ export interface ServiceDetailDto {
     name: string;
     description: string;
     price: number;
+    requiredProviders: number;
     duration?: string;
     dynamicPricing: boolean;
     basePricePerELO?: number;
@@ -233,6 +235,7 @@ export interface SubpackageUpdateRequest {
   minELO?: number;
   maxELO?: number;
   serviceId?: string;
+  requiredProviders?: number;
 }
 
 export interface GameCreateRequest {
@@ -252,6 +255,7 @@ export interface SubpackageCreateRequest {
   name: string;
   description: string;
   price: number;
+  requiredProviders: number;
   duration?: string;
   dynamicPricing: boolean;
   basePricePerELO?: number;

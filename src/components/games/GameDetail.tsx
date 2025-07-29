@@ -598,6 +598,14 @@ export default function GameDetail({ gameId }: GameDetailProps) {
           >
             <Input type="number" min={0} step={0.01} />
           </Form.Item>
+
+          <Form.Item
+            name="requiredProviders"
+            label="No of Pros Needed"
+            rules={[{ required: true, message: "No of gamers is required" }]}
+          >
+            <Input type="number" min={0} />
+          </Form.Item>
           <Form.Item name="duration" label="Duration">
             <Input placeholder="e.g., 2-3 days" />
           </Form.Item>

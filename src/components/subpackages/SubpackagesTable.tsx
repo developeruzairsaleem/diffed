@@ -405,6 +405,18 @@ export default function SubpackagesTable() {
                         <InputNumber min={0} style={{ width: "100%" }} />
                       </Form.Item>
                     </Col>
+                    <Form.Item
+                      name="requiredProviders"
+                      label="Required Providers"
+                      rules={[
+                        {
+                          required: true,
+                          message: "No of Providers is required",
+                        },
+                      ]}
+                    >
+                      <InputNumber min={0} style={{ width: "100%" }} />
+                    </Form.Item>
                     <Col span={8}>
                       <Form.Item name="maxELO" label="Max ELO">
                         <InputNumber min={0} style={{ width: "100%" }} />

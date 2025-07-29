@@ -386,6 +386,9 @@ export default function SubpackageDetail({
           <Form.Item name="duration" label="Duration">
             <Input placeholder="e.g., 2-3 days" />
           </Form.Item>
+          <Form.Item name="requiredProviders" label="Required Providers">
+            <InputNumber min={0} placeholder="e.g., 4" />
+          </Form.Item>
           <Form.Item
             name="dynamicPricing"
             label="Dynamic Pricing"

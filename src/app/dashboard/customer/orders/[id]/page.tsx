@@ -22,24 +22,62 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ChatInterface from "@/components/chat/ChatInterface";
-import type { OrderDetailDto } from "@/types/order.dto";
+import type {
+  AssignmentUpdateRequest,
+  OrderDetailDto,
+} from "@/types/order.dto";
 import { useStore } from "@/store/useStore";
-import { Button } from "antd";
+import { Button, message } from "antd";
 
+// -------------------------------
+// order detail page for customer
+// ------------------------------------
 export default function OrderDetailPage() {
+  // ---------------------------------------------
+  // application state for orderdetail page and chat page
+  // --------------------------------------------
+
   const store = useStore();
-  const CURRENT_USER = store.user;
   const params = useParams();
   const orderId = params!.id as string;
   const [order, setOrder] = useState<OrderDetailDto | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrder();
+  const handleUpdateAssignment = async (
+    assingmentId: string,
+    data: AssignmentUpdateRequest
+  ) => {
+    try {
+      //  -------------------------------------------------
+      // update the order assignment status to approved.
+      // ---------------------------------------------------
+      const response = await fetch(
+        `/api/orders/${orderId}/assignments/${assingmentId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const result = await response.json();
+      // ------------------------------------------------------
+      // check if the update of assignment was successful or not
+      // ------------------------------------------------------
+      if (!result.success) {
+        return message.error("Failed to update the assignment");
+      }
+      message.success("Successfully update!");
+    } catch (error) {
+      console.error("something went wrong", error);
+      message.error("Something went wrong updating.");
     }
-  }, [orderId]);
+  };
 
+  //----------------------------------
+  // Fetching order detail data
+  // -------------------------------
   const fetchOrder = async () => {
     try {
       const response = await fetch(`/api/orders/${orderId}`);
@@ -54,6 +92,18 @@ export default function OrderDetailPage() {
     }
   };
 
+  //-------------------------------------------
+  //  fetch order on orderId change or first page load
+  //--------------------------------------------
+  useEffect(() => {
+    if (orderId) {
+      fetchOrder();
+    }
+  }, [orderId]);
+
+  // --------------------------------------------------
+  // status color depending on the current order status
+  // -------------------------------------------------
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
@@ -68,7 +118,9 @@ export default function OrderDetailPage() {
         return "bg-gray-500";
     }
   };
-
+  // ----------------------------------------------------
+  // Get icon depending on the status of individual order
+  // ----------------------------------------------------
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "PENDING":
@@ -83,7 +135,9 @@ export default function OrderDetailPage() {
         return <Clock className="h-4 w-4" />;
     }
   };
-
+  // ------------------------------------------------------
+  // If the order detail is loading show a loader by default
+  // ------------------------------------------------------
   if (loading) {
     return (
       <div
@@ -94,7 +148,7 @@ export default function OrderDetailPage() {
       </div>
     );
   }
-
+  // If no order exist return the message that no order found
   if (!order) {
     return (
       <div className="min-h-screen  flex items-center justify-center">
@@ -107,10 +161,6 @@ export default function OrderDetailPage() {
       </div>
     );
   }
-
-  const progressPercent = Math.round(
-    (order.approvedCount / order.requiredCount) * 100
-  );
 
   return (
     <div className="min-h-screen ">
@@ -133,7 +183,7 @@ export default function OrderDetailPage() {
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/chat">
+          <Link href="/dashboard/customer/orders">
             <div className="flex items-center gap-2 text-white hover:text-white/80 transition-colors cursor-pointer">
               <ArrowLeft className="h-5 w-5" />
               <span>Back to Orders</span>
@@ -207,16 +257,6 @@ export default function OrderDetailPage() {
                       <p className="text-sm text-white">Created</p>
                     </div>
                   </div>
-
-                  {/* <div> */}
-                  {/* <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Progress</span>
-                      <span className="text-sm text-gray-600">
-                        {progressPercent}%
-                      </span>
-                    </div> */}
-                  {/* <Progress value={progressPercent} className="h-2" /> */}
-                  {/* </div> */}
                 </CardContent>
               </Card>
 
@@ -322,12 +362,28 @@ export default function OrderDetailPage() {
                             </div>
                           </div>
                           <div className="text-right flex gap-2">
-                            <button className=" bg-gradient-to-r from-pink-500 p-3 inline-block via-purple-500 to-cyan-400 transition-all">
-                              Approve Provider
-                            </button>
-                            <button className="inline-block bg-gradient-to-r from-pink-500 p-3 via-purple-500 to-cyan-400 transition-all">
-                              Mark as Verified
-                            </button>
+                            {
+                              // check if the status is pending then show the approve button
+                              assignment.status === "PENDING" ? (
+                                <button
+                                  onClick={() =>
+                                    handleUpdateAssignment(assignment.id, {
+                                      status: "APPROVED",
+                                    })
+                                  }
+                                  className=" block rounded-lg bg-gradient-to-r text-white text-semibold from-pink-500 p-3 mr-4  via-purple-500 to-cyan-400 transition-all"
+                                >
+                                  Approve Provider
+                                </button>
+                              ) : (
+                                <button
+                                  disabled={true}
+                                  className=" block rounded-lg text-white text-semibold  p-3 mr-4  bg-gray-50/30 transition-all"
+                                >
+                                  {assignment.status}
+                                </button>
+                              )
+                            }
                           </div>
                         </div>
                       ))}

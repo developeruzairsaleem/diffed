@@ -115,6 +115,7 @@ export async function GET(request: NextRequest) {
         name: subpackage.name,
         description: subpackage.description,
         price: subpackage.price,
+        requiredProviders: subpackage.requiredProviders || 1,
         duration: subpackage.duration,
         dynamicPricing: subpackage.dynamicPricing,
         basePricePerELO: subpackage.basePricePerELO,

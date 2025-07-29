@@ -41,6 +41,7 @@ async function main() {
             price: 10 * h,
             duration: `${3 * h}h`,
             serviceId: service.id,
+            requiredProviders: h,
           },
         });
       }
@@ -109,7 +110,7 @@ async function main() {
         customerId: customer.id,
         subpackageId: subpkg.id,
         price: subpkg.price,
-        requiredCount: 1,
+        requiredCount: subpkg.requiredProviders,
         notes: `Please handle my ${subpkg.name}`,
       },
     });

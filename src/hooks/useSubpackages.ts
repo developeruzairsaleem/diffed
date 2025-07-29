@@ -12,6 +12,7 @@ export interface SubpackageDetailDto {
   duration?: string;
   dynamicPricing: boolean;
   basePricePerELO?: number;
+  requiredProviders: number;
   minELO?: number;
   maxELO?: number;
   serviceId: string;
@@ -63,6 +64,7 @@ export interface SubpackageListDto {
   duration?: string;
   dynamicPricing: boolean;
   basePricePerELO?: number;
+  requiredProviders: number;
   minELO?: number;
   maxELO?: number;
   serviceId: string;

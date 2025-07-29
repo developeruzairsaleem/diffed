@@ -16,6 +16,7 @@ export interface UserDto {
 export interface SubpackageDto {
   id: string;
   name: string;
+  requiredProviders: number;
   description: string;
   price: number;
   duration?: string;

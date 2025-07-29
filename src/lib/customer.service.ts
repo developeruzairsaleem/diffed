@@ -255,6 +255,7 @@ export class CustomerService {
           description: order.subpackage.description,
           price: order.subpackage.price,
           duration: order.subpackage.duration || undefined,
+          requiredProviders: order.subpackage.requiredProviders,
           service: {
             id: order.subpackage.service.id,
             name: order.subpackage.service.name,

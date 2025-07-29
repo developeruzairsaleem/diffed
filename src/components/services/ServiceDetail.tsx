@@ -417,6 +417,15 @@ export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
           >
             <InputNumber min={0} step={0.01} style={{ width: "100%" }} />
           </Form.Item>
+          <Form.Item
+            name="requiredProviders"
+            label="Required Providers"
+            rules={[
+              { required: true, message: "Providers number is required" },
+            ]}
+          >
+            <InputNumber min={0} style={{ width: "100%" }} />
+          </Form.Item>
           <Form.Item name="duration" label="Duration">
             <Input placeholder="e.g., 2-3 days" />
           </Form.Item>

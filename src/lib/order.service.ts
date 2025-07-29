@@ -106,6 +106,7 @@ export class OrderService {
         description: order.subpackage.description,
         price: order.subpackage.price,
         duration: order.subpackage.duration || undefined,
+        requiredProviders: order.subpackage.requiredProviders,
         service: {
           id: order.subpackage.service.id,
           name: order.subpackage.service.name,
@@ -213,6 +214,7 @@ export class OrderService {
         name: order.subpackage.name,
         description: order.subpackage.description,
         price: order.subpackage.price,
+        requiredProviders: order.subpackage.requiredProviders,
         duration: order.subpackage.duration || undefined,
         service: {
           id: order.subpackage.service.id,
@@ -228,7 +230,15 @@ export class OrderService {
       status: order.status,
       notes: order.notes || undefined,
       rerollsLeft: order.rerollsLeft,
-      approvedCount: order.approvedCount,
+      approvedCount: order.assignments.reduce(
+        (acc, item) =>
+          item.status === "APPROVED" ||
+          item.status === "COMPLETED" ||
+          item.status === "VERIFIED"
+            ? (acc += 1)
+            : acc,
+        0
+      ),
       requiredCount: order.requiredCount,
       stripeSessId: order.stripeSessId || undefined,
       createdAt: order.createdAt,
@@ -413,6 +423,7 @@ export class OrderService {
         description: order.subpackage.description,
         price: order.subpackage.price,
         duration: order.subpackage.duration || undefined,
+        requiredProviders: order.subpackage.requiredProviders,
         service: {
           id: order.subpackage.service.id,
           name: order.subpackage.service.name,

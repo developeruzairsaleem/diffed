@@ -3,8 +3,8 @@ import { faker } from "@faker-js/faker";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
-  const mainCustomerId = "cmdipay370000v090p3jq7jrv";
-  const mainCustomerWalletId = "cmdipb0f80002v090nvk6nox5";
+  const mainCustomerId = "cmdnrvftu0000v0ao4gj5wad7";
+  const mainCustomerWalletId = "cmdnrvgap0002v0aouvk3u6t2";
 
   // Create games with services and subpackages
   const games = await Promise.all(
@@ -39,6 +39,7 @@ async function main() {
               price: (j + 1) * 15,
               duration: `${2 + j}h`,
               serviceId: service.id,
+              requiredProviders: j + 1,
             },
           });
         }
@@ -81,7 +82,7 @@ async function main() {
         customerId: mainCustomerId,
         subpackageId: subpackage.id,
         price: subpackage.price,
-        requiredCount: faker.number.int({ min: 1, max: 5 }),
+        requiredCount: subpackage.requiredProviders,
         notes: Math.random() > 0.5 ? faker.lorem.sentence() : null,
       },
     });
