@@ -287,6 +287,7 @@ export class OrderService {
       where: { id },
       data: {
         ...data,
+
         updatedAt: new Date(),
       },
     });

@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
@@ -22,10 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ChatInterface from "@/components/chat/ChatInterface";
-import type {
-  AssignmentUpdateRequest,
-  OrderDetailDto,
-} from "@/types/order.dto";
+import type { OrderDetailDto } from "@/types/order.dto";
 import { useStore } from "@/store/useStore";
 import { Button, message } from "antd";
 
@@ -43,19 +39,18 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<OrderDetailDto | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const handleUpdateAssignment = async (
-    assingmentId: string,
-    data: AssignmentUpdateRequest
-  ) => {
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const handleApproveAssignment = async (assingmentId: string) => {
+    setApprovingId(assingmentId);
     try {
       //  -------------------------------------------------
       // update the order assignment status to approved.
       // ---------------------------------------------------
       const response = await fetch(
-        `/api/orders/${orderId}/assignments/${assingmentId}`,
+        `/api/orders/${orderId}/assignments/${assingmentId}/approve`,
         {
           method: "PUT",
-          body: JSON.stringify(data),
+          body: JSON.stringify({}),
           headers: {
             "Content-Type": "application/json",
           },
@@ -66,12 +61,17 @@ export default function OrderDetailPage() {
       // check if the update of assignment was successful or not
       // ------------------------------------------------------
       if (!result.success) {
-        return message.error("Failed to update the assignment");
+        setApprovingId(null);
+        return message.error("Failed to approve the assignment");
       }
-      message.success("Successfully update!");
+      message.success("Successfully Approved!");
+      // Refetch order to update UI
+      await fetchOrder();
     } catch (error) {
       console.error("something went wrong", error);
       message.error("Something went wrong updating.");
+    } finally {
+      setApprovingId(null);
     }
   };
 
@@ -161,6 +161,11 @@ export default function OrderDetailPage() {
       </div>
     );
   }
+
+  // Calculate the number of assignments with status APPROVED, VERIFIED, or COMPLETED
+  const approvedAssignmentsCount = order.assignments.filter((a) =>
+    ["APPROVED", "VERIFIED", "COMPLETED"].includes(a.status)
+  ).length;
 
   return (
     <div className="min-h-screen ">
@@ -363,17 +368,47 @@ export default function OrderDetailPage() {
                           </div>
                           <div className="text-right flex gap-2">
                             {
-                              // check if the status is pending then show the approve button
-                              assignment.status === "PENDING" ? (
+                              // Only show approve button if status is PENDING and approvedAssignmentsCount < requiredCount
+                              assignment.status === "PENDING" &&
+                              approvedAssignmentsCount < order.requiredCount ? (
                                 <button
                                   onClick={() =>
-                                    handleUpdateAssignment(assignment.id, {
-                                      status: "APPROVED",
-                                    })
+                                    handleApproveAssignment(assignment.id)
                                   }
-                                  className=" block rounded-lg bg-gradient-to-r text-white text-semibold from-pink-500 p-3 mr-4  via-purple-500 to-cyan-400 transition-all"
+                                  disabled={approvingId === assignment.id}
+                                  className={` rounded-lg bg-gradient-to-r text-white text-semibold from-pink-500 p-3 mr-4 via-purple-500 to-cyan-400 transition-all flex items-center justify-center ${
+                                    approvingId === assignment.id
+                                      ? "opacity-60 cursor-not-allowed"
+                                      : ""
+                                  }`}
                                 >
-                                  Approve Provider
+                                  {approvingId === assignment.id ? (
+                                    <span className="flex items-center gap-2">
+                                      <svg
+                                        className="animate-spin h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <circle
+                                          className="opacity-25"
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          stroke="currentColor"
+                                          strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                          className="opacity-75"
+                                          fill="currentColor"
+                                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                        ></path>
+                                      </svg>
+                                      Approving...
+                                    </span>
+                                  ) : (
+                                    "Approve Provider"
+                                  )}
                                 </button>
                               ) : (
                                 <button

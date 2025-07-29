@@ -66,7 +66,7 @@ export function useCustomerOrders(params: OrdersListRequest) {
         }
       });
 
-      const response = await fetch(`/api/customer/orders?${searchParams}`);
+      const response = await fetch(`/api/orders?${searchParams}`);
       const result: ApiResponse<CustomerOrderListResponse> =
         await response.json();
 
