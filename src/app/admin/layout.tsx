@@ -1,5 +1,5 @@
 "use client";
-
+import "@ant-design/v5-patch-for-react-19";
 import React, { useState } from "react";
 import { Layout, Menu, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
@@ -14,7 +14,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const { Header, Sider, Content } = Layout;
-
+import "antd/dist/reset.css";
+import { LuGamepad } from "react-icons/lu";
 export default function AdminLayout({
   children,
 }: {
@@ -33,19 +34,34 @@ export default function AdminLayout({
       label: <Link href="/admin">Dashboard</Link>,
     },
     {
+      key: "/admin/orders",
+      icon: <DashboardOutlined />,
+      label: <Link href="/admin/orders">Orders</Link>,
+    },
+    {
+      key: "/admin/games",
+      icon: <LuGamepad />,
+      label: <Link href="/admin/games">Games</Link>,
+    },
+    {
       key: "/admin/services",
       icon: <UserOutlined />,
       label: <Link href="/admin/services">Services</Link>,
     },
     {
-      key: "/admin/games",
-      icon: "0 ",
-      label: <Link href="/admin/games">Games</Link>,
+      key: "/admin/subpackages",
+      icon: <StarOutlined />,
+      label: <Link href="/admin/subpackages">SubPackages</Link>,
     },
     {
-      key: "/admin/reviews",
+      key: "/admin/customers",
       icon: <StarOutlined />,
-      label: <Link href="/admin/reviews">Reviews</Link>,
+      label: <Link href="/admin/customers">Customers</Link>,
+    },
+    {
+      key: "/admin/providers",
+      icon: <StarOutlined />,
+      label: <Link href="/admin/providers">Providers</Link>,
     },
   ];
 

@@ -1,15 +1,16 @@
-import { createServerClient } from "./supabase";
+import { TransactionType } from "@/generated/prisma";
+import { prisma } from "./prisma";
+import { Decimal } from "@prisma/client/runtime/library"; // or from "decimal.js" if you use that
 
 export async function getWalletBalance(userId: string) {
-  const supabase = createServerClient();
+  // get wallet balance from db
+  const wallet = await prisma.wallet.findFirst({
+    where: {
+      userId: userId,
+    },
+  });
 
-  const { data: wallet, error } = await supabase
-    .from("wallets")
-    .select("balance")
-    .eq("user_id", userId)
-    .single();
-
-  if (error) throw error;
+  if (!wallet) throw Error("Wallet not found for balane extraction");
   return wallet?.balance || 0;
 }
 
@@ -18,49 +19,79 @@ export async function updateWalletBalance(
   amount: number,
   type: "add" | "subtract"
 ) {
-  const supabase = createServerClient();
-
   const currentBalance = await getWalletBalance(userId);
-  const newBalance =
-    type === "add" ? currentBalance + amount : currentBalance - amount;
 
-  if (newBalance < 0) {
+  const newBalance: Decimal =
+    type === "add"
+      ? (currentBalance as Decimal).add(amount)
+      : (currentBalance as Decimal).sub(amount);
+
+  if (newBalance.lessThan(0)) {
     throw new Error("Insufficient funds");
   }
 
-  const { error } = await supabase
-    .from("wallets")
-    .update({ balance: newBalance, updated_at: new Date().toISOString() })
-    .eq("user_id", userId);
+  console.log("new balance", newBalance);
 
-  if (error) throw error;
-  return newBalance;
+  const updatedWallet = await prisma.wallet.update({
+    where: {
+      userId: userId,
+    },
+    data: {
+      balance: newBalance,
+      updatedAt: new Date(),
+    },
+  });
+  if (!updatedWallet) throw Error("Can't update wallet with new balance");
+  return { success: true, wallet: updatedWallet };
 }
 
 export async function createTransaction(
   walletId: string,
-  type: string,
+  type: TransactionType,
   amount: number,
   description: string,
   stripePaymentIntentId?: string,
   metadata?: any
 ) {
-  const supabase = createServerClient();
-
-  const { data, error } = await supabase
-    .from("transactions")
-    .insert({
-      wallet_id: walletId,
+  const newTransaction = await prisma.transaction.create({
+    data: {
+      walletId,
       type,
       amount,
       description,
-      stripe_payment_intent_id: stripePaymentIntentId,
+      stripePaymentIntentId,
       metadata,
       status: "completed",
-    })
-    .select()
-    .single();
+    },
+  });
 
-  if (error) throw error;
-  return data;
+  if (!newTransaction) throw Error("Failed to create a transaction in db");
+  return { data: newTransaction };
+}
+
+// creating a wallet for users
+export async function createWallet(userId: string) {
+  const userWallet = await prisma.wallet.create({
+    data: { userId },
+  });
+
+  if (!userWallet) throw Error("Wallet creation failed");
+
+  return userWallet;
+}
+
+// getting the user wallet
+
+export async function getWallet(userId: string) {
+  const wallet = await prisma.wallet.findFirst({
+    where: {
+      userId: userId,
+    },
+  });
+
+  if (!wallet) {
+    throw Error("Cant find the wallet for current user");
+  }
+
+  return wallet;
 }

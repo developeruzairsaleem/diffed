@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -12,53 +6,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-enum VerificationStatus {
-  unverified
-  pending
-  verified
-}
-
-enum Availability {
-  online
-  offline
-  busy
-}
-
-enum CustomerType {
-  casual
-  competitive
-  professional
-  collector
-}
-
-enum GamingLevel {
-  beginner
-  intermediate
-  advanced
-  expert
-}
-
-enum BudgetRange {
-  low
-  medium
-  high
-  premium
-}
-
-enum ActivityPattern {
-  weekend_warrior
-  daily_grinder
-  casual_player
-  seasonal_player
-}
-
-enum LearningStyle {
-  visual
-  hands_on
-  analytical
-  social
 }
 
 enum TransactionType {
@@ -75,163 +22,16 @@ enum TransactionStatus {
   cancelled
 }
 
-enum CommunicationPreference {
-  text_only
-  voice_chat
-  video_call
-  mixed
-}
-
-enum RiskTolerance {
-  low
-  medium
-  high
-}
-
-enum ProviderType {
-  coach
-  booster
-}
-
 enum Role {
+  admin
   customer
   provider
 }
 
 enum Status {
   active
+  inactive
   suspended
-  ban
-}
-
-model Provider {
-  id                 String             @id @default(cuid())
-  userId             String             @unique
-  user               User               @relation(fields: [userId], references: [id])
-  firstName          String?
-  lastName           String?
-  providerType       ProviderType
-  services           ProviderService[]
-  games              Json
-  currentRanks       Json
-  peakRanks          Json?
-  experienceYears    Int
-  totalOrders        Int                @default(0)
-  completedOrders    Int                @default(0)
-  averageRating      Decimal            @default(0) @db.Decimal
-  totalEarnings      Decimal            @default(0) @db.Decimal
-  availabilityStatus Availability       @default(offline)
-  verificationStatus VerificationStatus @default(unverified)
-  verificationBadges Json?
-  bio                String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-
-  //Relations
-  orders Order[]
-
-  @@map("providers")
-}
-
-model Service {
-  id          String            @id @default(cuid())
-  title       String
-  description String
-  image       String            @default("https://diffed.gg/images/Maskgroup.png")
-  providers   ProviderService[]
-
-  @@map("services")
-}
-
-model ProviderService {
-  id         String   @id @default(cuid())
-  provider   Provider @relation(fields: [providerId], references: [id])
-  providerId String
-  service    Service  @relation(fields: [serviceId], references: [id])
-  serviceId  String
-  price      Float
-  duration   String? // e.g. "1 hour", optional
-  experience Int?
-  notes      String?
-
-  // Add any provider-specific service configs (like experience, package etc)
-
-  //relations
-  orders Order[]
-}
-
-model Customer {
-  id                      String                  @id @default(cuid())
-  userId                  String                  @unique
-  user                    User                    @relation(fields: [userId], references: [id])
-  customerType            CustomerType
-  primaryGames            Json
-  currentRanks            Json?
-  gamingGoals             Json?
-  budgetRange             BudgetRange             @default(medium)
-  preferredServiceTypes   Json?
-  activityPattern         ActivityPattern         @default(casual_player)
-  learningStyle           LearningStyle           @default(hands_on)
-  communicationPreference CommunicationPreference @default(mixed)
-  peakHours               Json?
-  riskTolerance           RiskTolerance           @default(medium)
-  lifetimeValue           Decimal                 @default(0) @db.Decimal(12, 2)
-  satisfactionScore       Decimal                 @default(0) @db.Decimal(3, 2)
-  churnRiskScore          Decimal                 @default(0) @db.Decimal(3, 2)
-  lastOrderDate           DateTime?
-  createdAt               DateTime                @default(now())
-  updatedAt               DateTime                @updatedAt
-
-  // Relations (commented for now, to be added when those models are made)
-  orders Order[]
-  // customerPreferences     CustomerPreference?
-  // customerJourney         CustomerJourney?
-  // gamingHistory           CustomerGamingHistory[]
-  // feedback                CustomerFeedback[]
-
-  @@map("customers")
-}
-
-model Game {
-  id        String @id @default(cuid())
-  image     String
-  teammates Int
-  sessions  Int
-  name      String
-
-  orders Order[]
-
-  @@map("games")
-}
-
-model Order {
-  id                 String        @id @default(cuid())
-  customerId         String
-  providerId         String
-  providerServiceId  String
-  gameId             String
-  scheduledDate      DateTime
-  status             OrderStatus   @default(pending)
-  paymentStatus      PaymentStatus @default(unpaid)
-  notes              String?
-  cancellationReason String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-
-  // Relations
-  customer        Customer             @relation(fields: [customerId], references: [id])
-  provider        Provider             @relation(fields: [providerId], references: [id])
-  providerService ProviderService      @relation(fields: [providerServiceId], references: [id])
-  game            Game                 @relation(fields: [gameId], references: [id])
-  statusHistory   OrderStatusHistory[]
-}
-
-enum OrderStatus {
-  pending
-  confirmed
-  in_progress
-  completed
-  cancelled
 }
 
 enum PaymentStatus {
@@ -245,59 +45,14 @@ enum OrderActorRole {
   provider
 }
 
-model OrderStatusHistory {
-  id             String         @id @default(cuid())
-  orderId        String
-  previousStatus OrderStatus
-  newStatus      OrderStatus
-  changedByRole  OrderActorRole
-  reason         String?
-  changedAt      DateTime       @default(now())
-
-  order Order @relation(fields: [orderId], references: [id])
-}
-
-model Review {
+model PlatformReview {
   id          String @id @default(cuid())
   starRating  Int
   description String @db.Text
-  image       String
+  userimage   String
   name        String
 
   @@map("reviews")
-}
-
-model User {
-  id               String   @id @default(cuid())
-  username         String   @unique
-  email            String   @unique
-  password         String
-  role             Role
-  status           Status   @default(active)
-  stripeCustomerId String?  @map("stripe_customer_id")
-  profileImage     String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  provider Provider? //add customer too when made
-  customer Customer?
-  wallet   Wallet?
-
-  @@map("users")
-}
-
-model Wallet {
-  id        String   @id @default(cuid())
-  balance   Decimal  @default(0.00) @db.Decimal(10, 2)
-  currency  String   @default("USD") @db.VarChar(3)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
-
-  userId       String        @unique @map("user_id")
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-
-  @@index([userId], name: "idx_wallets_user_id")
 }
 
 model Transaction {
@@ -317,4 +72,146 @@ model Transaction {
   @@index([walletId], name: "idx_transactions_wallet_id")
   @@index([type], name: "idx_transactions_type")
   @@index([status], name: "idx_transactions_status")
+}
+
+model Game {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  image      String
+  isEloBased Boolean   @default(false)
+  ranks      Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  services   Service[]
+
+  @@map("games")
+}
+
+// new changes to schema
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  password     String
+  role         Role
+  status       Status   @default(active)
+  stripeCustId String?  @map("stripe_customer_id")
+  profileImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  wallet      Wallet?
+  orders      Order[]           @relation("CustomerOrders")
+  assignments OrderAssignment[]
+  chats       Chat[]
+}
+
+model Wallet {
+  id       String  @id @default(cuid())
+  balance  Decimal @default(0.00) @db.Decimal(10, 2)
+  currency String  @default("USD")
+
+  userId       String        @unique @map("user_id")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId], name: "idx_wallets_user_id")
+}
+
+model Service {
+  id          String       @id @default(cuid())
+  name        String
+  description String
+  gameId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  game        Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  subpackages Subpackage[]
+}
+
+model Subpackage {
+  id                String   @id @default(cuid())
+  name              String
+  description       String
+  price             Float
+  duration          String? // e.g. "3h"
+  dynamicPricing    Boolean  @default(false)
+  basePricePerELO   Float?
+  minELO            Int?
+  maxELO            Int?
+  serviceId         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  service           Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  stripeProdId      String?  @unique
+  stripePriceId     String?  @unique
+  requiredProviders Int      @default(1)
+  orders            Order[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique @default(cuid())
+  customerId    String
+  customer      User        @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
+  subpackageId  String
+  subpackage    Subpackage  @relation(fields: [subpackageId], references: [id], onDelete: Cascade)
+  price         Float
+  status        OrderStatus @default(PENDING)
+  notes         String?
+  rerollsLeft   Int         @default(3)
+  approvedCount Int         @default(0) // number of providers approved
+  requiredCount Int         @default(1) // how many providers needed
+  stripeSessId  String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  assignments OrderAssignment[]
+  chats       Chat[]
+}
+
+model OrderAssignment {
+  id           String                @id @default(cuid())
+  orderId      String
+  providerId   String
+  claimedAt    DateTime              @default(now())
+  status       OrderAssignmentStatus @default(PENDING)
+  approved     Boolean               @default(false)
+  completed    Boolean               @default(false)
+  leftEarly    Boolean               @default(false)
+  progress     Float                 @default(0.0) // percentage 0-100
+  proofUrl     String?
+  reviewRating Int?
+  reviewText   String?
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider User  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, providerId])
+}
+
+model Chat {
+  id       String   @id @default(cuid())
+  orderId  String
+  senderId String
+  message  String
+  sentAt   DateTime @default(now())
+
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sender User  @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderAssignmentStatus {
+  REPLACED
+  PENDING
+  APPROVED
+  COMPLETED
+  VERIFIED
 }

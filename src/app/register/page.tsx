@@ -6,6 +6,7 @@ import { orbitron, roboto } from "@/fonts/fonts";
 import Image from "next/image";
 import { signup } from "@/actions/auth";
 import { useRouter } from "next/navigation";
+import { useStore } from "@/store/useStore";
 type FormValues = {
   username: string;
   email: string;
