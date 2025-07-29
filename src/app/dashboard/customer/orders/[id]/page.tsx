@@ -167,6 +167,34 @@ export default function OrderDetailPage() {
     ["APPROVED", "VERIFIED", "COMPLETED"].includes(a.status)
   ).length;
 
+  // Access control: only allow if order.status is IN_PROGRESS and user is owner or approved/verified/completed provider
+  const userId = store?.user?.id;
+  const isCustomer = userId && userId === order.customerId;
+  const isProvider =
+    userId &&
+    order.assignments.some(
+      (a) =>
+        a.providerId === userId &&
+        ["APPROVED", "VERIFIED", "COMPLETED"].includes(a.status)
+    );
+  // can access the page if is pending or is in progress
+  const canAccess =
+    (order.status === "IN_PROGRESS" || order.status === "PENDING") &&
+    (isCustomer || isProvider);
+
+  if (!canAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+          <p className="text-white/80">
+            You do not have permission to view this order.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen ">
       <style jsx global>{`
