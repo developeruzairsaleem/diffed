@@ -1,31 +1,74 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import gamesData from "../../../../../gamedata.json";
 import packagesData from "../../../../../services.json";
 import { lato, orbitron } from "@/fonts/fonts";
 import GradientBorder from "@/HOC/GradientBorder";
+import { message } from "antd";
+import { Spinner } from "flowbite-react";
+import SafeImage from "@/components/ui/SafeImage";
+import Link from "next/link";
 
 const GamesComponent = () => {
-  const [selectedGame, setSelectedGame] = useState(gamesData[0]);
-  const [activePackageIndex, setActivePackageIndex] = useState(0);
-  const selectedPackages = packagesData.find(
-    (pkg) => pkg.name === selectedGame.name
-  ) || { packages: [] };
+  const [games, setGames] = useState<any[]>([]);
+  const [selectedGame, setSelectedGame] = useState(
+    (games?.length && games[0]) || {}
+  );
+  const [loading, setLoading] = useState(false);
+  const [selectedServiceIndex, setSelectedServiceIndex] = useState(0);
 
   // Reset active package index when game changes
   React.useEffect(() => {
-    setActivePackageIndex(0);
+    setSelectedServiceIndex(0);
   }, [selectedGame]);
+
+  // fetching games
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/games");
+        if (!response.ok) {
+          return message.error("Can't fetch the games please reload to retry");
+        }
+        const data = await response.json();
+        if (!data || data?.error) {
+          return message.error(
+            data?.error || "something went wrong during games fetching"
+          );
+        }
+
+        console.log("data", data);
+        setGames(data);
+        setSelectedGame(data[0]);
+      } catch (error) {
+        console.error("error fetching", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGames();
+  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen p-6 pt-0">
+        <div className="max-w-7xl h-full mx-auto flex justify-center items-center">
+          <Spinner color="failure" aria-label="Failure spinner example" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-6 pt-0">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl h-full mx-auto">
         {/* Games Grid */}
         <div className="mb-2">
           <h2 className="text-3xl font-semibold text-white mb-12">
             Select Your Favourite Game
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {gamesData.map((game, index) => (
+            {games.map((game, index) => (
               <div
                 key={index}
                 onClick={() => setSelectedGame(game)}
@@ -36,9 +79,10 @@ const GamesComponent = () => {
                 }`}
               >
                 <div className="relative overflow-hidden rounded-xl  transition-colors aspect-[5/4]">
-                  <img
+                  <SafeImage
                     src={game.image}
                     alt={game.name}
+                    placeholder="/images/placeholder.png"
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   {/* Dark overlay with more space for text */}
@@ -49,9 +93,9 @@ const GamesComponent = () => {
                     <h3 className="text-3xl font-bold text-white mb-3 drop-shadow-lg">
                       {game.name}
                     </h3>
-                    <p className="text-gray-200 text-base mb-4 drop-shadow">
-                      {game.ranks.length} ranks available
-                    </p>
+                    {/* <p className="text-gray-200 text-base mb-4 drop-shadow">
+                      {game?.ranks?.length} ranks available
+                    </p> */}
                   </div>
                 </div>
               </div>
@@ -67,10 +111,11 @@ const GamesComponent = () => {
         >
           <div className="flex items-center mb-8">
             <div className="relative w-20 h-20 mr-6 rounded-lg overflow-hidden">
-              <img
+              <SafeImage
                 src={selectedGame.image}
                 alt={selectedGame.name}
                 className="w-full h-full object-cover"
+                placeholder="/images/placeholder.png"
               />
             </div>
             <div>
@@ -85,7 +130,7 @@ const GamesComponent = () => {
             </div>
           </div>
 
-          {selectedPackages.packages && selectedPackages.packages.length > 0 ? (
+          {selectedGame?.services && selectedGame?.services.length > 0 ? (
             <div>
               {/* Package Category Navigation */}
 
@@ -111,19 +156,19 @@ const GamesComponent = () => {
                   <div className="rounded-lg  bg-[#b31d7c]">
                     <div className="">
                       <div className="flex flex-wrap gap-2 bg-gray-900/50 p-2 rounded-lg border border-gray-600">
-                        {selectedPackages.packages.map(
-                          (packageCategory, index) => (
+                        {selectedGame?.services.map(
+                          (service: any, index: any) => (
                             <button
                               key={index}
-                              onClick={() => setActivePackageIndex(index)}
+                              onClick={() => setSelectedServiceIndex(index)}
                               className={`px-6 py-3 rounded-md m-2 font-semibold cursor-pointer transition-all duration-200 ${
-                                activePackageIndex === index
+                                selectedServiceIndex === index
                                   ? `group
                                     bg-gradient-to-r from-pink-500 gap-3 via-purple-500 to-cyan-400`
                                   : "text-gray-300 hover:text-white hover:bg-[rgba(255, 255, 255, 0.15)]"
                               }`}
                             >
-                              {packageCategory.category}
+                              {service.name}
                             </button>
                           )
                         )}
@@ -134,7 +179,7 @@ const GamesComponent = () => {
               </div>
 
               {/* Active Package Category */}
-              {selectedPackages.packages[activePackageIndex] && (
+              {selectedGame?.services[selectedServiceIndex] && (
                 <div
                   className="col-span-2 mb-14 lg:mb-0"
                   style={{
@@ -149,12 +194,12 @@ const GamesComponent = () => {
                     <h2
                       className={` ${orbitron.className} text-white text-2xl font-bold mb-6`}
                     >
-                      {selectedPackages.packages[activePackageIndex].category}
+                      {selectedGame?.services[selectedServiceIndex]?.name}
                     </h2>
                     <p className="my-2 text-gray-200 mb-6">
                       {
-                        selectedPackages.packages[activePackageIndex]
-                          .description
+                        selectedGame?.services[selectedServiceIndex]
+                          ?.description
                       }
                     </p>
 
@@ -195,15 +240,15 @@ const GamesComponent = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {selectedPackages.packages[
-                            activePackageIndex
-                          ].items.map((item, itemIndex) => (
+                          {selectedGame?.services[
+                            selectedServiceIndex
+                          ]?.subpackages.map((item: any, itemIndex: any) => (
                             <tr key={itemIndex} className=" transition-colors">
                               <td
                                 className={`py-5 px-4 text-[#E1E1E1] ${
                                   itemIndex !==
-                                  selectedPackages.packages[activePackageIndex]
-                                    .items.length -
+                                  selectedGame?.services[selectedServiceIndex]
+                                    .subpackages.length -
                                     1
                                     ? "border-b border-white"
                                     : ""
@@ -216,8 +261,8 @@ const GamesComponent = () => {
                               <td
                                 className={`py-5 px-4 text-[#E1E1E1] ${
                                   itemIndex !==
-                                  selectedPackages.packages[activePackageIndex]
-                                    .items.length -
+                                  selectedGame?.services[selectedServiceIndex]
+                                    .subpackages.length -
                                     1
                                     ? "border-b border-white"
                                     : ""
@@ -230,8 +275,8 @@ const GamesComponent = () => {
                               <td
                                 className={`py-5 px-4 text-[#E1E1E1] ${
                                   itemIndex !==
-                                  selectedPackages.packages[activePackageIndex]
-                                    .items.length -
+                                  selectedGame?.services[selectedServiceIndex]
+                                    .subpackages.length -
                                     1
                                     ? "border-b border-white"
                                     : ""
@@ -244,24 +289,22 @@ const GamesComponent = () => {
                               <td
                                 className={`py-5 px-4 text-[#E1E1E1] max-w-md ${
                                   itemIndex !==
-                                  selectedPackages.packages[activePackageIndex]
-                                    .items.length -
+                                  selectedGame?.services[selectedServiceIndex]
+                                    .subpackages.length -
                                     1
                                     ? "border-b border-white"
                                     : ""
                                 }`}
                               >
                                 <p className="leading-relaxed">
-                                  {item.description.length > 35
-                                    ? item.description.substring(0, 35) + "..."
-                                    : item.description}
+                                  {item.description}
                                 </p>
                               </td>
                               <td
                                 className={`py-5 px-4 text-center ${
                                   itemIndex !==
-                                  selectedPackages.packages[activePackageIndex]
-                                    .items.length -
+                                  selectedGame?.services[selectedServiceIndex]
+                                    .subpackages.length -
                                     1
                                     ? "border-b border-white"
                                     : ""
@@ -281,16 +324,19 @@ const GamesComponent = () => {
                               <td
                                 className={`py-5 px-4 text-center ${
                                   itemIndex !==
-                                  selectedPackages.packages[activePackageIndex]
-                                    .items.length -
+                                  selectedGame?.services[selectedServiceIndex]
+                                    .subpackages.length -
                                     1
                                     ? "border-b border-white"
                                     : ""
                                 }`}
                               >
-                                <button className="bg-gradient-to-r cursor-pointer from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 text-sm">
+                                <Link
+                                  href={`/checkout/${item.id}`}
+                                  className="bg-gradient-to-r cursor-pointer from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 text-sm"
+                                >
                                   Checkout
-                                </button>
+                                </Link>
                               </td>
                             </tr>
                           ))}

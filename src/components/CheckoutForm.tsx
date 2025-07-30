@@ -29,9 +29,13 @@ type FormData = z.infer<typeof schema>;
 
 interface CheckoutFormProps {
   onPaymentSuccess?: (paymentMethodId: string) => void;
+  subpackageId: string | string[] | undefined;
 }
 
-export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
+export default function CheckoutForm({
+  onPaymentSuccess,
+  subpackageId,
+}: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
@@ -242,7 +246,7 @@ export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
         </FormField>
         <button
           type="submit"
-          className="w-full py-6 text-center w-full rounded bg-gradient-to-r from-[#EE2C81] via-[#FE0FD0] via-[#58B9E3] to-[#F79FC5] hover:scale-105 transition-all cursor-pointer text-white text-[24px] mt-16 disabled:opacity-50"
+          className=" py-6 text-center w-full rounded bg-gradient-to-r from-[#EE2C81]  via-[#58B9E3] to-[#F79FC5] hover:scale-105 transition-all cursor-pointer text-white text-[24px] mt-16 disabled:opacity-50"
           disabled={loading}
         >
           {loading ? "Processing..." : "Subscribe"}

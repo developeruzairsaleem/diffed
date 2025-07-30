@@ -1,11 +1,16 @@
-"use client"
+"use client";
 import { lato, orbitron, poppins } from "@/fonts/fonts";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "@/components/CheckoutForm";
+import { useParams } from "next/navigation";
 
 export default function Checkout() {
-  const stripePromise = loadStripe("pk_test_51R9i482MRcnSBYc7PUCHKjITMA5QX0BD7EVBYSk4OmNWTIP54WlHjVhdb9DMn9W91CShSzAw6SDVUDVQ8CBrrtyc00CHyToDDu"); // Replace with your Stripe public key
+  const params = useParams();
+  const subpackageId = params?.subpackageId;
+  const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  );
 
   return (
     <div className="Checkout p-8 max-w-[1300px] justify-between mx-auto w-full ">
@@ -73,8 +78,8 @@ export default function Checkout() {
         </div>
         <form className="form mt-20 lg:mt-0 lg:ml-20 lg:justify-self-start xl:justify-self-end ">
           <Elements stripe={stripePromise}>
-         <CheckoutForm />
-       </Elements>
+            <CheckoutForm subpackageId={subpackageId || ""} />
+          </Elements>
         </form>
       </div>
     </div>

@@ -150,24 +150,24 @@ model Subpackage {
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  orderNumber   String      @unique @default(cuid())
+  id            String            @id @default(cuid())
+  orderNumber   String            @unique @default(cuid())
   customerId    String
-  customer      User        @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
+  customer      User              @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
   subpackageId  String
-  subpackage    Subpackage  @relation(fields: [subpackageId], references: [id], onDelete: Cascade)
+  subpackage    Subpackage        @relation(fields: [subpackageId], references: [id], onDelete: Cascade)
   price         Float
-  status        OrderStatus @default(PENDING)
+  status        OrderStatus       @default(PENDING)
   notes         String?
-  rerollsLeft   Int         @default(3)
-  approvedCount Int         @default(0) // number of providers approved
-  requiredCount Int         @default(1) // how many providers needed
+  rerollsLeft   Int               @default(3)
+  approvedCount Int               @default(0) // redundant no need to change
+  requiredCount Int               @default(1) // how many providers needed
   stripeSessId  String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  assignments OrderAssignment[]
-  chats       Chat[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  isInQueue     Boolean           @default(false)
+  assignments   OrderAssignment[]
+  chats         Chat[]
 }
 
 model OrderAssignment {
