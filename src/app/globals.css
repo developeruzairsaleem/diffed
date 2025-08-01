@@ -33,7 +33,22 @@ body {
   background: var(--background);
   overflow-x: hidden;
 }
-
+.fade-mask-ltr {
+  mask-image: linear-gradient(
+    to top right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 35%,
+    rgba(0, 0, 0, 0.3) 60%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to top right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 35%,
+    rgba(0, 0, 0, 0.3) 60%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
 .section-title {
   font-family: var(--font-orbitron), sans-serif;
   font-size: clamp(
@@ -112,8 +127,6 @@ body {
   text-transform: uppercase;
 }
 
-
-
 /* Custom Scrollbar Styles */
 /* For Webkit browsers (Chrome, Safari, Edge, Opera) */
 ::-webkit-scrollbar {
@@ -127,13 +140,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #5d1a45, #4e0d37); /* Gradient thumb matching your theme */
+  background: linear-gradient(
+    to bottom,
+    #5d1a45,
+    #4e0d37
+  ); /* Gradient thumb matching your theme */
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #6a2050, #5a1040); /* Slightly brighter on hover */
+  background: linear-gradient(
+    to bottom,
+    #6a2050,
+    #5a1040
+  ); /* Slightly brighter on hover */
 }
 
 /* For Firefox */

@@ -11,3 +11,7 @@ export const formatAmountForStripe = (amount: number): number => {
 export const formatAmountFromStripe = (amount: number): number => {
   return amount / 100;
 };
+// const array=[123,321]
+// const firstValue =array[0]
+// const  secondValue = array[1]
+// const [firstValue,secondValue] =[123,214]

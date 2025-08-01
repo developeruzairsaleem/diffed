@@ -332,7 +332,7 @@ const GamesComponent = () => {
                                 }`}
                               >
                                 <Link
-                                  href={`/checkout/${item.id}`}
+                                  href={`/dashboard/customer/checkout/${item.id}`}
                                   className="bg-gradient-to-r cursor-pointer from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 text-sm"
                                 >
                                   Checkout

@@ -38,7 +38,6 @@ export async function updateWalletBalance(
     },
     data: {
       balance: newBalance,
-      updatedAt: new Date(),
     },
   });
   if (!updatedWallet) throw Error("Can't update wallet with new balance");

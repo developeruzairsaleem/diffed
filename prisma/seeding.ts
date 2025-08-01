@@ -3,8 +3,8 @@ import { faker } from "@faker-js/faker";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
-  const mainCustomerId = "cmdnrvftu0000v0ao4gj5wad7";
-  const mainCustomerWalletId = "cmdnrvgap0002v0aouvk3u6t2";
+  const mainCustomerId = "cmdshw47m0000v0tky898h3m3";
+  const mainCustomerWalletId = "cmdshw4pk0002v0tkougs31fa";
 
   // Create games with services and subpackages
   const games = await Promise.all(
@@ -83,6 +83,8 @@ async function main() {
         subpackageId: subpackage.id,
         price: subpackage.price,
         requiredCount: subpackage.requiredProviders,
+        discordTag: `#12314${i}`,
+        discordUsername: `uzairkhan${i}`,
         notes: Math.random() > 0.5 ? faker.lorem.sentence() : null,
       },
     });
