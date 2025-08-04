@@ -1,5 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+import { message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -24,6 +27,7 @@ import {
 
 const Dashboard = ({ children }: { children: React.ReactNode }) => {
   const store = useStore();
+  const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -64,6 +68,27 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
     }
     getCustomerDashboard();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        message.success("You have been successfully logged out.");
+        // Redirect to the login page or home page after logout
+        router.push("/");
+      } else {
+        message.error(data.error || "Logout failed.");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      message.error("An unexpected error occurred during logout.");
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -162,6 +187,7 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
 
             <div className="p-2 border-t border-white/10">
               <button
+                onClick={handleLogout}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg text-white hover:bg-white/10 transition-colors ${
                   !isSidebarOpen && "justify-center"
                 }`}

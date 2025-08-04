@@ -167,7 +167,7 @@ model Order {
   stripeSessId    String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  isInQueue       Boolean           @default(false)
+  isInQueue       Boolean           @default(true)
   assignments     OrderAssignment[]
   chats           Chat[]
 }

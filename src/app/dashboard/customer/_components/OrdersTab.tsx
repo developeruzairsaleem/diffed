@@ -1,25 +1,56 @@
+"use client";
 import {
   Package,
   Activity,
   CheckCircle,
-  DollarSign,
   Clock,
   XCircle,
   AlertCircle,
+  Inbox,
 } from "lucide-react";
-import gamesData from "../../../../../gamedata.json";
-import orders from "../../../../../orders.json";
 import { useCustomerOrders } from "@/hooks/useOrders";
 import { useStore } from "@/store/useStore";
-import { CustomerOrderListDto } from "@/types/order.dto";
-import { Spinner } from "flowbite-react";
+import type { CustomerOrderListDto } from "@/types/order.dto";
 import { useState } from "react";
 import Link from "next/link";
+import SafeImage from "@/components/ui/SafeImage";
+import { OrdersSkeleton } from "@/components/ui/OrdersSkeleton";
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "COMPLETED":
+      return <CheckCircle className="w-4 h-4" />;
+    case "IN_PROGRESS":
+      return <Activity className="w-4 h-4" />;
+    case "PENDING":
+      return <Clock className="w-4 h-4" />;
+    case "CANCELLED":
+      return <XCircle className="w-4 h-4" />;
+    default:
+      return <AlertCircle className="w-4 h-4" />;
+  }
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "COMPLETED":
+      return "text-green-400 border-green-400 border-2 bg-green-500/10";
+    case "IN_PROGRESS":
+      return "text-blue-400 border-blue-400 border-2 bg-blue-500/10";
+    case "PENDING":
+      return "text-yellow-400 border-2 border-yellow-400 bg-yellow-500/10";
+    case "CANCELLED":
+      return "text-red-400 border-red-400 border-2 bg-red-500/10";
+    default:
+      return "text-gray-400 border-gray-400 border-2 bg-gray-500/10";
+  }
+};
+
 const OrdersTab = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const { user } = useStore();
-  //  renaming hooks name for recent orders
+
   const {
     data: ordersData,
     error: ordersError,
@@ -30,40 +61,15 @@ const OrdersTab = () => {
     page,
     limit,
   });
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "COMPLETED":
-        return <CheckCircle className="w-4 h-4" />;
-      case "IN_PROGRESS":
-        return <Activity className="w-4 h-4" />;
-      case "PENDING":
-        return <Clock className="w-4 h-4" />;
-      case "CANCELLED":
-        return <XCircle className="w-4 h-4" />;
-      default:
-        return <AlertCircle className="w-4 h-4" />;
-    }
-  };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "COMPLETED":
-        return "text-green-600 border-green-600 border-2 bg-transparent";
-      case "IN_PROGRESS":
-        return "text-blue-600 border-blue-600 border-2 bg-transparent";
-      case "PENDING":
-        return "text-yellow-600 border-2 border-yellow-600 bg-transparent";
-      case "CANCELLED":
-        return "text-red-600 border-red-600 border-2 bg-transparent";
-      default:
-        return "text-gray-600 border-gray-600 border-2 bg-transparent";
-    }
-  };
+  if (loadingOrders) {
+    return <OrdersSkeleton />;
+  }
 
   return (
     <div className="space-y-6 mb-20 flex flex-col">
       <div
-        className={` rounded-lg flex-1 mt-auto `}
+        className="rounded-lg flex-1 mt-auto"
         style={{
           padding: "1px",
           background:
@@ -81,25 +87,28 @@ const OrdersTab = () => {
           <div className="rounded-lg h-full bg-[#52103A]">
             <div
               style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
-              className="  rounded-lg h-full shadow-sm w-full"
+              className="rounded-lg h-full shadow-sm w-full"
             >
-              <div className="p-6  border-gray-200">
+              <div className="p-6 border-gray-200">
                 <h3 className="text-xl font-semibold text-white flex items-center">
                   <Clock className="w-5 h-5 mr-2" /> Orders
                 </h3>
               </div>
-              <div className="p-6 ">
+              <div className="p-6">
                 <div className="overflow-x-auto w-full">
-                  {loadingOrders ? (
-                    <Spinner
-                      color="pink"
-                      className="my-5 mx-auto block"
-                      aria-label="Pink spinner example"
-                    />
-                  ) : !ordersData?.orders?.length ? (
-                    <h3 className="text-white text-center my-5 text-2xl">
-                      No Orders Found
-                    </h3>
+                  {!ordersData?.orders?.length ? (
+                    <div className="text-center py-20 px-6">
+                      <Inbox className="w-16 h-16 mx-auto text-gray-500 mb-4" />
+                      <h3 className="text-2xl font-semibold text-white mb-2">
+                        No Orders Yet
+                      </h3>
+                      <p className="text-gray-300 mb-6">
+                        When you place an order, it will appear here.
+                      </p>
+                      <button className="font-semibold text-white bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 hover:opacity-90 transition-opacity duration-200 py-3 px-6 rounded-lg text-base">
+                        Place New Order
+                      </button>
+                    </div>
                   ) : (
                     <>
                       <table
@@ -140,37 +149,45 @@ const OrdersTab = () => {
                         <tbody>
                           {ordersData?.orders?.map(
                             (order: CustomerOrderListDto, idx: number) => (
-                              <tr className="" key={order?.id}>
-                                <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                              <tr
+                                className="hover:bg-white/5 transition-colors duration-200"
+                                key={order?.id}
+                              >
+                                <td className="py-4 px-4 text-[#E1E1E1]">
                                   <div className="flex items-center space-x-3">
                                     {order?.subpackage?.service?.game?.image ? (
-                                      <img
+                                      <SafeImage
+                                        placeholder="/images/placeholder.png"
                                         src={
                                           order?.subpackage?.service?.game
                                             ?.image
                                         }
-                                        className="w-8 h-8"
+                                        className="w-10 h-10 rounded-md object-cover"
+                                        alt={
+                                          order?.subpackage?.service?.game?.name
+                                        }
                                       />
                                     ) : (
-                                      <div className="w-8 h-8"></div>
+                                      <div className="w-10 h-10 bg-[#3A0F2A] rounded-md flex items-center justify-center">
+                                        <Package className="w-5 h-5 text-gray-400" />
+                                      </div>
                                     )}
-                                    <span>
+                                    <span className="font-medium">
                                       {order?.subpackage?.service?.game?.name}
                                     </span>
                                   </div>
                                 </td>
-
-                                <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                <td className="py-4 px-4 text-[#E1E1E1] font-medium">
                                   {order?.subpackage?.service?.name}
                                 </td>
-
-                                <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                <td
+                                  className="py-4 px-4 text-[#E1E1E1] max-w-[200px] truncate"
+                                  title={order?.subpackage?.name}
+                                >
                                   {order?.subpackage?.name}
                                 </td>
-
-                                <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                <td className="py-4 px-4 text-[#E1E1E1]">
                                   {(() => {
-                                    console.log(order);
                                     const filtered =
                                       order?.providers?.filter((provider) =>
                                         [
@@ -179,36 +196,53 @@ const OrdersTab = () => {
                                           "VERIFIED",
                                         ].includes(provider?.status)
                                       ) || [];
-
                                     const first = filtered[0];
-
-                                    if (!first) return "No Providers"; // or return "No providers" or fallback
-
+                                    if (!first)
+                                      return (
+                                        <span className="text-gray-400">
+                                          No Providers
+                                        </span>
+                                      );
                                     return (
                                       <span>
                                         {first.username}
-                                        {filtered.length > 1 && " and more"}
+                                        {filtered.length > 1 && (
+                                          <span className="text-gray-400">
+                                            {" "}
+                                            and {filtered.length - 1} more
+                                          </span>
+                                        )}
                                       </span>
                                     );
                                   })()}
                                 </td>
-
-                                <td className={`py-3 px-4 text-[#E1E1E1] `}>
+                                <td className="py-4 px-4 text-[#E1E1E1] font-semibold">
                                   $ {order?.price}
                                 </td>
-
-                                <td
-                                  className={`py-1  flex px-4 text-[#E1E1E1] ${getStatusColor(
-                                    order?.status
-                                  )} items-center  gap-2 rounded-xl font-bold `}
-                                >
-                                  {getStatusIcon(order?.status)} {order?.status}
-                                </td>
-                                <td>
-                                  <Link
-                                    href={`/dashboard/customer/orders/${order.id}`}
+                                <td className="py-4 px-4">
+                                  <span
+                                    className={`py-1.5 px-3 text-xs font-bold rounded-full inline-flex items-center gap-2 ${getStatusColor(
+                                      order?.status
+                                    )}`}
                                   >
-                                    View Chat
+                                    {getStatusIcon(order?.status)}
+                                    <span className="capitalize">
+                                      {order.status
+                                        .replace("_", " ")
+                                        .toLowerCase()}
+                                    </span>
+                                  </span>
+                                </td>
+                                <td className="py-4 px-4">
+                                  <Link
+                                    href={
+                                      order.status === "PENDING"
+                                        ? `/dashboard/customer/orders/${order.id}/pending`
+                                        : `/dashboard/customer/orders/${order.id}`
+                                    }
+                                    className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs"
+                                  >
+                                    View Details
                                   </Link>
                                 </td>
                               </tr>
@@ -216,20 +250,19 @@ const OrdersTab = () => {
                           )}
                         </tbody>
                       </table>
-
                       <div className="flex justify-center items-center gap-4 mt-6">
                         <button
                           onClick={() =>
                             setPage((prev) => Math.max(prev - 1, 1))
                           }
                           disabled={page === 1}
-                          className="px-4 py-2 bg-pink-600 text-white rounded disabled:opacity-50"
+                          className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-pink-600 hover:to-purple-700 transition-all duration-300 font-medium"
                         >
                           Previous
                         </button>
-
-                        <span className="text-white">Page {page}</span>
-
+                        <span className="text-white font-medium px-4">
+                          Page {page}
+                        </span>
                         <button
                           onClick={() => {
                             if (
@@ -239,8 +272,11 @@ const OrdersTab = () => {
                               setPage((prev) => prev + 1);
                             }
                           }}
-                          disabled={page * limit > ordersData.total}
-                          className="px-4 py-2 bg-pink-600 text-white rounded disabled:opacity-50"
+                          disabled={
+                            !ordersData?.total ||
+                            page * limit >= ordersData.total
+                          }
+                          className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-pink-600 hover:to-purple-700 transition-all duration-300 font-medium"
                         >
                           Next
                         </button>
@@ -256,4 +292,5 @@ const OrdersTab = () => {
     </div>
   );
 };
+
 export default OrdersTab;

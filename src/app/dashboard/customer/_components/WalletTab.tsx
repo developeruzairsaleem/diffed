@@ -1,48 +1,59 @@
 "use client";
 import { useStore } from "@/store/useStore";
-import { useState } from "react";
-import {
-  Plus,
-  Wallet,
-  ArrowUpDown,
-  Download,
-  Activity,
-  Minus,
-  Gift,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Wallet, Activity, Minus, Gift } from "lucide-react";
 import formatDate from "../_lib/format-date";
 import AddFundsCard from "./AddFundCard";
+import { WalletSkeleton } from "@/components/ui/WalletSkeleton";
+
 const WalletTab = () => {
   const store = useStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [showAddFunds, setShowAddFunds] = useState(false);
 
   // refresh Wallet Data so we can reuse it in the dashboard rendering
   const refreshWalletData = async () => {
-    const wallet = await fetch("/api/wallet").then((res) => res.json());
-
-    const walletData = {
-      id: wallet.id,
-      balance: wallet.balance,
-      currency: wallet.currency,
-    };
-    store.setWallet(walletData);
-    const tx = await fetch("/api/transaction/me").then((res) => res.json());
-    const txData = tx.map((idTx: any) => {
-      return {
-        id: idTx.id,
-        type: idTx.type,
-        amount: idTx.amount,
-        walletId: idTx.walletId,
-        createdAt: idTx.createdAt,
-        description: idTx.description,
-        status: idTx.status,
+    try {
+      const wallet = await fetch("/api/wallet").then((res) => res.json());
+      const walletData = {
+        id: wallet.id,
+        balance: wallet.balance,
+        currency: wallet.currency,
       };
-    });
-    store.setTransactions(txData);
+      store.setWallet(walletData);
+
+      const tx = await fetch("/api/transaction/me").then((res) => res.json());
+      const txData = tx.map((idTx: any) => {
+        return {
+          id: idTx.id,
+          type: idTx.type,
+          amount: idTx.amount,
+          walletId: idTx.walletId,
+          createdAt: idTx.createdAt,
+          description: idTx.description,
+          status: idTx.status,
+        };
+      });
+      store.setTransactions(txData);
+    } catch (error) {
+      console.error("Error refreshing wallet data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    // Initial load
+    refreshWalletData();
+  }, []);
 
   const walletTransactions = store.transactions;
   console.log("transactions", walletTransactions);
-  const [showAddFunds, setShowAddFunds] = useState(false);
+
+  if (isLoading) {
+    return <WalletSkeleton />;
+  }
+
   return (
     <div className="space-y-6 pb-12">
       <div className="flex items-center justify-between">
@@ -62,12 +73,13 @@ const WalletTab = () => {
           handleAddShow={setShowAddFunds}
         />
       )}
+
       {/* Balance Card */}
       <div
         style={{ padding: "2px" }}
         className=" bg-gradient-to-r rounded-xl from-pink-500 gap-3 via-purple-500 to-cyan-400"
       >
-        <div className="bg-[#6C3457] rounded-xl p-4">
+        <div className="bg-[#3A0F2A] rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-200 font-bold text-sm">
@@ -90,15 +102,14 @@ const WalletTab = () => {
       </div>
 
       {/* Transaction History */}
-      {/* Balance Card */}
       <div
         style={{ padding: "2px" }}
         className=" bg-gradient-to-r rounded-xl from-pink-500 via-purple-500 to-cyan-400"
       >
-        <div className="bg-[#591742] rounded-xl">
+        <div className="bg-[#3A0F2A] rounded-xl">
           <div
             style={{
-              backgroundColor: "rgba(255,255,255,0.15)",
+              backgroundColor: "rgba(255,255,255,0.05)",
             }}
             className=" rounded-xl shadow-sm "
           >

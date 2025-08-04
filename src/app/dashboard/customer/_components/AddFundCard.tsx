@@ -121,7 +121,7 @@ function AddFundsForm({
       style={{ padding: "2px" }}
       className=" bg-gradient-to-r max-w-xl w-full rounded-xl from-pink-500 via-purple-500 to-cyan-400"
     >
-      <div className="bg-[#591742] max-w-xl w-full rounded-xl">
+      <div className="bg-[#3A0F2A] max-w-xl w-full rounded-xl">
         <Card className="w-full text-white  max-w-xl mx-auto">
           <CardHeader>
             {/* if the funds added successfully show the following message */}
@@ -226,7 +226,7 @@ export default function FundsFormProvider({
     <div
       onClick={() => handleAddShow(false)}
       style={{
-        backgroundColor: "rgba(0,0,0,0.45",
+        backgroundColor: "rgba(0,0,0,0.45)",
       }}
       className="w-screen h-screen fixed top-0 left-0 flex items-center justify-center overflow-hidden"
     >
