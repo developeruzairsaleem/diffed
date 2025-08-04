@@ -42,6 +42,12 @@ export async function PUT(
       );
     }
 
+    if (order.rerollsLeft <= 0) {
+      return NextResponse.json({
+        error: "Already used available rerolls",
+        success: false,
+      });
+    }
     // Check if user is the customer (order owner)
     const isCustomer = session?.userId === order.customerId;
 
@@ -64,20 +70,10 @@ export async function PUT(
       ["APPROVED", "VERIFIED", "COMPLETED"].includes(a.status)
     ).length;
 
-    if (approvedCount >= order.requiredCount) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Required count already fulfilled. Cannot approve more assignments.",
-        },
-        { status: 400 }
-      );
-    }
-
     const success = await OrderService.updateAssignment(params.assignmentId, {
-      status: "APPROVED",
+      status: "REPLACED",
     });
+
     if (!success) {
       const response: ApiResponse<never> = {
         success: false,
@@ -89,18 +85,15 @@ export async function PUT(
       );
       return NextResponse.json(response, { status: 400 });
     }
-    // change the status of the main order to inprogress incase the orderassignment becomes equal to the requiredCount
-    if (approvedCount + 1 === order.requiredCount) {
-      await prisma.order.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          status: "IN_PROGRESS",
-          isInQueue: false,
-        },
-      });
-    }
+
+    await prisma.order.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        rerollsLeft: order.rerollsLeft - 1,
+      },
+    });
 
     const response: ApiResponse<never> = {
       success: true,

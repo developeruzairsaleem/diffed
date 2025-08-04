@@ -1,239 +1,315 @@
-"use client"
+"use client";
+import React, { useState, useEffect } from "react";
+import {
+  Flame,
+  Users,
+  DollarSign,
+  Clock,
+  List,
+  Wifi,
+  WifiOff,
+  ServerCrash,
+  AlertTriangle,
+} from "lucide-react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { message } from "antd";
+import { io } from "socket.io-client";
+import { Socket } from "socket.io";
+import { useStore } from "@/store/useStore";
+dayjs.extend(relativeTime);
 
-import { useState, useMemo } from "react" // Import useMemo
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle, XCircle, Gamepad2, DollarSign, Clock } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs" // Import Tabs components
-
-interface Order {
-  id: string
-  clientName: string
-  clientAvatar: string
-  service: string
-  game: string // e.g., "Valorant", "League of Legends", "Fortnite", "CS2", "Overwatch 2"
-  price: number
-  status: "Pending" | "Accepted" | "Rejected"
-  requestedAt: string
+// --- TYPE DEFINITIONS BASED ON PROVIDED JSON AND SCHEMA ---
+interface Game {
+  id: string;
+  name: string;
+  image: string;
+  isEloBased: boolean;
 }
 
-const initialOrders: Order[] = [
-  {
-    id: "ORD001",
-    clientName: "GamerPro2024",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "1-on-1 Coaching",
-    game: "Valorant",
-    price: 35,
-    status: "Pending",
-    requestedAt: "2025-07-18 10:00 AM",
-  },
-  {
-    id: "ORD002",
-    clientName: "LeaguePlayer99",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "Rank Boosting",
-    game: "League of Legends",
-    price: 150,
-    status: "Pending",
-    requestedAt: "2025-07-18 09:30 AM",
-  },
-  {
-    id: "ORD003",
-    clientName: "CS_Master",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "VOD Review",
-    game: "CS2",
-    price: 20,
-    status: "Pending",
-    requestedAt: "2025-07-17 05:00 PM",
-  },
-  {
-    id: "ORD004",
-    clientName: "OverwatchFan",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "Team Coaching",
-    game: "Overwatch 2",
-    price: 120,
-    status: "Pending",
-    requestedAt: "2025-07-17 02:15 PM",
-  },
-  {
-    id: "ORD005",
-    clientName: "FortnitePro",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "1-on-1 Coaching",
-    game: "Fortnite",
-    price: 40,
-    status: "Pending",
-    requestedAt: "2025-07-17 01:00 PM",
-  },
-  {
-    id: "ORD007",
-    clientName: "ApexLegend",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "Rank Boosting",
-    game: "Apex Legends",
-    price: 180,
-    status: "Pending",
-    requestedAt: "2025-07-16 04:00 PM",
-  },
-  {
-    id: "ORD005",
-    clientName: "NewbieGamer",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "1-on-1 Coaching",
-    game: "Valorant",
-    price: 35,
-    status: "Accepted",
-    requestedAt: "2025-07-16 11:00 AM",
-  },
-  {
-    id: "ORD006",
-    clientName: "RageQuitKid",
-    clientAvatar: "/placeholder.svg?height=40&width=40",
-    service: "Rank Boosting",
-    game: "League of Legends",
-    price: 100,
-    status: "Rejected",
-    requestedAt: "2025-07-16 09:00 AM",
-  },
-]
+interface Service {
+  id: string;
+  name: string;
+  description: string;
+  game: Game;
+}
 
-export function OrderQueue() {
-  const [orders, setOrders] = useState<Order[]>(initialOrders)
-  const [activeFilter, setActiveFilter] = useState("All") // New state for filter
+interface Subpackage {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  duration: string;
+  requiredProviders: number;
+  service: Service;
+}
 
-  // Dynamically get unique games from orders, plus "All"
-  const gameFilters = useMemo(() => {
-    const uniqueGames = new Set(initialOrders.map((order) => order.game))
-    return ["All", ...Array.from(uniqueGames).sort()]
-  }, [])
+// This is the main Order object received from the GET /api/orders/queue endpoint
+interface Order {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  subpackageId: string;
+  discordTag: string;
+  discordUsername: string;
+  price: number;
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
+  notes: string | null;
+  rerollsLeft: number;
+  approvedCount: number;
+  requiredCount: number; // This is the total number of providers needed
+  updatedAt: string; // ISO date string
+  isInQueue: boolean;
+  subpackage: Subpackage;
+  // The following properties are from the OrderAssignment model but might not be on the initial queue object.
+  // For this component, we primarily care about the queue data.
+  // We'll assume the queue gives us the required count, but not who is assigned yet.
+}
 
-  // Filtered orders based on activeFilter
-  const filteredOrders = useMemo(() => {
-    if (activeFilter === "All") {
-      return orders
-    }
-    return orders.filter((order) => order.game === activeFilter)
-  }, [orders, activeFilter])
+interface ApiResponse {
+  success: boolean;
+  data?: Order[];
+  error?: string;
+}
 
-  const handleAccept = (id: string) => {
-    setOrders((prevOrders) => prevOrders.map((order) => (order.id === id ? { ...order, status: "Accepted" } : order)))
-    console.log(`Order ${id} accepted!`)
-  }
+// --- HELPER & UI COMPONENTS ---
 
-  const handleReject = (id: string) => {
-    setOrders((prevOrders) => prevOrders.map((order) => (order.id === id ? { ...order, status: "Rejected" } : order)))
-    console.log(`Order ${id} rejected!`)
-  }
+const OrderCardSkeleton = () => (
+  <div className="bg-[#2a0a1e]/80 p-5 rounded-xl border border-white/10 animate-pulse">
+    <div className="flex justify-between items-start">
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 bg-white/10 rounded-lg"></div>
+        <div>
+          <div className="h-5 w-40 bg-white/10 rounded mb-2"></div>
+          <div className="h-4 w-32 bg-white/10 rounded"></div>
+        </div>
+      </div>
+      <div className="h-4 w-20 bg-white/10 rounded"></div>
+    </div>
+    <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+      <div className="flex gap-6">
+        <div className="h-5 w-24 bg-white/10 rounded"></div>
+        <div className="h-5 w-24 bg-white/10 rounded"></div>
+      </div>
+      <div className="h-10 w-28 bg-white/20 rounded-lg"></div>
+    </div>
+  </div>
+);
 
-  const getStatusBadgeClass = (status: Order["status"]) => {
-    switch (status) {
-      case "Accepted":
-        return "bg-green-500 text-white"
-      case "Rejected":
-        return "bg-red-500 text-white"
-      case "Pending":
-      default:
-        return "bg-yellow-500 text-white"
-    }
-  }
+const EmptyQueue = () => (
+  <div className="text-center py-20 px-6 rounded-lg bg-black/20 col-span-full">
+    <ServerCrash className="w-16 h-16 mx-auto text-gray-500" />
+    <h3 className="mt-4 text-2xl font-semibold text-white">
+      The Queue is Empty
+    </h3>
+    <p className="mt-2 text-gray-400">
+      There are no available orders right now. Check back soon!
+    </p>
+  </div>
+);
+
+const ErrorState = ({ message }: { message: string }) => (
+  <div className="text-center py-20 px-6 rounded-lg bg-red-900/30 border border-red-500/50 col-span-full">
+    <AlertTriangle className="w-16 h-16 mx-auto text-red-400" />
+    <h3 className="mt-4 text-2xl font-semibold text-white">
+      Failed to Load Queue
+    </h3>
+    <p className="mt-2 text-red-300">
+      {message || "An unexpected error occurred. Please try again later."}
+    </p>
+  </div>
+);
+
+const OrderCard = ({
+  order,
+  onApply,
+  isApplying,
+}: {
+  order: Order;
+  onApply: (orderId: string, customerId: string) => void;
+  isApplying: boolean;
+}) => {
+  // Assuming platform takes a 20% fee
+  const earnings = order.price;
+  const game = order.subpackage.service.game;
 
   return (
-    <Card className="bg-black/30 backdrop-blur-sm border-white/10">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center">
-          <Clock className="w-5 h-5 mr-2" />
-          Orders Queue
-        </CardTitle>
-        <CardDescription className="text-white/70">Manage incoming coaching and boosting requests.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Filter Options */}
-        <Tabs value={activeFilter} onValueChange={setActiveFilter} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 bg-white/5 border border-white/10 shadow-md">
-            {gameFilters.map((game) => (
-              <TabsTrigger
-                key={game}
-                value={game}
-                className="text-white/70 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-600"
-              >
-                {game}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-
-        {/* Orders List */}
-        {filteredOrders.length === 0 ? (
-          <p className="text-white/70 text-center py-8">No orders found for {activeFilter}.</p>
-        ) : (
-          <div className="grid gap-4">
-            {filteredOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5"
-              >
-                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-0">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={order.clientAvatar || "/placeholder.svg"} alt={order.clientName} />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-xs">
-                        {order.clientName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium text-white">{order.clientName}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Gamepad2 className="w-4 h-4 text-white/60" />
-                    <span className="text-sm text-white/80">
-                      {order.service} ({order.game})
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-white/60" />
-                    <span className="text-sm text-white/80">${order.price}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-white/60" />
-                    <span className="text-xs text-white/60">{order.requestedAt}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 items-end md:items-center">
-                  <Badge className={getStatusBadgeClass(order.status)}>{order.status}</Badge>
-                  {order.status === "Pending" && (
-                    <div className="flex gap-2 mt-2 sm:mt-0">
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleAccept(order.id)}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        Accept
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="bg-red-600 hover:bg-red-700 text-white border-red-700"
-                        onClick={() => handleReject(order.id)}
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Reject
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+    <div className="p-px rounded-xl bg-gradient-to-br from-pink-500/50 via-purple-500/50 to-cyan-400/50">
+      <div className="bg-[#1c0715] p-5 rounded-xl h-full">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-4">
+            <img
+              src={game.image || "/logo/logo.png"}
+              alt={game.name}
+              className="w-16 h-16 rounded-lg object-cover border-2 border-white/10"
+            />
+            <div>
+              <h3 className="font-bold text-white text-lg">{game.name}</h3>
+              <p className="text-gray-300 text-sm">
+                {order.subpackage.service.name}
+              </p>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
-  )
+          <p className="text-sm text-gray-400 flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            {dayjs(order.updatedAt).fromNow()}
+          </p>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-end">
+          <div className="flex gap-x-6 gap-y-2 flex-wrap">
+            <div>
+              <p className="text-xs text-gray-400 uppercase font-semibold">
+                Package
+              </p>
+              <p className="text-white font-medium truncate max-w-xs">
+                {order.subpackage.name}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase font-semibold">
+                Price
+              </p>
+              <p className="font-semibold text-green-400 flex items-center gap-1">
+                <DollarSign className="w-4 h-4" />
+                {earnings}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase font-semibold">
+                Slots
+              </p>
+              <p className="font-semibold text-cyan-300 flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                {/* This would need real-time data; for now, showing required count */}
+                {order.approvedCount} / {order.requiredCount}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onApply(order.id, order.customerId)}
+            disabled={isApplying}
+            className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-5 rounded-lg inline-flex items-center justify-center text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isApplying ? "Applying..." : "Apply Now"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN COMPONENT ---
+
+export function OrderQueue() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useStore();
+  const [error, setError] = useState<string | null>(null);
+  const [applyingOrderId, setApplyingOrderId] = useState<string | null>(null);
+
+  const fetchQueue = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/orders/queue");
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch data from the server.");
+      }
+
+      const data: ApiResponse = await res.json();
+
+      if (data.success) {
+        setOrders(data.data || []);
+      } else {
+        // Handle the case where API returns { success: false }
+        throw new Error(data.error || "The API returned an error.");
+      }
+    } catch (err: any) {
+      console.error("Failed to fetch queue:", err);
+      setError(err?.message || "something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchQueue();
+  }, []);
+
+  const handleApply = async (orderId: string, customerId: string) => {
+    setApplyingOrderId(orderId);
+    try {
+      // Step 1: Create the OrderAssignment in the database
+      const response = await fetch(`/api/orders/${orderId}/assignments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        // The server should return a meaningful error message
+        throw new Error(result.message || "Failed to apply for the order.");
+      }
+
+      // Step 3: Update the UI by removing the order from the queue for this provider
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+
+      message.success(
+        `Successfully applied for order ${orderId}! The customer has been notified.`
+      );
+    } catch (error: any) {
+      console.error("Application failed:", error);
+      message.error(`Error: ${error.message}`);
+    } finally {
+      setApplyingOrderId(null);
+    }
+  };
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <>
+          <OrderCardSkeleton />
+          <OrderCardSkeleton />
+          <OrderCardSkeleton />
+          <OrderCardSkeleton />
+        </>
+      );
+    }
+    if (error) {
+      return <ErrorState message={error} />;
+    }
+    if (orders.length > 0) {
+      return orders.map((order) => (
+        <OrderCard
+          key={order.id}
+          order={order}
+          onApply={handleApply}
+          isApplying={applyingOrderId === order.id}
+        />
+      ));
+    }
+    return <EmptyQueue />;
+  };
+
+  return (
+    <div className="space-y-8 p-4 md:p-8">
+      <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+        <List className="text-cyan-300" /> Order Queue
+      </h1>
+      <div>
+        <button
+          onClick={fetchQueue}
+          disabled={isLoading}
+          className="text-white bg-cyan-700 hover:bg-cyan-800 px-4 py-2 rounded-lg font-medium disabled:opacity-50"
+        >
+          {isLoading ? "Refreshing..." : "Refresh Queue"}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">{renderContent()}</div>
+    </div>
+  );
 }

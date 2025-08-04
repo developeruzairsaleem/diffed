@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import io, { type Socket } from "socket.io-client";
 import type { ChatMessage, TypingData } from "../lib/socket";
 
+// ------------------------------------------
+// connect the socket connection for realtime
+// -----------------------------------------
 export function useSocket() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -36,7 +39,9 @@ export function useSocket() {
 
   return { socket, isConnected };
 }
-
+// --------------------------------
+// get all the chats for the order
+// --------------------------------
 export function useOrderChat(
   orderId: string,
   currentUser: { id: string; username: string; avatar?: string; role: string }

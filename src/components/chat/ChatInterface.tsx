@@ -65,7 +65,7 @@ export default function ChatInterface({
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-
+    // after a sligh delay of typing state change it back to normal
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
       sendTyping(false);
@@ -311,7 +311,7 @@ export default function ChatInterface({
               <Button
                 onClick={handleSendMessage}
                 disabled={!messageInput.trim() || !isConnected}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
+                className="bg-gradient-to-r from-pink-600 via-purple-400 to-cyan-400 hover:from-pink-700 hover:via-purple-700 hover:to-cyan-700 text-white border-0"
                 size="lg"
               >
                 <Send className="h-4 w-4" />

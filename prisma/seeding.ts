@@ -3,8 +3,8 @@ import { faker } from "@faker-js/faker";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
-  const mainCustomerId = "cmdshw47m0000v0tky898h3m3";
-  const mainCustomerWalletId = "cmdshw4pk0002v0tkougs31fa";
+  const mainCustomerId = "cmdwytq8p0000v0dwj1ex74fy";
+  const mainCustomerWalletId = "cmdwytqqg0002v0dwhpqp49dz";
 
   // Create games with services and subpackages
   const games = await Promise.all(

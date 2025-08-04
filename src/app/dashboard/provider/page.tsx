@@ -1,176 +1,178 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from "react";
+import { useStore } from "@/store/useStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Edit, Settings } from "lucide-react";
-
-// Import Sidebar components
+import { Button } from "@/components/ui/button";
 import {
-  SidebarProvider,
-  Sidebar,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+  Edit,
+  Settings,
+  LayoutGrid,
+  List,
+  Package,
+  DollarSign,
+  Users,
+  Star,
+  Cog,
+} from "lucide-react";
 
-// Import all the card components
+// Main Profile Sidebar
 import { ProfileSidebar } from "./components/profile-sidebar";
-import { CoachStats } from "./components/coach-stats";
+
+// Tab Content Components
+import { OrderQueue } from "./components/Queue";
 import CoachInformation from "./components/coach-information";
 import { GamingAccounts } from "./components/gaming-accounts";
 import { RecentActivity } from "./components/recent-activity";
+import OrdersPage from "./components/Orders";
+import Earning from "./components/Earning";
+import Services from "./components/Services";
 import { ActiveClients } from "./components/active-clients";
 import { ClientReviews } from "./components/client-reviews";
 import { NotificationSettings } from "./components/notification-settings";
 import { PricingSettings } from "./components/pricing-settings";
 import { SecuritySettings } from "./components/security-settings";
-import Earning from "./components/Earning";
-import DemoPage from "./components/orders/page";
-import GamesComponent from "./components/Services";
-import { OrderQueue } from "./components/Queue";
 
-export default function GamerCoachProfile() {
+// This is the new dashboard component
+export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const { user, setUser, setWallet, setTransactions } = useStore();
+
+  // Effect for getting the provider dashboard info
+  useEffect(() => {
+    const getProviderDashboard = async () => {
+      try {
+        const userRes = await fetch("/api/user/me");
+        if (!userRes.ok) throw new Error("Failed to fetch user");
+        const userData = await userRes.json();
+        setUser({
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          isLoggedIn: true,
+          role: userData.role,
+          avatar: userData.profileImage,
+        });
+
+        const walletRes = await fetch("/api/wallet");
+        if (!walletRes.ok) throw new Error("Failed to fetch wallet");
+        const walletData = await walletRes.json();
+        setWallet({
+          id: walletData.id,
+          balance: walletData.balance,
+          currency: walletData.currency,
+        });
+
+        const txRes = await fetch("/api/transaction/me");
+        if (!txRes.ok) throw new Error("Failed to fetch transactions");
+        const txData = await txRes.json();
+        setTransactions(
+          txData.map((idTx: any) => ({
+            id: idTx.id,
+            type: idTx.type,
+            amount: idTx.amount,
+            walletId: idTx.walletId,
+            createdAt: idTx.createdAt,
+            description: idTx.description,
+            status: idTx.status,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+    getProviderDashboard();
+  }, [setUser, setWallet, setTransactions]);
+
+  const TABS = [
+    { value: "overview", label: "Overview", icon: LayoutGrid },
+    { value: "queue", label: "Queue", icon: List },
+    { value: "orders", label: "Orders", icon: Package },
+    { value: "earnings", label: "Earnings", icon: DollarSign },
+    { value: "services", label: "Services", icon: Cog },
+    { value: "clients", label: "Clients", icon: Users },
+    { value: "reviews", label: "Reviews", icon: Star },
+    { value: "settings", label: "Settings", icon: Settings },
+  ];
 
   return (
-    <SidebarProvider className="lg:flex lg:gap-[100px] md:gap-8">
-      <Sidebar className="w-auto h-auto border-none">
-        <ProfileSidebar />
-        {/* <div className="mt-0 hidden lg:block">
-          {" "}
-        </div> */}
-      </Sidebar>
+    <div className="min-h-screen font-sans bg-[#3A0F2A] text-white">
+      <div className="flex">
+        {/* --- FIXED SIDEBAR ON DESKTOP --- */}
+        <aside className="hidden lg:block lg:w-80 lg:flex-shrink-0 h-screen sticky top-0">
+          <ProfileSidebar />
+        </aside>
 
-      <SidebarInset>
-        <div className="min-h-screen bg-gaming-gradient font-[lato]">
-          {/* Mobile Header with Sidebar Trigger */}
-          <div className="bg-black/20 backdrop-blur-sm border-b border-white/10 md:hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center py-4">
-                <div className="flex items-center space-x-4">
-                  <SidebarTrigger className="-ml-1" />{" "}
-                  {/* Mobile toggle button */}
-                  <h1 className="text-2xl font-bold text-white">
-                    Alex Turning
-                  </h1>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                </div>
+        {/* --- SCROLLABLE MAIN CONTENT --- */}
+        <main className="flex-1 min-w-0">
+          <div className="p-4 sm:p-6 lg:p-8">
+            {/* --- MAIN HEADER --- */}
+            <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">
+                  Welcome back, {user?.username || "Provider"}!
+                </h1>
+                <p className="text-gray-400 mt-1">
+                  Here's what's happening with your coaching dashboard today.
+                </p>
               </div>
-            </div>
-          </div>
+            </header>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 ">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* This div creates spacing on desktop, actual sidebar is fixed */}
-              <div className="lg:col-span-1 hidden lg:block"></div>
-
-              {/* Main Content */}
-              <div className="lg:col-span-3 ">
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <div className="sticky top-0 z-20 bg-transparent">
-                    <TabsList className="shadow-md h-[50px] p-1 grid grid-cols-8 bg-black/30 backdrop-blur-sm border-white/10 w-full mt-8 md:mt-0">
-                      {/* <TabsList className="fixed top-4  z-20 w-full shadow-md h-[50px] p-1 grid grid-cols-8 bg-black/30 backdrop-blur-sm border-white/10"> */}
-                      <TabsTrigger
-                        value="overview"
-                        className=" text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Overview
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="queue"
-                        className=" text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Queue
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="orders"
-                        className=" text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Orders
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="earnings"
-                        className=" text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Earnings
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="services"
-                        className="text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Services
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="clients"
-                        className="text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Clients
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="reviews"
-                        className="text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Reviews
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="settings"
-                        className="text-white/80 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 border-0"
-                      >
-                        Settings
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
-                  <TabsContent value="overview" className="space-y-6 pt-10">
-                    <CoachInformation />
-                    <GamingAccounts />
-                    <RecentActivity />
-                  </TabsContent>
-                  <TabsContent value="queue" className="space-y-6 pt-10">
-                    <OrderQueue />
-                  </TabsContent>
-                  <TabsContent value="orders" className="space-y-6 pt-10">
-                    {/* <Orders /> */}
-                    <DemoPage />
-                  </TabsContent>
-                  <TabsContent value="earnings" className="space-y-6 pt-10">
-                    <Earning />
-                  </TabsContent>
-                  <TabsContent value="services" className="space-y-6">
-                    <GamesComponent />
-                  </TabsContent>
-                  <TabsContent value="clients" className="space-y-6 pt-10">
-                    <ActiveClients />
-                  </TabsContent>
-                  <TabsContent value="reviews" className="space-y-6 pt-10">
-                    <ClientReviews />
-                  </TabsContent>
-                  <TabsContent value="settings" className="space-y-6 pt-10">
-                    <NotificationSettings />
-                    <PricingSettings />
-                    <SecuritySettings />
-                  </TabsContent>
-                </Tabs>
+            {/* --- TABS NAVIGATION & CONTENT --- */}
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="relative"
+            >
+              <div className="sticky top-0 z-10 bg-[#3A0F2A]/50 backdrop-blur-lg py-2 -mx-8 px-8">
+                <TabsList className="p-1.5 h-auto bg-black/30 border border-white/10 rounded-xl grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
+                  {TABS.map(({ value, label, icon: Icon }) => (
+                    <TabsTrigger
+                      key={value}
+                      value={value}
+                      className="w-full h-12 flex flex-col sm:flex-row items-center justify-center gap-2 px-2 text-gray-300 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-purple-600/20 transition-all duration-300"
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">{label}</span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
               </div>
-            </div>
+
+              <div className="mt-8">
+                <TabsContent value="overview" className="space-y-6">
+                  <CoachInformation />
+                  <GamingAccounts />
+                  <RecentActivity />
+                </TabsContent>
+                <TabsContent value="queue">
+                  <OrderQueue />
+                </TabsContent>
+                <TabsContent value="orders">
+                  <OrdersPage />
+                </TabsContent>
+                <TabsContent value="earnings">
+                  <Earning />
+                </TabsContent>
+                <TabsContent value="services">
+                  <Services />
+                </TabsContent>
+                <TabsContent value="clients">
+                  <ActiveClients />
+                </TabsContent>
+                <TabsContent value="reviews">
+                  <ClientReviews />
+                </TabsContent>
+                <TabsContent value="settings" className="space-y-8">
+                  <NotificationSettings />
+                  <PricingSettings />
+                  <SecuritySettings />
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </main>
+      </div>
+    </div>
   );
 }

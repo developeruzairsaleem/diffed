@@ -482,7 +482,7 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
-        <div className="form mt-20 lg:mt-0 lg:ml-20 lg:justify-self-start xl:justify-self-end ">
+        <div className="form w-full mt-20 lg:mt-0 lg:ml-10 lg:justify-self-start xl:justify-self-end ">
           {clientSecret && (
             <Elements stripe={stripePromise}>
               <CheckoutForm

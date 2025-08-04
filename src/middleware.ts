@@ -27,76 +27,76 @@ const protectedRoutes = [
 // const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // const { pathname } = request.nextUrl;
 
-  // check if the route is protected
-  const isProtected = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // // check if the route is protected
+  // const isProtected = protectedRoutes.some((route) =>
+  //   pathname.startsWith(route)
+  // );
 
-  // the route is accessible to logged out users
-  const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
+  // // the route is accessible to logged out users
+  // const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
 
-  // Decrypt the session from the cookie
-  const cookie = (await cookies()).get("session")?.value;
-  const session = await decrypt(cookie);
+  // // Decrypt the session from the cookie
+  // const cookie = (await cookies()).get("session")?.value;
+  // const session = await decrypt(cookie);
 
-  // redirect the user to login if the user is not authenticated
-  if (isProtected && !session?.userId) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
-  }
+  // // redirect the user to login if the user is not authenticated
+  // if (isProtected && !session?.userId) {
+  //   return NextResponse.redirect(new URL("/login", request.nextUrl));
+  // }
 
-  // if is admin route than check for admin role
-  if (pathname.startsWith("/admin")) {
-    // if (session?.role === "admin") {
-    return NextResponse.next();
-    // } else {
-    // return NextResponse.redirect("/login");
-    // }
-  }
+  // // if is admin route than check for admin role
+  // if (pathname.startsWith("/admin")) {
+  //   // if (session?.role === "admin") {
+  //   return NextResponse.next();
+  //   // } else {
+  //   // return NextResponse.redirect("/login");
+  //   // }
+  // }
 
-  // Allow authenticated users to access protected routes with role-based restrictions
-  if (isProtected && session?.userId) {
-    // Prevent customers from accessing provider dashboard
-    if (
-      pathname.startsWith("/dashboard/provider") &&
-      session.role === "customer"
-    ) {
-      return NextResponse.redirect(
-        new URL("/dashboard/customer", request.nextUrl)
-      );
-    }
+  // // Allow authenticated users to access protected routes with role-based restrictions
+  // if (isProtected && session?.userId) {
+  //   // Prevent customers from accessing provider dashboard
+  //   if (
+  //     pathname.startsWith("/dashboard/provider") &&
+  //     session.role === "customer"
+  //   ) {
+  //     return NextResponse.redirect(
+  //       new URL("/dashboard/customer", request.nextUrl)
+  //     );
+  //   }
 
-    // Prevent providers from accessing customer dashboard
-    if (
-      pathname.startsWith("/dashboard/customer") &&
-      session.role === "provider"
-    ) {
-      return NextResponse.redirect(
-        new URL("/dashboard/provider", request.nextUrl)
-      );
-    }
+  //   // Prevent providers from accessing customer dashboard
+  //   if (
+  //     pathname.startsWith("/dashboard/customer") &&
+  //     session.role === "provider"
+  //   ) {
+  //     return NextResponse.redirect(
+  //       new URL("/dashboard/provider", request.nextUrl)
+  //     );
+  //   }
 
-    return NextResponse.next();
-  }
+  // return NextResponse.next();
+  // }
 
   // Redirect authenticated users from public routes to their dashboard
-  if (
-    isPublic &&
-    session?.userId &&
-    !request.nextUrl.pathname.startsWith("/dashboard")
-  ) {
-    if (session.role === "customer") {
-      return NextResponse.redirect(
-        new URL("/dashboard/customer", request.nextUrl)
-      );
-    }
-    if (session.role === "provider") {
-      return NextResponse.redirect(
-        new URL("/dashboard/provider", request.nextUrl)
-      );
-    }
-  }
+  // if (
+  //   isPublic &&
+  //   session?.userId &&
+  //   !request.nextUrl.pathname.startsWith("/dashboard")
+  // ) {
+  //   if (session.role === "customer") {
+  //     return NextResponse.redirect(
+  //       new URL("/dashboard/customer", request.nextUrl)
+  //     );
+  //   }
+  //   if (session.role === "provider") {
+  //     return NextResponse.redirect(
+  //       new URL("/dashboard/provider", request.nextUrl)
+  //     );
+  //   }
+  // }
 
   return NextResponse.next();
 }
