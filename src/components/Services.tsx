@@ -1,6 +1,9 @@
+"use client";
 import { orbitron } from "@/fonts/fonts";
+import { useRouter } from "next/navigation";
 
 export default function Services() {
+  const router = useRouter();
   const cardData = [
     {
       title: "Coaching",
@@ -52,6 +55,7 @@ desired rank.`,
             <p className="pb-4 text-lg lg:text-lg ">{card.description}</p>
 
             <button
+              onClick={() => router.push("/login")}
               className={` ${orbitron.className} relative mx-4 mt-6 mb-8 group cursor-pointer`}
             >
               <div

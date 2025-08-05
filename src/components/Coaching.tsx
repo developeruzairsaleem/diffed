@@ -1,14 +1,17 @@
 "use client";
 import { useState } from "react";
 import { orbitron } from "@/fonts/fonts";
+import { useRouter } from "next/navigation";
 export default function Coaching() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const router = useRouter();
   return (
     <div className=" flex justify-center relative -my-12">
       <button
         className={` ${orbitron.className} relative cursor-pointer group`}
         onMouseEnter={() => setHoveredButton("coaching")}
         onMouseLeave={() => setHoveredButton(null)}
+        onClick={() => router.push("/register")}
       >
         <div
           className={`

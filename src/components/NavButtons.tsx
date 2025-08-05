@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { orbitron } from "@/fonts/fonts";
+import { useRouter } from "next/navigation";
 export default function Component() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
-
+  const router = useRouter();
   return (
     <div className={`flex gap-6 items-center ${orbitron.className} font-thin`}>
       {/* LOGIN Button */}
@@ -12,6 +13,7 @@ export default function Component() {
         className="relative group cursor-pointer"
         onMouseEnter={() => setHoveredButton("login")}
         onMouseLeave={() => setHoveredButton(null)}
+        onClick={() => router.push("/login")}
       >
         <div
           style={{ backgroundColor: "rgba(255,255,255,0.07)" }}
@@ -47,6 +49,7 @@ export default function Component() {
         className="relative group cursor-pointer"
         onMouseEnter={() => setHoveredButton("register")}
         onMouseLeave={() => setHoveredButton(null)}
+        onClick={() => router.push("/register")}
       >
         <div
           style={{ backgroundColor: "rgba(255,255,255,0.07)" }}

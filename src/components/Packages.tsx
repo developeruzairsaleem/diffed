@@ -1,8 +1,11 @@
+"use client";
 import { GamePageData } from "@/app/valorant/page";
 import { lato, orbitron } from "@/fonts/fonts";
+import { useRouter } from "next/navigation";
 
 export default function Packages({ data }: { data: GamePageData }) {
   const packages = data.packages;
+  const router = useRouter();
   return (
     <div className="pb-20">
       <div className="flex mx-auto justify-center px-4">
@@ -45,6 +48,7 @@ export default function Packages({ data }: { data: GamePageData }) {
                 {indPack.text}
               </p>
               <button
+                onClick={() => router.push("/login")}
                 className={` ${lato.className} mt-auto relative cursor-pointer group
           
             bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400

@@ -22,10 +22,10 @@ export default function Navbar() {
   const [gamesOpen, setGamesOpen] = useState(false);
   return (
     <nav className="w-full sticky top-0 z-50 bg-[#581742]/90 backdrop-blur">
-        <div className="flex justify-between max-w-8xl py-8 w-full px-6 mx-auto">
-          <Link href="/">
-            <img src="/logo/logo.png" alt="Logo image" className="h-14 w-auto" />
-          </Link>
+      <div className="flex justify-between max-w-8xl py-8 w-full px-6 mx-auto">
+        <Link href="/">
+          <img src="/logo/logo.png" alt="Logo image" className="h-14 w-auto" />
+        </Link>
 
         {/* Desktop Nav */}
         <div className="main_buttons hidden lg:flex">
@@ -71,19 +71,13 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
             <li className="cursor-pointer hover:text-gray-200 transition-all">
-              <Link href="#why-us" >
-                Features
-              </Link>
+              <Link href="#why-us">Features</Link>
             </li>
             <li className="cursor-pointer hover:text-gray-200 transition-all">
-              <Link href="#customer-reviews">
-                Customer Reviews
-              </Link>
+              <Link href="#customer-reviews">Customer Reviews</Link>
             </li>
             <li className="cursor-pointer hover:text-gray-200 transition-all">
-              <Link href="/about">
-                About
-              </Link> 
+              <Link href="/about">About</Link>
             </li>
           </ul>
           <NavButtons />

@@ -1,6 +1,9 @@
+"use client";
 import { lato, orbitron } from "@/fonts/fonts";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 export default function RankUp() {
+  const router = useRouter();
   return (
     <div className="">
       <h2
@@ -24,6 +27,7 @@ export default function RankUp() {
       </p>
       <div className="flex justify-center mb-12">
         <button
+          onClick={() => router.push("/login")}
           className={` ${orbitron.className} relative mx-auto inline-block cursor-pointer group`}
         >
           <div

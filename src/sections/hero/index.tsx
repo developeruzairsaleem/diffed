@@ -1,7 +1,10 @@
-import React from 'react';
+"use client";
+import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const Index = () => {
+  const router = useRouter();
   return (
     <div className="py-[50px] flex flex-col items-center justify-center w-full ">
       <Image
@@ -39,14 +42,16 @@ const Index = () => {
         </p>
       </div>
 
-      <button className="gradient-btn uppercase -skew-x-12 hover:scale-105 transition-all  mt-[58px]">
+      <button
+        onClick={() => router.push("/register")}
+        className="gradient-btn uppercase -skew-x-12 hover:scale-105 transition-all  mt-[58px]"
+      >
         <div className="skew-x-12">
-            get coaching, <br /> play with a teammate
+          get coaching, <br /> play with a teammate
         </div>
       </button>
-
     </div>
-  )
-}
+  );
+};
 
 export default Index;

@@ -1,10 +1,11 @@
+"use client";
 import React from "react";
 import Image from "next/image";
+import { Router } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Services = () => {
-
-  
-
+  const router = useRouter();
   return (
     <div className="py-12 flex flex-col items-center w-full gap-[67px]">
       <div className="text-center w-full ">
@@ -35,6 +36,7 @@ const Services = () => {
           </div>
 
           <button
+            onClick={() => router.push("/login")}
             className="gradient-btn -skew-x-20 px-[7px]
            "
           >
@@ -56,17 +58,18 @@ const Services = () => {
           </div>
           <div className="flex flex-col gap-[14px] mb-[47px] px-[7px]">
             <p className="text-[24px] font-[500] line-height-[111%] letter-spacing-[3.5%]">
-            Boosting
+              Boosting
             </p>
             <p className="text-[18px] font-[500] line-height-[86%] letter-spacing-[3.5%] capitalize">
-            Get fast rank-ups from top-tier pros. <br />
-            Safe, efficient, and secure.
+              Get fast rank-ups from top-tier pros. <br />
+              Safe, efficient, and secure.
             </p>
           </div>
 
           <button
             className="gradient-btn -skew-x-20 px-[7px]
            "
+            onClick={() => router.push("/login")}
           >
             <p className="text-[16px] font-[700] letter-spacing-[4%] skew-x-20">
               exlore teammate
