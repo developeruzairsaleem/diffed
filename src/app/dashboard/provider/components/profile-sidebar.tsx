@@ -7,7 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Mail, Crown, User as UserIcon } from "lucide-react";
+import { Mail, Crown, User as UserIcon, LogOut } from "lucide-react";
+import { message } from "antd";
+import { redirect, useRouter } from "next/navigation";
 
 // Helper to capitalize the first letter for display
 const capitalize = (s: string) => {
@@ -44,7 +46,27 @@ const ProfileSidebarSkeleton = () => (
  */
 export function ProfileSidebar() {
   const { user } = useStore();
+  const router = useRouter();
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+      });
 
+      const data = await response.json();
+
+      if (data.success) {
+        // Redirect to the login page or home page after logout
+        message.success("You have been successfully logged out.");
+        router.push("/");
+      } else {
+        message.error(data.error || "Logout failed.");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      message.error("An unexpected error occurred during logout.");
+    }
+  };
   if (!user) {
     return <ProfileSidebarSkeleton />;
   }
@@ -108,6 +130,17 @@ export function ProfileSidebar() {
           </div>
         </div>
       </CardContent>
+
+      <div className="p-2 relative z-50 mt-auto border-t border-white/10">
+        <button
+          onClick={handleLogout}
+          type="button"
+          className={`w-full flex items-center cursor-pointer space-x-3 p-3 rounded-lg text-white hover:bg-white/10 transition-colors ${"justify-center"}`}
+        >
+          <LogOut className="w-5 h-5 flex-shrink-0" />
+          <span className="whitespace-nowrap">Logout</span>
+        </button>
+      </div>
     </Card>
   );
 }
