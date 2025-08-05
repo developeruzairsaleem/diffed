@@ -28,8 +28,8 @@ import OrdersPage from "./components/Orders";
 import Earning from "./components/Earning";
 import Services from "./components/Services";
 import { ActiveClients } from "./components/active-clients";
-import { ClientReviews } from "./components/client-reviews";
-import { NotificationSettings } from "./components/notification-settings";
+import { ProviderReviews } from "./components/provider-reviews";
+import { SettingsTab } from "./components/notification-settings";
 import { PricingSettings } from "./components/pricing-settings";
 import { SecuritySettings } from "./components/security-settings";
 
@@ -89,7 +89,6 @@ export default function Dashboard() {
     { value: "queue", label: "Queue", icon: List },
     { value: "orders", label: "Orders", icon: Package },
     { value: "earnings", label: "Earnings", icon: DollarSign },
-    { value: "services", label: "Services", icon: Cog },
     { value: "clients", label: "Clients", icon: Users },
     { value: "reviews", label: "Reviews", icon: Star },
     { value: "settings", label: "Settings", icon: Settings },
@@ -142,8 +141,6 @@ export default function Dashboard() {
               <div className="mt-8">
                 <TabsContent value="overview" className="space-y-6">
                   <CoachInformation />
-                  <GamingAccounts />
-                  <RecentActivity />
                 </TabsContent>
                 <TabsContent value="queue">
                   <OrderQueue />
@@ -154,19 +151,17 @@ export default function Dashboard() {
                 <TabsContent value="earnings">
                   <Earning />
                 </TabsContent>
-                <TabsContent value="services">
+                {/* <TabsContent value="services">
                   <Services />
-                </TabsContent>
+                </TabsContent> */}
                 <TabsContent value="clients">
                   <ActiveClients />
                 </TabsContent>
                 <TabsContent value="reviews">
-                  <ClientReviews />
+                  <ProviderReviews />
                 </TabsContent>
                 <TabsContent value="settings" className="space-y-8">
-                  <NotificationSettings />
-                  <PricingSettings />
-                  <SecuritySettings />
+                  <SettingsTab />
                 </TabsContent>
               </div>
             </Tabs>

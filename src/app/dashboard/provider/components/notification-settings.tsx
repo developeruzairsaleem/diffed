@@ -1,45 +1,131 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Bell } from "lucide-react"
+"use client";
 
-export function NotificationSettings() {
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { Bell, User, Loader2 } from "lucide-react";
+import { message } from "antd";
+import { SettingsSkeleton } from "@/components/ui/SettingsSkeleton"; // Adjust path
+
+export function SettingsTab() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+  });
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/profile-settings");
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+        setFormData({ username: data.username, email: data.email });
+      } catch (error) {
+        message.error(error?.message || "Failed to load your settings.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const response = await fetch("/api/profile-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      message.success("Profile updated successfully!");
+    } catch (error) {
+      message.error(error?.message || "Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <SettingsSkeleton />;
+  }
+
   return (
-    <Card className="bg-black/30 backdrop-blur-sm border-white/10 shadow-2xl">
-      <CardHeader>
-        <CardTitle className="flex items-center text-white">
-          <Bell className="w-5 h-5 mr-2" />
-          Notifications
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="font-medium text-white">New Client Requests</h4>
-            <p className="text-sm text-white/70">Get notified when someone books a session</p>
-          </div>
-          <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-            Enable
-          </Button>
-        </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="font-medium text-white">Session Reminders</h4>
-            <p className="text-sm text-white/70">Reminders 30 minutes before sessions</p>
-          </div>
-          <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-            Enable
-          </Button>
-        </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="font-medium text-white">Payment Notifications</h4>
-            <p className="text-sm text-white/70">Get notified about payments and earnings</p>
-          </div>
-          <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-            Enable
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  )
+    <div className="space-y-8">
+      {/* Profile Information Card */}
+      <Card
+        style={{ backgroundColor: "#3A0F2A" }}
+        className="bg-opacity-30 backdrop-blur-sm border-white/10 shadow-2xl"
+      >
+        <form onSubmit={handleFormSubmit}>
+          <CardHeader>
+            <CardTitle className="flex items-center text-white">
+              <User className="w-5 h-5 mr-3" />
+              Profile Information
+            </CardTitle>
+            <CardDescription className="text-white/70">
+              Update your account details here.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-white/80">
+                Username
+              </Label>
+              <Input
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                className="bg-black/30 border-white/20 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-white/80">
+                Email Address
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="bg-black/30 border-white/20 text-white"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={saving}
+              className="bg-[linear-gradient(90deg,_#EE2C81_0%,_#FE0FD0_60%)] hover:opacity-90 text-white font-semibold"
+            >
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+          </CardContent>
+        </form>
+      </Card>
+    </div>
+  );
 }

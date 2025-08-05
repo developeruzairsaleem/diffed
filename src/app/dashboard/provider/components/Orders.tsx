@@ -1,119 +1,100 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+"use client";
 
-// dummy json data - To be replaced by api
-import ordersData from "../../../../../orders.json";
-const orders = ordersData;
-// end of dummy json data
+import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import { message } from "antd";
+import { OrdersSkeleton } from "@/components/ui/OrderCardSkeleton"; // Adjust path
+import { OrderAssignmentCard } from "./Order-Assignment-Card"; // Adjust path
 
-export default function Orders() {
+// It's good practice to define a type for your data
+type Assignment = {
+  id: string;
+  // Add other properties of assignment here
+};
+
+export default function ProviderOrdersPage() {
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  // State for the main page skeleton
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  // Separate state for the refresh button's spinner
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchAssignments = useCallback(async () => {
+    try {
+      const response = await fetch("/api/provider-assignments");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch data.");
+      }
+
+      setAssignments(data);
+      return { success: true }; // Return success status
+    } catch (error: any) {
+      console.error("Fetch error:", error);
+      message.error(error.message || "Something went wrong");
+      return { success: false }; // Return failure status
+    }
+  }, []);
+
+  // Effect for the initial data load
+  useEffect(() => {
+    setIsPageLoading(true);
+    fetchAssignments().finally(() => {
+      setIsPageLoading(false);
+    });
+  }, [fetchAssignments]);
+
+  // Handler for the refresh button
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    const result = await fetchAssignments();
+    if (result.success) {
+      message.success("Assignments refreshed!");
+    }
+    // Always stop the spinner after the fetch is complete
+    setIsRefreshing(false);
+  };
+
   return (
-    <div className="overflow-x-auto w-full">
-      <Table
-        className="min-w-full"
-        style={{
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE/Edge
-        }}
-      >
-        <TableHeader>
-          <TableRow className="border-b-1 border-white/30 mb-6">
-            <TableHead className="py-4 font-bold text-md">Order ID</TableHead>
-            <TableHead className="py-4 font-bold text-md">Game</TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Package Type
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">Package ID</TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Package Name
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">Duration</TableHead>
-            <TableHead className="py-4 font-bold text-md">Price</TableHead>
-            <TableHead className="py-4 font-bold text-md">Status</TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Scheduled At
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Completed At
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Feedback Rating
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Feedback Review
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Player Name
-            </TableHead>
-            <TableHead className="py-4 font-bold text-md">
-              Customer Name
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody
-          style={{
-            scrollbarWidth: "none", // Firefox
-            msOverflowStyle: "none", // IE/Edge
-          }}
+    <div className="p-4 md:p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-white">My Assignments</h1>
+        <Button
+          onClick={handleRefresh}
+          // The button is disabled if either the page is loading or it's currently refreshing
+          disabled={isPageLoading || isRefreshing}
+          className="bg-white/10 hover:bg-white/20 text-white"
         >
-          {orders.map((order) => (
-            <TableRow
-              key={order.orderId}
-              className="border-b-1 border-white/30"
-            >
-              <TableCell className="font-medium py-4 border-r-2 border-white/20 h-4/5">
-                {order.orderId}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5 ">
-                {order.game}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.packageType}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.packageId}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.packageName}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.duration}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.price}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.status}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.scheduledAt}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.completedAt}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.feedback?.rating}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.feedback?.review}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.player_name}
-              </TableCell>
-              <TableCell className="py-4 border-r-1 border-white/5">
-                {order.customer_name}
-              </TableCell>
-            </TableRow>
+          {/* The spinner is now controlled by the isRefreshing state */}
+          <RefreshCw
+            className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+          />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Content Area */}
+      {isPageLoading ? (
+        <OrdersSkeleton />
+      ) : assignments.length > 0 ? (
+        <div className="grid grid-cols-1  gap-6">
+          {assignments.map((assignment) => (
+            <OrderAssignmentCard key={assignment.id} assignment={assignment} />
           ))}
-        </TableBody>
-      </Table>
+        </div>
+      ) : (
+        <div className="text-center py-16 bg-black/20 rounded-lg border border-white/10">
+          <p className="text-white/80 text-lg">
+            You have no order assignments at the moment.
+          </p>
+          <p className="text-white/50 mt-2">
+            Check back later for new coaching opportunities!
+          </p>
+        </div>
+      )}
     </div>
   );
 }

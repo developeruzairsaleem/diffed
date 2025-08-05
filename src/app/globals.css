@@ -159,7 +159,44 @@ body {
 
 /* For Firefox */
 /* Note: Firefox styling is more limited than Webkit */
-* {
-  scrollbar-width: thin; /* "auto" or "none" */
-  scrollbar-color: #5d1a45 rgba(0, 0, 0, 0.1); /* thumb color track color */
+/* * {
+  scrollbar-width: thin; 
+  scrollbar-color: #5d1a45 rgba(0, 0, 0, 0.1); 
+} */
+
+/* In app/globals.css */
+
+/* Target the modal content when it has our custom class */
+.payout-modal .ant-modal-content {
+  background-color: #2c1223; /* A dark color from your theme */
+  border: 1px solid #ee2c81; /* Accent border */
+  color: #e1e1e1; /* Light text color for content */
+  box-shadow: 0 8px 32px 0 rgba(238, 44, 129, 0.37);
+}
+
+/* Style the modal header */
+.payout-modal .ant-modal-header {
+  background-color: transparent; /* Make header transparent to show content bg */
+  border-bottom: 1px solid #ee2c81;
+  color: #ffffff;
+}
+
+/* Style the title text inside the header */
+.payout-modal .ant-modal-title {
+  color: #ffffff;
+}
+
+/* Style the close 'X' icon */
+.payout-modal .ant-modal-close {
+  color: #e1e1e1;
+}
+.payout-modal .ant-modal-close:hover {
+  color: #ffffff;
+  background-color: #ee2c81;
+  border-radius: 4px;
+}
+
+/* Ensure the body of the modal is also transparent */
+.payout-modal .ant-modal-body {
+  background-color: transparent;
 }
