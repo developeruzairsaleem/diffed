@@ -3,104 +3,98 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { decrypt } from "./lib/sessions";
 
-// Public routes accessible without auth
-const publicRoutes = [
-  "/",
-  "/cs2",
-  "/fornite",
-  "/gamer-girl",
-  "/league-of-legends",
-  "/marvel-rivals",
-  "/valorant",
-  "/login",
-  "/register",
-];
+// 1. DEFINE YOUR ROUTES
 
-const protectedRoutes = [
-  "/dashboard",
-  "/dashboard/customer",
-  "/dashboard/provider",
-  "/sample-page",
-];
+/**
+ * Routes that are only for unauthenticated users (e.g., login, register).
+ * Logged-in users will be redirected away from these.
+ */
+const authRoutes = ["/login", "/register"];
 
-// Secret key for verifying token
-// const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+/**
+ * The home/dashboard route for each user role.
+ * Used for redirecting users after login or when they access wrong pages.
+ */
+const roleHomepages = {
+  customer: "/dashboard/customer",
+  provider: "/dashboard/provider",
+  admin: "/admin",
+};
+
+/**
+ * The protected route prefixes for each role.
+ * This is crucial for access control.
+ */
+const protectedRoutePrefixes = {
+  customer: "/dashboard/customer",
+  provider: "/dashboard/provider",
+  admin: "/admin",
+};
 
 export async function middleware(request: NextRequest) {
-  // const { pathname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-  // // check if the route is protected
-  // const isProtected = protectedRoutes.some((route) =>
-  //   pathname.startsWith(route)
-  // );
+  // 2. GET THE USER'S SESSION
+  const cookie = (await cookies()).get("session")?.value;
+  // The 'session' can be null if the cookie is invalid or not present
+  const session = await decrypt(cookie);
 
-  // // the route is accessible to logged out users
-  // const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
+  // 3. LOGGED-IN USER ON AN AUTH-ONLY ROUTE
+  // If the user is logged in and tries to visit /login or /register,
+  // redirect them to their respective dashboard homepage.
+  if (session && authRoutes.includes(pathname)) {
+    const homeUrl = roleHomepages[session?.role] || "/";
+    return NextResponse.redirect(new URL(homeUrl, request.url));
+  }
 
-  // // Decrypt the session from the cookie
-  // const cookie = (await cookies()).get("session")?.value;
-  // const session = await decrypt(cookie);
+  // 4. PROTECTED ROUTE ACCESS CONTROL
 
-  // // redirect the user to login if the user is not authenticated
-  // if (isProtected && !session?.userId) {
-  //   return NextResponse.redirect(new URL("/login", request.nextUrl));
-  // }
+  // Determine if the user is trying to access a protected area
+  const isAccessingCustomerArea = pathname.startsWith(
+    protectedRoutePrefixes.customer
+  );
+  const isAccessingProviderArea = pathname.startsWith(
+    protectedRoutePrefixes.provider
+  );
+  const isAccessingAdminArea = pathname.startsWith(
+    protectedRoutePrefixes.admin
+  );
+  const isAccessingProtectedRoute =
+    isAccessingCustomerArea || isAccessingProviderArea || isAccessingAdminArea;
 
-  // // if is admin route than check for admin role
-  // if (pathname.startsWith("/admin")) {
-  //   // if (session?.role === "admin") {
-  //   return NextResponse.next();
-  //   // } else {
-  //   // return NextResponse.redirect("/login");
-  //   // }
-  // }
+  if (isAccessingProtectedRoute) {
+    // Case A: User is NOT logged in
+    if (!session?.userId) {
+      // Redirect unauthenticated users to the login page, but keep track of where they wanted to go.
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-  // // Allow authenticated users to access protected routes with role-based restrictions
-  // if (isProtected && session?.userId) {
-  //   // Prevent customers from accessing provider dashboard
-  //   if (
-  //     pathname.startsWith("/dashboard/provider") &&
-  //     session.role === "customer"
-  //   ) {
-  //     return NextResponse.redirect(
-  //       new URL("/dashboard/customer", request.nextUrl)
-  //     );
-  //   }
+    // Case B: User IS logged in but is accessing the WRONG dashboard
+    if (session.role === "customer" && !isAccessingCustomerArea) {
+      return NextResponse.redirect(
+        new URL(roleHomepages.customer, request.url)
+      );
+    }
+    if (session.role === "provider" && !isAccessingProviderArea) {
+      return NextResponse.redirect(
+        new URL(roleHomepages.provider, request.url)
+      );
+    }
+    if (session.role === "admin" && !isAccessingAdminArea) {
+      return NextResponse.redirect(new URL(roleHomepages.admin, request.url));
+    }
+  }
 
-  //   // Prevent providers from accessing customer dashboard
-  //   if (
-  //     pathname.startsWith("/dashboard/customer") &&
-  //     session.role === "provider"
-  //   ) {
-  //     return NextResponse.redirect(
-  //       new URL("/dashboard/provider", request.nextUrl)
-  //     );
-  //   }
-
-  // return NextResponse.next();
-  // }
-
-  // Redirect authenticated users from public routes to their dashboard
-  // if (
-  //   isPublic &&
-  //   session?.userId &&
-  //   !request.nextUrl.pathname.startsWith("/dashboard")
-  // ) {
-  //   if (session.role === "customer") {
-  //     return NextResponse.redirect(
-  //       new URL("/dashboard/customer", request.nextUrl)
-  //     );
-  //   }
-  //   if (session.role === "provider") {
-  //     return NextResponse.redirect(
-  //       new URL("/dashboard/provider", request.nextUrl)
-  //     );
-  //   }
-  // }
-
+  // 5. IF NONE OF THE ABOVE, PROCEED
+  // This covers:
+  // - Authenticated users accessing their correct dashboard.
+  // - Any user (auth or not) accessing a truly public page (like /, /valorant, etc.).
   return NextResponse.next();
 }
 
+// Do not change this config
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\.png$|.*\\.svg$).*)"],
 };
