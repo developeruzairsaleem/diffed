@@ -1,7 +1,7 @@
 "use client";
 import { lato, orbitron } from "@/fonts/fonts";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function RankUp() {
   const router = useRouter();
   return (

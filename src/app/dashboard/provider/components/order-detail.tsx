@@ -1,0 +1,264 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { SetupSkeleton } from "@/components/ui/SetupSkeleton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  User,
+  Gamepad2,
+  Info,
+  CheckCircle,
+  Upload,
+  Store,
+  Router,
+} from "lucide-react";
+import { orbitron } from "@/fonts/fonts";
+import { Label } from "@/components/ui/label";
+import ChatInterface from "@/components/chat/ChatInterface";
+import { useStore } from "@/store/useStore";
+import { UploadButton } from "@/utils/uploadthing";
+import { Toaster } from "@/components/ui/sonner";
+
+// --- UI SUB-COMPONENTS (Unchanged) ---
+
+const CustomerInfoCard = ({ customer }: { customer: any }) => {
+  const getInitials = (name = "") =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  return (
+    <Card
+      style={{ backgroundColor: "#3A0F2A" }}
+      className="bg-opacity-30 backdrop-blur-sm border-white/10"
+    >
+      <CardHeader>
+        <CardTitle className="flex items-center text-white">
+          <User className="w-5 h-5 mr-3" />
+          Client Details
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex items-center space-x-4">
+        <Avatar className="w-12 h-12 border-2 border-cyan-400/50">
+          <AvatarImage src={customer.profileImage || ""} />
+          <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-blue-600 font-bold">
+            {getInitials(customer.username)}
+          </AvatarFallback>
+        </Avatar>
+        <p className="text-lg font-semibold text-white">{customer.username}</p>
+      </CardContent>
+    </Card>
+  );
+};
+
+const OrderDetailsCard = ({ order }: { order: any }) => (
+  <Card
+    style={{ backgroundColor: "#3A0F2A" }}
+    className="bg-opacity-30 backdrop-blur-sm border-white/10"
+  >
+    <CardHeader>
+      <CardTitle className="flex items-center text-white">
+        <Info className="w-5 h-5 mr-3" />
+        Order Information
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-2 text-sm">
+      <p className="text-white/70">
+        <strong>Service:</strong> {order.subpackage.name}
+      </p>
+      <p className="text-white/70">
+        <strong>Game:</strong> {order.subpackage.service.game.name}
+      </p>
+      <p className="text-white/70">
+        <strong>Order Price:</strong>{" "}
+        <span className="font-bold text-green-400">
+          ${order.price.toFixed(2)}
+        </span>
+      </p>
+      <p className="text-white/70">
+        <strong>Order Status:</strong>{" "}
+        <span className="font-bold text-yellow-400">{order.status}</span>
+      </p>
+    </CardContent>
+  </Card>
+);
+
+const ActionsCard = ({
+  assignmentId,
+  isCompleted,
+  refetchAssignment,
+}: {
+  assignmentId: string;
+  isCompleted: boolean;
+  refetchAssignment: () => void;
+}) => {
+  if (isCompleted) {
+    return (
+      <Card
+        style={{ backgroundColor: "#3A0F2A" }}
+        className="bg-opacity-30 backdrop-blur-sm border-white/10"
+      >
+        <CardHeader>
+          <CardTitle className="flex items-center text-white">
+            <CheckCircle className="w-5 h-5 mr-3 text-green-400" />
+            Order Assignment Completed
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-green-400 text-center">
+            This order is marked as complete and is under review.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card
+      style={{ backgroundColor: "#3A0F2A" }}
+      className="bg-opacity-30 backdrop-blur-sm border-white/10"
+    >
+      <CardHeader>
+        <CardTitle className="flex items-center text-white">
+          <Gamepad2 className="w-5 h-5 mr-3" />
+          Action
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col gap-4 pt-2 items-center ">
+          <p className="font-semibold text-white text-lg">
+            Attach Completion Proof
+          </p>
+          <UploadButton
+            className="bg-green-500 hover:scale-105 transition-all p-2 rounded-xl"
+            endpoint="imageUploader"
+            input={{ assignmentId }}
+            onClientUploadComplete={(res) => {
+              toast.success("Upload Complete!", {
+                description: "Your proof has been submitted for verification.",
+              });
+              refetchAssignment(); // Refetch data to update status
+            }}
+            onUploadError={(error: Error) => {
+              toast.error("Upload Failed!", {
+                description: error.message || "Something went wrong.",
+              });
+            }}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// --- THE MAIN PAGE COMPONENT ---
+
+export default function ProviderSetupPage() {
+  const params = useParams();
+  const assignmentId = params!.id as string;
+  const [assignment, setAssignment] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const store = useStore();
+
+  const isCompleted =
+    assignment?.status === "COMPLETED" || assignment?.status === "VERIFIED";
+
+  const fetchAssignment = useCallback(async () => {
+    if (!assignmentId) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/provider-assignment/${assignmentId}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setAssignment(data);
+    } catch (error: any) {
+      console.error("Fetch error:", error);
+      toast.error("Failed to load assignment", {
+        description: error.message || "Could not load assignment details.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [assignmentId]);
+
+  useEffect(() => {
+    fetchAssignment();
+  }, [fetchAssignment]);
+
+  if (loading) {
+    return <SetupSkeleton />;
+  }
+
+  if (!assignment) {
+    return (
+      <div className="text-center text-white/70 p-10">
+        Assignment not found or access denied.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Toaster
+        position="top-center"
+        richColors
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: "#3A0F2A",
+            borderColor: "#8A2BE2",
+          },
+        }}
+      />
+      <div className="p-4 md:p-6 space-y-8">
+        <div
+          className="h-32 md:h-48 bg-cover bg-center rounded-lg flex items-end p-6"
+          style={{
+            backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.8), transparent), url(${assignment.order.subpackage.service.game.image})`,
+          }}
+        >
+          <h1
+            className={`text-3xl md:text-4xl font-bold text-white ${orbitron.className}`}
+          >
+            {assignment.order.subpackage.service.game.name} Coaching Session
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1 space-y-8">
+            <CustomerInfoCard customer={assignment.order.customer} />
+            <OrderDetailsCard order={assignment.order} />
+            <ActionsCard
+              isCompleted={isCompleted}
+              assignmentId={assignmentId}
+              refetchAssignment={fetchAssignment}
+            />
+          </div>
+
+          <div className="lg:col-span-2 space-y-8">
+            {store.user && (
+              <ChatInterface
+                orderId={assignment.order.id}
+                orderNumber={assignment.order.orderNumber}
+                currentUser={store.user}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

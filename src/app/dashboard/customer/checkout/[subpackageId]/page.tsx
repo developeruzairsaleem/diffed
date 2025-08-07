@@ -140,7 +140,7 @@ function CheckoutForm({
           return;
         }
         console.log(orderJson);
-        router.push(`/dashboard/customer/orders/${orderJson.data}`); // Redirect or show success
+        router.push(`/dashboard/customer/orders/${orderJson.data}/pending`); // Redirect or show success
       } catch (err) {
         setError("Order creation failed. Please try again or contact support.");
         setLoading(false);

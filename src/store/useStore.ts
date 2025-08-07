@@ -35,17 +35,22 @@ interface DashboardState {
   clearDashboard: () => void;
 }
 
-export const useStore = create<DashboardState>((set) => ({
-  user: null,
-  wallet: null,
-  transactions: [],
-  setUser: (user) => set({ user }),
-  setWallet: (wallet) => set({ wallet }),
-  setTransactions: (transactions) => set({ transactions }),
-  clearDashboard: () =>
-    set({
+export const useStore = create<DashboardState>()(
+  devtools(
+    (set) => ({
       user: null,
       wallet: null,
       transactions: [],
+      setUser: (user) => set({ user }),
+      setWallet: (wallet) => set({ wallet }),
+      setTransactions: (transactions) => set({ transactions }),
+      clearDashboard: () =>
+        set({
+          user: null,
+          wallet: null,
+          transactions: [],
+        }),
     }),
-}));
+    { name: "DashboardStore" }
+  )
+);

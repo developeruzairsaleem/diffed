@@ -32,58 +32,12 @@ import { ProviderReviews } from "./components/provider-reviews";
 import { SettingsTab } from "./components/notification-settings";
 import { PricingSettings } from "./components/pricing-settings";
 import { SecuritySettings } from "./components/security-settings";
+import ProviderSetupPage from "./components/order-detail";
 
 // This is the new dashboard component
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
-  const { user, setUser, setWallet, setTransactions } = useStore();
-
-  // Effect for getting the provider dashboard info
-  useEffect(() => {
-    const getProviderDashboard = async () => {
-      try {
-        const userRes = await fetch("/api/user/me");
-        if (!userRes.ok) throw new Error("Failed to fetch user");
-        const userData = await userRes.json();
-        setUser({
-          id: userData.id,
-          username: userData.username,
-          email: userData.email,
-          isLoggedIn: true,
-          role: userData.role,
-          avatar: userData.profileImage,
-        });
-
-        const walletRes = await fetch("/api/wallet");
-        if (!walletRes.ok) throw new Error("Failed to fetch wallet");
-        const walletData = await walletRes.json();
-        setWallet({
-          id: walletData.id,
-          balance: walletData.balance,
-          currency: walletData.currency,
-        });
-
-        const txRes = await fetch("/api/transaction/me");
-        if (!txRes.ok) throw new Error("Failed to fetch transactions");
-        const txData = await txRes.json();
-        setTransactions(
-          txData.map((idTx: any) => ({
-            id: idTx.id,
-            type: idTx.type,
-            amount: idTx.amount,
-            walletId: idTx.walletId,
-            createdAt: idTx.createdAt,
-            description: idTx.description,
-            status: idTx.status,
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
-    getProviderDashboard();
-  }, [setUser, setWallet, setTransactions]);
-
+  const { user } = useStore();
   const TABS = [
     { value: "overview", label: "Overview", icon: LayoutGrid },
     { value: "queue", label: "Queue", icon: List },

@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 // Helper function to get status colors
 const getStatusVariant = (status: any) => {
@@ -27,9 +28,17 @@ const getStatusVariant = (status: any) => {
 };
 
 export function OrderAssignmentCard({ assignment }: { assignment: any }) {
-  const { order, status, claimedAt, reviewRating, reviewText } = assignment;
-  const { subpackage, customer, orderNumber } = order;
+  const {
+    order,
+    id: assignmentId,
+    status,
+    claimedAt,
+    reviewRating,
+    reviewText,
+  } = assignment;
+  const { subpackage, customer, orderNumber, id: orderId } = order;
   const gameName = subpackage.service.game.name;
+  const router = useRouter();
 
   return (
     <Card className="bg-black/30 backdrop-blur-sm border-white/10 shadow-2xl flex flex-col h-full">
@@ -45,9 +54,25 @@ export function OrderAssignmentCard({ assignment }: { assignment: any }) {
             <span className="text-white/80 font-semibold">
               ${subpackage.price}
             </span>
-            <Badge className={`text-xs font-bold ${getStatusVariant(status)}`}>
-              {status}
-            </Badge>
+            <div className="flex flex-col gap-3">
+              <Badge
+                className={`text-xs font-bold ${getStatusVariant(status)}`}
+              >
+                {status}
+              </Badge>
+              {(status === "APPROVED" || status === "COMPLETED") && (
+                <button
+                  className="bg-gradient-to-r p-2 rounded-lg cursor-pointer hover:scale-105 transition-all   from-pink-500 via-purple-500 to-cyan-400"
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/provider/order-assignments/${assignmentId}`
+                    )
+                  }
+                >
+                  View Order
+                </button>
+              )}
+            </div>
           </div>
           <p className="text-sm text-white/60">
             <span className="font-bold text-white/80">Order ID:</span>{" "}
