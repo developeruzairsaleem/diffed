@@ -82,6 +82,7 @@ export class OrderService {
           assignments: {
             select: {
               id: true,
+              status: true,
             },
           },
         },
@@ -120,7 +121,13 @@ export class OrderService {
       price: order.price,
       status: order.status,
       rerollsLeft: order.rerollsLeft,
-      approvedCount: order.approvedCount,
+      approvedCount: order.assignments.reduce(
+        (acc, val) =>
+          ["APPROVED", "COMPLETED", "VERIFIED"].includes(val.status)
+            ? acc + 1
+            : acc,
+        0
+      ),
       requiredCount: order.requiredCount,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
@@ -248,8 +255,9 @@ export class OrderService {
         providerId: assignment.providerId,
         claimedAt: assignment.claimedAt,
         status: assignment.status,
-        approved: assignment.approved,
-        completed: assignment.completed,
+        approved: assignment.status === "APPROVED",
+        completed:
+          assignment.status === "COMPLETED" || assignment.status === "VERIFIED",
         leftEarly: assignment.leftEarly,
         progress: assignment.progress,
         proofUrl: assignment.proofUrl || undefined,

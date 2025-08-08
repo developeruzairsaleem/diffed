@@ -18,6 +18,7 @@ import {
   message,
   Modal,
   Rate,
+  Image,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -25,6 +26,7 @@ import {
   MessageOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useOrder } from "@/hooks/useOrders";
@@ -36,6 +38,7 @@ import type {
   AssignmentUpdateRequest,
 } from "@/types/order.dto";
 import Link from "next/link";
+import { Check } from "lucide-react";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -62,6 +65,7 @@ interface OrderDetailProps {
 export default function OrderDetail({ orderId }: OrderDetailProps) {
   const { data: order, loading, error, refetch } = useOrder(orderId);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [completingOrder, setCompletingOrder] = useState(false);
   const [assignmentModalVisible, setAssignmentModalVisible] = useState(false);
   const [selectedAssignment, setSelectedAssignment] =
     useState<OrderAssignmentDto | null>(null);
@@ -74,14 +78,19 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
 
   const handleUpdateOrder = async (values: OrderUpdateRequest) => {
     try {
-      values.rerollsLeft = parseInt(
-        values.rerollsLeft as unknown as string,
-        10
-      );
-      values.requiredCount = parseInt(
-        values.requiredCount as unknown as string,
-        10
-      );
+      setCompletingOrder(true);
+      // values.rerollsLeft = parseInt(
+      //   values.rerollsLeft as unknown as string,
+      //   10
+      // );
+      // values.requiredCount = parseInt(
+      //   values.requiredCount as unknown as string,
+      //   10
+      // );
+      console.log("----------------------------------");
+      console.log("HADNLING REQUEST", JSON.stringify(values));
+      console.log("----------------------------------");
+
       const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -99,6 +108,8 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
       }
     } catch (err) {
       message.error("Network error occurred");
+    } finally {
+      setCompletingOrder(false);
     }
   };
 
@@ -130,6 +141,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
     }
   };
 
+  // @ts-ignore
   const assignmentColumns: ColumnsType<OrderAssignmentDto> = [
     {
       title: "Provider",
@@ -159,25 +171,6 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
       ),
     },
     {
-      title: "Progress",
-      dataIndex: "progress",
-      key: "progress",
-      render: (progress: number) => (
-        <Progress percent={progress} size="small" />
-      ),
-    },
-    {
-      title: "Approved",
-      dataIndex: "approved",
-      key: "approved",
-      render: (approved: boolean) =>
-        approved ? (
-          <CheckCircleOutlined style={{ color: "green" }} />
-        ) : (
-          <ClockCircleOutlined style={{ color: "orange" }} />
-        ),
-    },
-    {
       title: "Rating",
       dataIndex: "reviewRating",
       key: "reviewRating",
@@ -185,24 +178,88 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
         rating ? <Rate disabled defaultValue={rating} /> : "-",
     },
     {
+      title: "Review",
+      key: "reviewtext",
+      dataIndex: "reviewText",
+      render: (reviewText: string, record: OrderAssignmentDto) =>
+        reviewText ? (
+          <p className="font-semibold text-gray-700 text-md">{reviewText}</p>
+        ) : (
+          "-"
+        ),
+    },
+    ,
+    {
+      title: "Proof",
+      key: "proofUrl",
+      dataIndex: "proofUrl",
+      render: (proofUrl: string) => {
+        if (!proofUrl) {
+          return "-";
+        }
+        return (
+          <Image
+            src={proofUrl} // This can be a thumbnail URL if you have one
+            width={50}
+            alt="Proof of completion"
+            preview={{
+              src: proofUrl, // The full-resolution image to show in the modal
+              mask: (
+                <div
+                  style={{
+                    background: "rgba(0, 0, 0, 0.5)",
+                    color: "white",
+                    height: "100%",
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <EyeOutlined />
+                </div>
+              ),
+            }}
+          />
+        );
+      },
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_, record: OrderAssignmentDto) => (
-        <Button
-          size="small"
-          icon={<EditOutlined />}
-          onClick={() => {
-            setSelectedAssignment(record);
-            assignmentForm.setFieldsValue(record);
-            setAssignmentModalVisible(true);
-          }}
-        >
-          Edit
-        </Button>
+        <Space>
+          <Button
+            size="small"
+            type="primary"
+            disabled={record.status === OrderAssignmentStatus.VERIFIED}
+            onClick={async () => {
+              try {
+                const response = await fetch(
+                  `/api/provider-assignment/${record.id}/verify`,
+                  {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                  }
+                );
+                const data = await response.json();
+                if (!response.ok)
+                  throw new Error(data.error || "Failed to verify assignment");
+                message.success("Assignment marked as verified");
+                refetch(); // Refresh the data
+              } catch (error: any) {
+                message.error(error.message || "Failed to verify assignment");
+              }
+            }}
+          >
+            {record.status === OrderAssignmentStatus.VERIFIED
+              ? "Verified"
+              : "Verify"}
+          </Button>
+        </Space>
       ),
     },
   ];
-
   const tabItems = [
     {
       key: "details",
@@ -322,15 +379,23 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           <h1>Order #{order.orderNumber.slice(-8)}</h1>
         </Space>
         <Space>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => {
-              form.setFieldsValue(order);
-              setEditModalVisible(true);
-            }}
-          >
-            Edit Order
-          </Button>
+          {order.status !== "COMPLETED" ? (
+            <Button
+              disabled={completingOrder}
+              icon={<Check />}
+              onClick={() => {
+                // mark order as completed
+                handleUpdateOrder({ status: "COMPLETED" });
+
+                // form.setFieldsValue(order);
+                // setEditModalVisible(true);
+              }}
+            >
+              Mark Order As Completed
+            </Button>
+          ) : (
+            <Button disabled={true}>Marked As Completed</Button>
+          )}
         </Space>
       </div>
 
