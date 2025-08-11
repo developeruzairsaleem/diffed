@@ -11,9 +11,7 @@ export default function ServicesPage() {
     <div style={{ padding: "24px" }}>
       <div style={{ marginBottom: 24 }}>
         <h1>Services Management</h1>
-        <p>
-          Monitor and manage all services and their subpackages across all games
-        </p>
+        <p>Monitor and manage all services across all games</p>
       </div>
 
       <ServicesTable />

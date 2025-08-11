@@ -42,7 +42,7 @@ export default function ServicesTable() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-
+  const [createLoading, setCreateLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -50,6 +50,7 @@ export default function ServicesTable() {
 
   const handleCreateService = async (values: ServiceCreateRequest) => {
     try {
+      setCreateLoading(true);
       const response = await fetch("/api/admin/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,6 +69,8 @@ export default function ServicesTable() {
       }
     } catch (err) {
       message.error("Network error occurred");
+    } finally {
+      setCreateLoading(false);
     }
   };
 
@@ -191,7 +194,7 @@ export default function ServicesTable() {
               <Button type="text" icon={<EyeOutlined />} size="small" />
             </Link>
           </Tooltip>
-      
+
           <Tooltip title="Delete">
             <Button
               type="text"
@@ -271,7 +274,6 @@ export default function ServicesTable() {
                 );
               })}
             </Select>
-            <Button icon={<FilterOutlined />}>More Filters</Button>
           </Space>
           <Button
             type="primary"
@@ -340,8 +342,8 @@ export default function ServicesTable() {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
-                Create Service
+              <Button disabled={createLoading} type="primary" htmlType="submit">
+                {createLoading ? "Creating..." : "Create Service"}
               </Button>
               <Button onClick={() => setCreateModalVisible(false)}>
                 Cancel

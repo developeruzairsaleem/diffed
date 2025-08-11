@@ -87,6 +87,7 @@ export async function GET(
       name: subpackage.name,
       description: subpackage.description,
       price: subpackage.price,
+      requiredProviders: (subpackage as any).requiredProviders ?? 1,
       duration: subpackage.duration,
       dynamicPricing: subpackage.dynamicPricing,
       basePricePerELO: subpackage.basePricePerELO,

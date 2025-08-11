@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Descriptions,
@@ -57,8 +57,25 @@ export default function SubpackageDetail({
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [pricingModalVisible, setPricingModalVisible] = useState(false);
   const [pricingResult, setPricingResult] = useState<any>(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [form] = Form.useForm();
   const [pricingForm] = Form.useForm();
+
+  useEffect(() => {
+    if (editModalVisible && subpackage) {
+      form.setFieldsValue({
+        name: subpackage.name,
+        description: subpackage.description,
+        price: subpackage.price,
+        duration: subpackage.duration,
+        requiredProviders: subpackage.requiredProviders,
+        dynamicPricing: subpackage.dynamicPricing,
+        basePricePerELO: subpackage.basePricePerELO,
+        minELO: subpackage.minELO,
+        maxELO: subpackage.maxELO,
+      });
+    }
+  }, [editModalVisible, subpackage, form]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -66,6 +83,7 @@ export default function SubpackageDetail({
 
   const handleUpdateSubpackage = async (values: SubpackageUpdateRequest) => {
     try {
+      setUpdateLoading(true);
       const response = await fetch(`/api/admin/subpackages/${subpackageId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -77,12 +95,18 @@ export default function SubpackageDetail({
       if (result.success) {
         message.success("Subpackage updated successfully");
         setEditModalVisible(false);
-        refetch();
+        setUpdateLoading(false);
+        await refetch();
+        form.resetFields();
       } else {
         message.error(result.error || "Failed to update subpackage");
+        setUpdateLoading(false);
+        form.resetFields();
       }
     } catch (err) {
       message.error("Network error occurred");
+      setUpdateLoading(false);
+      form.resetFields();
     }
   };
 
@@ -201,21 +225,7 @@ export default function SubpackageDetail({
                 />
               </Card>
             </Col>
-            <Col span={6}>
-              <Card>
-                <Statistic
-                  title="Completion Rate"
-                  value={subpackage.stats.completionRate}
-                  suffix="%"
-                  precision={1}
-                  valueStyle={{ color: "#52c41a" }}
-                />
-                <Progress
-                  percent={subpackage.stats.completionRate}
-                  showInfo={false}
-                />
-              </Card>
-            </Col>
+
             <Col span={6}>
               <Card>
                 <Statistic
@@ -313,8 +323,8 @@ export default function SubpackageDetail({
         }}
       >
         <Space>
-          <Link href={`/admin/games/${subpackage.service.gameId}`}>
-            <Button icon={<ArrowLeftOutlined />}>Back to Game</Button>
+          <Link href={`/admin/subpackages`}>
+            <Button icon={<ArrowLeftOutlined />}>Back to Subpackages</Button>
           </Link>
           <Avatar
             src={subpackage.service.game.image}
@@ -332,18 +342,20 @@ export default function SubpackageDetail({
           </div>
         </Space>
         <Space>
-          {subpackage.dynamicPricing && subpackage.service.game.isEloBased && (
-            <Button
-              icon={<CalculatorOutlined />}
-              onClick={() => setPricingModalVisible(true)}
-            >
-              Calculate Price
-            </Button>
-          )}
           <Button
             icon={<EditOutlined />}
             onClick={() => {
-              form.setFieldsValue(subpackage);
+              form.setFieldsValue({
+                name: subpackage.name,
+                description: subpackage.description,
+                price: subpackage.price,
+                duration: subpackage.duration,
+                requiredProviders: subpackage.requiredProviders,
+                dynamicPricing: subpackage.dynamicPricing,
+                basePricePerELO: subpackage.basePricePerELO,
+                minELO: subpackage.minELO,
+                maxELO: subpackage.maxELO,
+              });
               setEditModalVisible(true);
             }}
           >
@@ -360,6 +372,7 @@ export default function SubpackageDetail({
         open={editModalVisible}
         onCancel={() => setEditModalVisible(false)}
         footer={null}
+        destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleUpdateSubpackage}>
           <Form.Item
@@ -381,34 +394,100 @@ export default function SubpackageDetail({
             label="Base Price"
             rules={[{ required: true, message: "Price is required" }]}
           >
-            <InputNumber min={0} step={0.01} style={{ width: "100%" }} />
+            <InputNumber
+              min={0}
+              step={0.01}
+              style={{ width: "100%" }}
+              prefix="$"
+            />
           </Form.Item>
           <Form.Item name="duration" label="Duration">
             <Input placeholder="e.g., 2-3 days" />
           </Form.Item>
-          <Form.Item name="requiredProviders" label="Required Providers">
-            <InputNumber min={0} placeholder="e.g., 4" />
+          <Form.Item
+            name="requiredProviders"
+            label="Required Providers"
+            rules={[{ required: true, message: "No of Providers is required" }]}
+          >
+            <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item
             name="dynamicPricing"
-            label="Dynamic Pricing"
+            label="Enable Dynamic Pricing"
             valuePropName="checked"
           >
             <Switch />
           </Form.Item>
-          <Form.Item name="basePricePerELO" label="Base Price per ELO">
-            <InputNumber min={0} step={0.01} style={{ width: "100%" }} />
+          <Form.Item
+            shouldUpdate={(prev, cur) =>
+              prev.dynamicPricing !== cur.dynamicPricing
+            }
+            noStyle
+          >
+            {({ getFieldValue }) =>
+              getFieldValue("dynamicPricing") && (
+                <>
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      <Form.Item
+                        name="basePricePerELO"
+                        label="Price per ELO"
+                        rules={[
+                          {
+                            required: true,
+                            message:
+                              "Price per ELO is required when dynamic pricing is enabled",
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          min={0}
+                          step={0.01}
+                          style={{ width: "100%" }}
+                          prefix="$"
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item
+                        name="minELO"
+                        label="Min ELO"
+                        rules={[
+                          {
+                            required: true,
+                            message:
+                              "Min ELO is required when dynamic pricing is enabled",
+                          },
+                        ]}
+                      >
+                        <InputNumber min={0} style={{ width: "100%" }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item
+                        name="maxELO"
+                        label="Max ELO"
+                        rules={[
+                          {
+                            required: true,
+                            message:
+                              "Max ELO is required when dynamic pricing is enabled",
+                          },
+                        ]}
+                      >
+                        <InputNumber min={0} style={{ width: "100%" }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </>
+              )
+            }
           </Form.Item>
-          <Form.Item name="minELO" label="Minimum ELO">
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="maxELO" label="Maximum ELO">
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
+
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
-                Update Subpackage
+              <Button disabled={updateLoading} type="primary" htmlType="submit">
+                {updateLoading ? "Updating..." : "Update Subpackage"}
               </Button>
               <Button onClick={() => setEditModalVisible(false)}>Cancel</Button>
             </Space>

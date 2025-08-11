@@ -399,15 +399,7 @@ export default function ProvidersTable() {
               <Option value={true}>Has Assignments</Option>
               <Option value={false}>No Assignments</Option>
             </Select>
-            <Select
-              placeholder="Availability"
-              allowClear
-              style={{ width: 150 }}
-              onChange={handleAvailabilityFilter}
-            >
-              <Option value={true}>Available</Option>
-              <Option value={false}>Busy</Option>
-            </Select>
+
             <Space.Compact>
               <InputNumber
                 placeholder="Min earnings"

@@ -51,6 +51,7 @@ export default function GameDetail({ gameId }: GameDetailProps) {
   const { data: game, loading, error, refetch } = useGame(gameId);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [serviceModalVisible, setServiceModalVisible] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [subpackageModalVisible, setSubpackageModalVisible] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [form] = Form.useForm();
@@ -63,6 +64,7 @@ export default function GameDetail({ gameId }: GameDetailProps) {
 
   const handleUpdateGame = async (values: GameUpdateRequest) => {
     try {
+      setUpdateLoading(true);
       const response = await fetch(`/api/admin/games/${gameId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -80,6 +82,8 @@ export default function GameDetail({ gameId }: GameDetailProps) {
       }
     } catch (err) {
       message.error("Network error occurred");
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -303,21 +307,6 @@ export default function GameDetail({ gameId }: GameDetailProps) {
                 />
               </Card>
             </Col>
-            <Col span={6}>
-              <Card>
-                <Statistic
-                  title="Completion Rate"
-                  value={game.stats.completionRate}
-                  suffix="%"
-                  precision={1}
-                  valueStyle={{ color: "#52c41a" }}
-                />
-                <Progress
-                  percent={game.stats.completionRate}
-                  showInfo={false}
-                />
-              </Card>
-            </Col>
           </Row>
 
           <Card title="Game Information">
@@ -348,17 +337,6 @@ export default function GameDetail({ gameId }: GameDetailProps) {
               <Descriptions.Item label="Last Updated">
                 {new Date(game.updatedAt).toLocaleString()}
               </Descriptions.Item>
-              {Array.isArray(game?.ranks) && game.ranks.length > 0 && (
-                <Descriptions.Item label="Ranks" span={2}>
-                  <Space wrap>
-                    {game?.ranks?.map((rank: any, index: any) => (
-                      <Tag key={index} color="blue">
-                        {rank}
-                      </Tag>
-                    ))}
-                  </Space>
-                </Descriptions.Item>
-              )}
             </Descriptions>
           </Card>
 
@@ -502,23 +480,11 @@ export default function GameDetail({ gameId }: GameDetailProps) {
           >
             <Switch />
           </Form.Item>
-          <Form.Item name="ranks" label="Ranks (JSON Array)">
-            <TextArea
-              rows={4}
-              onChange={(e) => {
-                try {
-                  const ranks = JSON.parse(e.target.value || "[]");
-                  form.setFieldValue("ranks", ranks);
-                } catch {
-                  // Invalid JSON, ignore
-                }
-              }}
-            />
-          </Form.Item>
+
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
-                Update Game
+              <Button disabled={updateLoading} type="primary" htmlType="submit">
+                {updateLoading ? "Updating..." : "Update Game"}
               </Button>
               <Button onClick={() => setEditModalVisible(false)}>Cancel</Button>
             </Space>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import type { ApiResponse } from "@/types/game.dto";
-import { string } from "zod";
 
 export interface SubpackageDetailDto {
   id: string;
@@ -81,6 +80,7 @@ export interface SubpackageListDto {
   ordersCount: number;
   totalRevenue: number;
   completedOrders: number;
+  completionRate: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -102,6 +102,19 @@ export interface SubpackageListResponse {
   }>;
 }
 
+export interface SubpackageQueryParams {
+  page: number;
+  limit: number;
+  serviceId?: string;
+  gameId?: string;
+  search?: string;
+  dynamicPricing?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy: "createdAt" | "price" | "name";
+  sortOrder: "asc" | "desc";
+}
+
 export interface PricingCalculation {
   subpackageId: string;
   subpackageName: string;
@@ -121,10 +134,17 @@ export interface PricingCalculation {
   };
 }
 
-export function useSubpackages(serviceId?: string, gameId?: string) {
+export function useSubpackages(initialParams?: Partial<SubpackageQueryParams>) {
   const [data, setData] = useState<SubpackageListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [params, setParams] = useState<SubpackageQueryParams>({
+    page: 1,
+    limit: 10,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+    ...initialParams,
+  });
 
   const fetchSubpackages = async () => {
     try {
@@ -132,14 +152,25 @@ export function useSubpackages(serviceId?: string, gameId?: string) {
       setError(null);
 
       const searchParams = new URLSearchParams();
-      if (serviceId) searchParams.append("serviceId", serviceId);
-      if (gameId) searchParams.append("gameId", gameId);
+      searchParams.append("page", String(params.page));
+      searchParams.append("limit", String(params.limit));
+      searchParams.append("sortBy", params.sortBy);
+      searchParams.append("sortOrder", params.sortOrder);
+      if (params.serviceId) searchParams.append("serviceId", params.serviceId);
+      if (params.gameId) searchParams.append("gameId", params.gameId);
+      if (params.search) searchParams.append("search", params.search);
+      if (params.dynamicPricing !== undefined)
+        searchParams.append("dynamicPricing", String(params.dynamicPricing));
+      if (params.minPrice !== undefined)
+        searchParams.append("minPrice", String(params.minPrice));
+      if (params.maxPrice !== undefined)
+        searchParams.append("maxPrice", String(params.maxPrice));
 
       const response = await fetch(`/api/admin/subpackages?${searchParams}`);
       const result: ApiResponse<SubpackageListResponse> = await response.json();
 
       if (result.success && result.data) {
-        setData(result?.data || {});
+        setData(result.data);
       } else {
         setError(result.error || "Failed to fetch subpackages");
       }
@@ -152,9 +183,21 @@ export function useSubpackages(serviceId?: string, gameId?: string) {
 
   useEffect(() => {
     fetchSubpackages();
-  }, [serviceId, gameId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    params.page,
+    params.limit,
+    params.sortBy,
+    params.sortOrder,
+    params.serviceId,
+    params.gameId,
+    params.search,
+    params.dynamicPricing,
+    params.minPrice,
+    params.maxPrice,
+  ]);
 
-  return { data, loading, error, refetch: fetchSubpackages };
+  return { data, loading, error, refetch: fetchSubpackages, params, setParams };
 }
 
 export function useSubpackage(id: string) {

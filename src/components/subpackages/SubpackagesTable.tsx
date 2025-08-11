@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -43,10 +43,25 @@ export default function SubpackagesTable() {
   const [form] = Form.useForm();
   const [currentGameId, setCurrentGameId] = useState("");
   const [currentService, setCurrentService] = useState("");
-  const { data, loading, error, refetch } = useSubpackages();
+  const [createLoading, setCreateLoading] = useState(false);
+  const { data, loading, error, refetch, params, setParams } = useSubpackages({
+    page: 1,
+    limit: 10,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setParams((p) => ({ ...p, page: 1, search: searchText || undefined }));
+    }, 400);
+    return () => clearTimeout(id);
+  }, [searchText, setParams]);
 
   const handleCreateSubpackage = async (values: SubpackageCreateRequest) => {
     try {
+      setCreateLoading(true);
       const response = await fetch("/api/admin/subpackages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,11 +75,16 @@ export default function SubpackagesTable() {
         setCreateModalVisible(false);
         form.resetFields();
         refetch();
+        setCreateLoading(false);
       } else {
+        setCreateLoading(false);
+        form.resetFields();
         message.error(result.error || "Failed to create subpackage");
       }
     } catch (err) {
       message.error("Network error occurred");
+      setCreateLoading(false);
+      form.resetFields();
     }
   };
 
@@ -91,7 +111,9 @@ export default function SubpackagesTable() {
     {
       title: "Package",
       key: "package",
+      dataIndex: "name",
       width: 300,
+      sorter: true,
       render: (_, record: any) => (
         <Space>
           <Avatar
@@ -135,6 +157,7 @@ export default function SubpackagesTable() {
       dataIndex: "price",
       key: "price",
       width: 100,
+      sorter: true,
       render: (price: number) => (
         <span style={{ fontWeight: 500, color: "#52c41a" }}>
           ${price.toFixed(2)}
@@ -195,26 +218,13 @@ export default function SubpackagesTable() {
         </span>
       ),
     },
-    {
-      title: "Completion",
-      dataIndex: "completionRate",
-      key: "completionRate",
-      width: 100,
-      render: (rate: number) => (
-        <span
-          style={{
-            color: rate > 80 ? "#52c41a" : rate > 50 ? "#faad14" : "#ff4d4f",
-          }}
-        >
-          {rate.toFixed(1)}%
-        </span>
-      ),
-    },
+
     {
       title: "Created",
       dataIndex: "createdAt",
       key: "createdAt",
       width: 100,
+      sorter: true,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
@@ -228,11 +238,7 @@ export default function SubpackagesTable() {
               <Button type="text" icon={<EyeOutlined />} size="small" />
             </Link>
           </Tooltip>
-          {record.dynamicPricing && (
-            <Tooltip title="Calculate Price">
-              <Button type="text" icon={<CalculatorOutlined />} size="small" />
-            </Tooltip>
-          )}
+
           <Tooltip title="Delete">
             <Button
               type="text"
@@ -270,16 +276,25 @@ export default function SubpackagesTable() {
               allowClear
               style={{ width: 300 }}
               prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
             />
             <Select
               placeholder="Filter by pricing"
               allowClear
               style={{ width: 150 }}
+              value={params.dynamicPricing as any}
+              onChange={(value) =>
+                setParams((p) => ({
+                  ...p,
+                  page: 1,
+                  dynamicPricing: (value as boolean | undefined) ?? undefined,
+                }))
+              }
             >
               <Option value={true}>Dynamic Pricing</Option>
               <Option value={false}>Fixed Pricing</Option>
             </Select>
-            <Button icon={<FilterOutlined />}>More Filters</Button>
           </Space>
           <Button
             type="primary"
@@ -296,10 +311,37 @@ export default function SubpackagesTable() {
           rowKey="id"
           loading={loading}
           pagination={{
+            current: data?.page ?? params.page,
+            pageSize: params.limit,
+            total: data?.total ?? 0,
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} subpackages`,
+          }}
+          onChange={(pagination, _filters, sorter) => {
+            const s = Array.isArray(sorter) ? sorter[0] : sorter;
+            const sortField = (s?.field as string | undefined) ?? undefined;
+            const sortOrder = s?.order as "ascend" | "descend" | undefined;
+            setParams((p) => ({
+              ...p,
+              page: pagination.current ?? 1,
+              limit: pagination.pageSize ?? p.limit,
+              sortBy:
+                sortField === "price"
+                  ? "price"
+                  : sortField === "name"
+                  ? "name"
+                  : sortField === "createdAt"
+                  ? "createdAt"
+                  : p.sortBy,
+              sortOrder:
+                sortOrder === "ascend"
+                  ? "asc"
+                  : sortOrder === "descend"
+                  ? "desc"
+                  : p.sortOrder,
+            }));
           }}
           scroll={{ x: 1400 }}
         />
@@ -385,6 +427,18 @@ export default function SubpackagesTable() {
           >
             <Switch />
           </Form.Item>
+          <Form.Item
+            name="requiredProviders"
+            label="Required Providers"
+            rules={[
+              {
+                required: true,
+                message: "No of Providers is required",
+              },
+            ]}
+          >
+            <InputNumber min={0} style={{ width: "100%" }} />
+          </Form.Item>
           <Form.Item dependencies={["dynamicPricing"]} noStyle>
             {({ getFieldValue }) =>
               getFieldValue("dynamicPricing") && (
@@ -405,18 +459,6 @@ export default function SubpackagesTable() {
                         <InputNumber min={0} style={{ width: "100%" }} />
                       </Form.Item>
                     </Col>
-                    <Form.Item
-                      name="requiredProviders"
-                      label="Required Providers"
-                      rules={[
-                        {
-                          required: true,
-                          message: "No of Providers is required",
-                        },
-                      ]}
-                    >
-                      <InputNumber min={0} style={{ width: "100%" }} />
-                    </Form.Item>
                     <Col span={8}>
                       <Form.Item name="maxELO" label="Max ELO">
                         <InputNumber min={0} style={{ width: "100%" }} />
@@ -429,8 +471,8 @@ export default function SubpackagesTable() {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
-                Create Subpackage
+              <Button disabled={createLoading} type="primary" htmlType="submit">
+                {createLoading ? "Creating..." : " Create Subpackage"}
               </Button>
               <Button onClick={() => setCreateModalVisible(false)}>
                 Cancel

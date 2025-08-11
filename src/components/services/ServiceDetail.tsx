@@ -49,6 +49,7 @@ interface ServiceDetailProps {
 export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
   const { data: service, loading, error, refetch } = useService(serviceId);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [subpackageModalVisible, setSubpackageModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [subpackageForm] = Form.useForm();
@@ -59,6 +60,7 @@ export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
 
   const handleUpdateService = async (values: ServiceUpdateRequest) => {
     try {
+      setUpdateLoading(true);
       const response = await fetch(`/api/admin/services/${serviceId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -76,6 +78,8 @@ export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
       }
     } catch (err) {
       message.error("Network error occurred");
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -218,21 +222,6 @@ export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
                 />
               </Card>
             </Col>
-            <Col span={6}>
-              <Card>
-                <Statistic
-                  title="Completion Rate"
-                  value={service.stats.completionRate}
-                  suffix="%"
-                  precision={1}
-                  valueStyle={{ color: "#52c41a" }}
-                />
-                <Progress
-                  percent={service.stats.completionRate}
-                  showInfo={false}
-                />
-              </Card>
-            </Col>
           </Row>
 
           <Card title="Service Information">
@@ -282,21 +271,6 @@ export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
       label: `Subpackages (${service.subpackages.length})`,
       children: (
         <div>
-          <div
-            style={{
-              marginBottom: 16,
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setSubpackageModalVisible(true)}
-            >
-              Add Subpackage
-            </Button>
-          </div>
           <Table
             columns={subpackageColumns}
             dataSource={service.subpackages}
@@ -375,8 +349,8 @@ export default function ServiceDetail({ serviceId }: ServiceDetailProps) {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
-                Update Service
+              <Button disabled={updateLoading} type="primary" htmlType="submit">
+                {updateLoading ? "Updating..." : "Update Service"}
               </Button>
               <Button onClick={() => setEditModalVisible(false)}>Cancel</Button>
             </Space>

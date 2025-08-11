@@ -1,7 +1,7 @@
 "use client";
 import "@ant-design/v5-patch-for-react-19";
 import React, { useState } from "react";
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme, Button } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import {
   DashboardOutlined,
@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 const { Header, Sider, Content } = Layout;
 import "antd/dist/reset.css";
 import { LuGamepad } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 export default function AdminLayout({
   children,
 }: {
@@ -23,6 +24,8 @@ export default function AdminLayout({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -88,7 +91,7 @@ export default function AdminLayout({
           <Menu
             theme="dark"
             mode="inline"
-            selectedKeys={[pathname]}
+            selectedKeys={[pathname || "/admin"]}
             items={menuItems}
           />
         </Sider>
@@ -100,6 +103,7 @@ export default function AdminLayout({
                 alignItems: "center",
                 height: "100%",
                 paddingLeft: 16,
+                justifyContent: "space-between",
               }}
             >
               {React.createElement(
@@ -110,6 +114,27 @@ export default function AdminLayout({
                   style: { fontSize: 18, cursor: "pointer" },
                 }
               )}
+              <div style={{ paddingRight: 16 }}>
+                <Button
+                  type="primary"
+                  danger
+                  loading={loggingOut}
+                  onClick={async () => {
+                    try {
+                      setLoggingOut(true);
+                      await fetch("/api/logout", { method: "POST" });
+                      router.push("/");
+                    } catch (e) {
+                      // swallow
+                      console.error("error logging out", e);
+                    } finally {
+                      setLoggingOut(false);
+                    }
+                  }}
+                >
+                  {loggingOut ? "Logging out..." : "Logout"}
+                </Button>
+              </div>
             </div>
           </Header>
           <Content

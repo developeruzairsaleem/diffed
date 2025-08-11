@@ -53,6 +53,7 @@ export default function GamesTable() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
+  const [createLoading, setCreateLoading] = useState(false);
   const [deletingId, setDeletingId] = useState("");
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -61,12 +62,13 @@ export default function GamesTable() {
 
   const handleCreateGame = async (values: GameCreateRequest) => {
     try {
+      setCreateLoading(true);
       const response = await fetch("/api/admin/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...values,
-          ranks: values.ranks || [],
+          ranks: null, // added null constraints for all the games
         }),
       });
 
@@ -79,6 +81,8 @@ export default function GamesTable() {
       }
     } catch (err) {
       console.error("Error creating game:", err);
+    } finally {
+      setCreateLoading(false);
     }
   };
 
@@ -206,20 +210,6 @@ export default function GamesTable() {
         <span style={{ color: amount > 0 ? "#1890ff" : "#999" }}>
           ${amount.toFixed(2)}
         </span>
-      ),
-    },
-    {
-      title: "Popularity Rank",
-      dataIndex: "popularityRank",
-      key: "popularityRank",
-      width: 120,
-      render: (rank: number) => (
-        <Space>
-          <TrophyOutlined
-            style={{ color: rank <= 3 ? "#faad14" : "#d9d9d9" }}
-          />
-          <span>#{rank}</span>
-        </Space>
       ),
     },
     {
@@ -475,24 +465,11 @@ export default function GamesTable() {
           >
             <Switch />
           </Form.Item>
-          <Form.Item name="ranks" label="Ranks (JSON Array)">
-            <TextArea
-              rows={4}
-              placeholder='["Iron", "Bronze", "Silver", "Gold", "Platinum", "Diamond"]'
-              onChange={(e) => {
-                try {
-                  const ranks = JSON.parse(e.target.value || "[]");
-                  form.setFieldValue("ranks", ranks);
-                } catch {
-                  // Invalid JSON, ignore
-                }
-              }}
-            />
-          </Form.Item>
+
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">
-                Create Game
+              <Button disabled={createLoading} type="primary" htmlType="submit">
+                {createLoading ? "Creating..." : "Create Game"}
               </Button>
               <Button onClick={() => setCreateModalVisible(false)}>
                 Cancel
