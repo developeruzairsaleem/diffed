@@ -200,3 +200,16 @@ body {
 .payout-modal .ant-modal-body {
   background-color: transparent;
 }
+
+/* Style for payout amount InputNumber on provider earnings */
+.payout-input.ant-input-number {
+  background-color: transparent !important;
+  width: 100% !important;
+}
+.payout-input .ant-input-number-input {
+  color: #ffffff !important;
+}
+.payout-input .ant-input-number-input::placeholder {
+  color: #ffffff !important;
+  opacity: 0.7;
+}

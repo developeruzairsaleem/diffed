@@ -9,6 +9,7 @@ import {
   StarOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -63,6 +64,11 @@ export default function AdminLayout({
       icon: <StarOutlined />,
       label: <Link href="/admin/providers">Providers</Link>,
     },
+    {
+      key: "/admin/payout-requests",
+      icon: <DollarOutlined />,
+      label: <Link href="/admin/payout-requests">Payout Requests</Link>,
+    },
   ];
 
   return (
@@ -88,7 +94,7 @@ export default function AdminLayout({
           <Menu
             theme="dark"
             mode="inline"
-            selectedKeys={[pathname]}
+            selectedKeys={[pathname || "/admin"]}
             items={menuItems}
           />
         </Sider>

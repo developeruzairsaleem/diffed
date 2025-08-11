@@ -28,7 +28,7 @@ import { Button, message } from "antd";
 // -------------------------------
 // order detail page for customer
 // ------------------------------------
-export default function OrderDetailPage() {
+export default function AssignmentPage() {
   // ---------------------------------------------
   // application state for orderdetail page and chat page
   // --------------------------------------------
@@ -449,39 +449,9 @@ export default function OrderDetailPage() {
 
 
 
-                            {/* {assignment.status === "COMPLETED" && (assignment.gamePlay === null || assignment.communication === null || assignment.attitude === null) ? (
-                                
-                                <Link
-                                    href={`/dashboard/customer/orders/${order.id}/assignments/${assignment.id}/review`}
-                                    className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor"
-                                  >
-                                    Review
-                                  </Link>
-                            ): (
-                              <p
-                              // href={`/dashboard/customer/orders/${order.id}/assignments/${assignment.id}/review`}
-                              className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor"
-                            >
-                              Reviewed
-                            </p>
-                            )} */}
-
-                            {(assignment.status === "COMPLETED" ||assignment.status==="VERIFIED") && (
-                              !assignment?.reviewText ? (
-                                <Link
-                                  href={`/dashboard/customer/orders/${order.id}/assignments/${assignment.id}/review`}
-                                  className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor"
-                                >
-                                  Review
-                                </Link>
-                              ) : (
-                                <p
-                                  className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor"
-                                >
-                                  Reviewed
-                                </p>
-                              )
-                            ) }
+                            {assignment.status === "COMPLETED" && (
+                                <Badge className="text-sm text-white bg-slate-400 cursor-pointer">Review</Badge>
+                            )}
 
 
                           </div>

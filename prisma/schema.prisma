@@ -185,6 +185,10 @@ model OrderAssignment {
   proofUrl     String?
   reviewRating Int?
   reviewText   String?
+  gamePlay     Int?
+  communication Int?
+  attitude      Int?
+  tipAmount     Int?
 
   order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   provider User  @relation(fields: [providerId], references: [id], onDelete: Cascade)

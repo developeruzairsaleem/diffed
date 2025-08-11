@@ -44,6 +44,10 @@ export interface OrderAssignmentDto {
   reviewRating?: number;
   reviewText?: string;
   provider: UserDto;
+  gamePlay?: number;
+  communication?: number;
+  attitude?: number;
+  tipAmount?: number;
 }
 
 export interface ChatDto {
@@ -157,7 +161,29 @@ export interface AssignmentUpdateRequest {
   proofUrl?: string;
   reviewRating?: number;
   reviewText?: string;
+  gamePlay?: number;
+  communication?: number;
+  attitude?: number;
+  tipAmount?: number;
+  providerId?: string;
 }
+
+export interface AssignmentUpdateRequestShabir {
+  status?: OrderAssignmentStatus;
+  approved?: boolean;
+  completed?: boolean;
+  progress?: number;
+  proofUrl?: string;
+  reviewRating?: number;
+  reviewText: string;
+  gamePlay?: number;
+  communication?: number;
+  attitude?: number;
+  tipAmount?: number;
+  providerId?: string;
+}
+
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
