@@ -34,19 +34,20 @@ export const GET = async () => {
       });
     }
 
-    // 2. Calculate Total Earnings from all completed 'payment' transactions
-    const paymentTransactions = await prisma.transaction.findMany({
+    // 2. Calculate Total Earnings as sum of all 'completed' transactions plus current wallet balance
+    const completedTransactions = await prisma.transaction.findMany({
       where: {
         walletId: wallet.id,
-        type: "payment",
         status: "completed",
       },
+      select: { amount: true },
     });
 
-    const totalEarnings = paymentTransactions.reduce(
+    const sumCompleted = completedTransactions.reduce(
       (sum, tx) => sum.add(tx.amount),
       new Decimal(0)
     );
+    const totalEarnings = sumCompleted.add(wallet.balance);
 
     const responsePayload = {
       availableBalance: wallet.balance,

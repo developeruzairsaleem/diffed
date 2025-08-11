@@ -285,6 +285,8 @@ export class OrderService {
         },
       })),
     };
+
+
   }
 
   static async updateOrder(
@@ -303,6 +305,7 @@ export class OrderService {
     return this.getOrderById(updatedOrder.id);
   }
 
+
   static async updateAssignment(
     assignmentId: string,
     data: AssignmentUpdateRequest
@@ -315,6 +318,21 @@ export class OrderService {
       return true;
     } catch (error) {
       console.error("Error updating assignment:", error);
+      return false;
+    }
+  }
+
+  static async getAssignment(
+    assignmentId: string,
+  ): Promise<any> {
+    try {
+       const assignment = await prisma.orderAssignment.findUnique({
+        where: { id: assignmentId },
+        include: {provider: true}
+      });
+      return assignment;
+    } catch (error) {
+      console.error("Error getting assignment:", error);
       return false;
     }
   }

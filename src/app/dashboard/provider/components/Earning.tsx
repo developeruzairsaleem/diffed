@@ -23,11 +23,55 @@ const getStatusClass = (status: any) => {
 };
 
 export default function EarningPage() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [payoutAmount, setPayoutAmount] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  type Transaction = {
+    id: string;
+    createdAt: string | Date;
+    description?: string | null;
+    type: "withdrawal" | "payment" | "deposit" | "refund";
+    amount: string | number;
+    status: "pending" | "completed" | "failed" | "cancelled";
+  };
+  type EarningsResponse = {
+    totalEarnings: string | number;
+    availableBalance: string | number;
+    transactionHistory: Transaction[];
+  };
+
+  const [data, setData] = useState<EarningsResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [payoutAmount, setPayoutAmount] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [connectStatus, setConnectStatus] = useState<
+    | { connected: false }
+    | {
+        connected: true;
+        accountId: string;
+        chargesEnabled: boolean;
+        payoutsEnabled: boolean;
+        detailsSubmitted: boolean;
+      }
+    | null
+  >(null);
+  type PayoutMethodDetails = {
+    connected: boolean;
+    payoutsEnabled?: boolean;
+    detailsSubmitted?: boolean;
+    bankAccounts?: Array<{
+      id: string;
+      bankName: string | null;
+      last4: string | null;
+      currency: string | null;
+      country: string | null;
+      accountHolderName: string | null;
+      defaultForCurrency: boolean;
+    }>;
+  };
+  const [isPayoutDetailsOpen, setIsPayoutDetailsOpen] = useState(false);
+  const [payoutDetails, setPayoutDetails] = useState<PayoutMethodDetails | null>(null);
+
+  const toNum = (value: string | number): number =>
+    typeof value === "string" ? parseFloat(value) : value;
 
   const fetchEarningsData = useCallback(async () => {
     try {
@@ -37,7 +81,7 @@ export default function EarningPage() {
       setData(result);
     } catch (error) {
       console.error(error);
-      message.error(error?.message || "something went wrong");
+      message.error((error as any)?.message || "something went wrong");
     } finally {
       setLoading(false);
     }
@@ -47,16 +91,33 @@ export default function EarningPage() {
     fetchEarningsData();
   }, [fetchEarningsData]);
 
-  const showPayoutModal = () => {
+  const showPayoutModal = async () => {
+    // Block if there is a pending withdrawal transaction
+    const hasPendingWithdrawal = (data?.transactionHistory || []).some(
+      (t) => t.type === "withdrawal" && t.status === "pending"
+    );
+    if (hasPendingWithdrawal) {
+      message.warning(
+        "You already have a payout request pending. Please wait until it is processed."
+      );
+      return;
+    }
     setPayoutAmount(null); // Reset amount on modal open
     setIsModalVisible(true);
+    try {
+      const res = await fetch("/api/stripe/connect", { method: "GET" });
+      const status = await res.json();
+      setConnectStatus(status);
+    } catch (e) {
+      setConnectStatus({ connected: false });
+    }
   };
 
   const handlePayoutRequest = async () => {
     if (!payoutAmount || payoutAmount <= 0) {
       return message.error("Please enter a valid amount to withdraw.");
     }
-    if (payoutAmount > parseFloat(data?.availableBalance)) {
+    if (payoutAmount > parseFloat(String(data?.availableBalance ?? 0))) {
       return message.error(
         "Withdrawal amount cannot exceed available balance."
       );
@@ -78,7 +139,7 @@ export default function EarningPage() {
       await fetchEarningsData(); // Refresh data to show the new pending transaction
     } catch (error) {
       console.error(error);
-      message.error(error?.message);
+      message.error((error as any)?.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -96,6 +157,8 @@ export default function EarningPage() {
   }
 
   const { totalEarnings, availableBalance, transactionHistory } = data;
+  const exceedsBalance = (payoutAmount ?? 0) > parseFloat(String(availableBalance));
+  const invalidAmount = !payoutAmount || payoutAmount <= 0 || exceedsBalance;
 
   return (
     <div className="main mx-auto pb-60">
@@ -108,7 +171,7 @@ export default function EarningPage() {
             TOTAL EARNING
           </h3>
           <h3 className={`${orbitron.className} font-bold text-5xl mt-2`}>
-            ${parseFloat(totalEarnings).toFixed(2)}
+            ${toNum(totalEarnings).toFixed(2)}
           </h3>
         </div>
 
@@ -121,7 +184,7 @@ export default function EarningPage() {
           </h3>
           <div className="flex items-end justify-between mt-2">
             <h3 className={`${orbitron.className} text-5xl`}>
-              ${parseFloat(availableBalance).toFixed(2)}
+              ${toNum(availableBalance).toFixed(2)}
             </h3>
             <button
               onClick={showPayoutModal}
@@ -130,6 +193,13 @@ export default function EarningPage() {
               Request Payout
             </button>
           </div>
+          {(data?.transactionHistory || []).some(
+            (t) => t.type === "withdrawal" && t.status === "pending"
+          ) && (
+            <p className="mt-2 text-yellow-300/90 text-sm">
+              A payout request is currently pending. You can request a new payout once it is processed.
+            </p>
+          )}
         </div>
       </div>
 
@@ -189,7 +259,7 @@ export default function EarningPage() {
                         }`}
                       >
                         {tx.type === "withdrawal" ? "-" : "+"}$
-                        {parseFloat(tx.amount).toFixed(2)}
+                        {toNum(tx.amount).toFixed(2)}
                       </td>
                       <td className="py-4 px-4 text-center">
                         <span
@@ -204,7 +274,7 @@ export default function EarningPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center py-10 text-white/70">
+                    <td colSpan={4} className="text-center py-10 text-white/70">
                       No transaction history found.
                     </td>
                   </tr>
@@ -221,11 +291,81 @@ export default function EarningPage() {
           >
             PAYOUT METHOD
           </h2>
-          <p className="text-center text-white/60">
-            Payouts are currently processed by an admin. More automated methods
-            coming soon!
-          </p>
+          <div className="w-full space-y-4">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/stripe/connect/payout-method");
+                  const js = (await res.json()) as PayoutMethodDetails & { error?: string };
+                  if (!res.ok) throw new Error(js?.error || "Failed to fetch payout method");
+                  setPayoutDetails(js);
+                  setIsPayoutDetailsOpen(true);
+                } catch (e: any) {
+                  message.error(e?.message || "Failed to load payout method");
+                }
+              }}
+              className="w-full py-2 rounded-md bg-slate-800 text-white hover:bg-slate-700"
+            >
+              View Payout Method
+            </button>
+
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/stripe/connect", { method: "PUT" });
+                  const js = await res.json();
+                  if (js?.url) {
+                    window.location.href = js.url as string;
+                  } else {
+                    message.error(js?.error || "Failed to open update link");
+                  }
+                } catch (e) {
+                  message.error("Failed to open update link");
+                }
+              }}
+              className="w-full py-2 rounded-md bg-pink-600 text-white hover:bg-pink-500"
+            >
+              Update Payout Details
+            </button>
+          </div>
         </div>
+        {/* Payout Method Details Modal */}
+        <Modal
+          className={"payout-modal"}
+          title={<span className={`${orbitron.className} text-white`}>Payout Method Details</span>}
+          open={isPayoutDetailsOpen}
+          onCancel={() => setIsPayoutDetailsOpen(false)}
+          footer={null}
+        >
+          <div className="space-y-3 text-white">
+            {!payoutDetails?.connected && (
+              <p className="text-white/80">Stripe account not connected.</p>
+            )}
+            {payoutDetails?.connected && (
+              <div>
+                <p className="text-white/80">
+                  Payouts Enabled: {payoutDetails.payoutsEnabled ? "Yes" : "No"}
+                </p>
+                {Array.isArray(payoutDetails.bankAccounts) && payoutDetails.bankAccounts.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {payoutDetails.bankAccounts.map((ba) => (
+                      <div key={ba.id} className="rounded-md bg-white/5 p-2">
+                        <p className="text-white">
+                          {ba.bankName || "Bank"} •••• {ba.last4}
+                        </p>
+                        <p className="text-white/70 text-sm">
+                          {ba.country?.toUpperCase()} • {ba.currency?.toUpperCase()} {ba.defaultForCurrency ? "(default)" : ""}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-white/70">No bank account found.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </Modal>
       </div>
 
       <Modal
@@ -235,7 +375,7 @@ export default function EarningPage() {
             Request Payout
           </span>
         }
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
         closable={!isSubmitting}
@@ -243,26 +383,52 @@ export default function EarningPage() {
       >
         <Spin spinning={isSubmitting} tip="Submitting...">
           <div className="space-y-4 p-4">
+            {connectStatus && !connectStatus.connected && (
+              <div className="rounded-md bg-yellow-500/10 border border-yellow-500/30 p-3 text-yellow-200">
+                <p className="mb-2">You need to complete Stripe onboarding to receive payouts.</p>
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch("/api/stripe/connect", { method: "POST" });
+                      const js = await res.json();
+                      if (js?.url) {
+                        window.location.href = js.url as string;
+                      } else {
+                        message.error(js?.error || "Failed to start onboarding");
+                      }
+                    } catch (e) {
+                      message.error("Failed to start onboarding");
+                    }
+                  }}
+                  className="px-4 py-2 rounded-md bg-pink-600 hover:bg-pink-500 text-white"
+                >
+                  Start Stripe Onboarding
+                </button>
+              </div>
+            )}
             <p className="text-white/80">
               Enter the amount you wish to withdraw from your available balance
               of{" "}
               <strong className="text-green-400">
-                ${parseFloat(availableBalance).toFixed(2)}
+                ${parseFloat(String(availableBalance)).toFixed(2)}
               </strong>
               .
             </p>
             <InputNumber
               value={payoutAmount}
-              onChange={setPayoutAmount}
-              placeholder="e.g., 150.00"
+              onChange={(v) => setPayoutAmount(v)}
+              placeholder="Enter your payout amount"
               min={0.01}
-              max={parseFloat(availableBalance)}
               precision={2}
-              className="w-full !bg-gray-800 !text-white !border-gray-600 !h-12 !text-lg"
+              className="payout-input w-full !h-12 !text-lg"
+              style={{ backgroundColor: 'transparent', width: '100%' }}
             />
+            {exceedsBalance && (
+              <p className="text-red-400 text-sm mt-1">Amount exceeds available balance.</p>
+            )}
             <button
               onClick={handlePayoutRequest}
-              disabled={isSubmitting}
+              disabled={isSubmitting || invalidAmount}
               className="w-full mt-4 py-3 rounded-lg text-white text-xl font-semibold transition-all"
               style={{
                 background:

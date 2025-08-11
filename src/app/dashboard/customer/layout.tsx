@@ -24,6 +24,7 @@ import {
   Menu,
   Clock,
 } from "lucide-react";
+import { Toaster } from "sonner";
 
 const Dashboard = ({ children }: { children: React.ReactNode }) => {
   const store = useStore();
@@ -116,6 +117,9 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="bg-[#48182d] min-h-screen text-gray-200">
+
+<Toaster position="top-right" richColors />
+
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-[#3a0f2a] z-50 shadow-lg">
         <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
@@ -159,12 +163,14 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
         </div>
       </header>
 
+
+
+
       <div className="flex pt-16">
         {/* Sidebar */}
         <aside
-          className={`fixed top-16 bottom-0 left-0 z-40 bg-[#2a0a1e] transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? "w-64" : "w-20"
-          }`}
+          className={`fixed top-16 bottom-0 left-0 z-40 bg-[#2a0a1e] transition-all duration-300 ease-in-out ${isSidebarOpen ? "w-64" : "w-20"
+            }`}
         >
           <div className="h-full flex flex-col">
             <nav className="flex-grow p-2 space-y-1 mt-4">
@@ -172,9 +178,8 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-3 p-3 rounded-lg text-white hover:bg-white/10 transition-colors ${
-                    pathname === item.href ? "bg-white/15" : ""
-                  } ${!isSidebarOpen && "justify-center"}`}
+                  className={`flex items-center space-x-3 p-3 rounded-lg text-white hover:bg-white/10 transition-colors ${pathname === item.href ? "bg-white/15" : ""
+                    } ${!isSidebarOpen && "justify-center"}`}
                   title={item.label}
                 >
                   <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -188,9 +193,8 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
             <div className="p-2 border-t border-white/10">
               <button
                 onClick={handleLogout}
-                className={`w-full flex items-center space-x-3 p-3 rounded-lg text-white hover:bg-white/10 transition-colors ${
-                  !isSidebarOpen && "justify-center"
-                }`}
+                className={`w-full flex items-center space-x-3 p-3 rounded-lg text-white hover:bg-white/10 transition-colors ${!isSidebarOpen && "justify-center"
+                  }`}
               >
                 <LogOut className="w-5 h-5 flex-shrink-0" />
                 {isSidebarOpen && (
@@ -203,9 +207,8 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
 
         {/* Main Content */}
         <main
-          className={`flex-1 transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? "ml-64" : "ml-20"
-          }`}
+          className={`flex-1 transition-all duration-300 ease-in-out ${isSidebarOpen ? "ml-64" : "ml-20"
+            }`}
         >
           <div className="h-[calc(100vh-4rem)] overflow-y-auto">
             <div className="p-4 sm:p-6 lg:p-8">{children}</div>

@@ -15,21 +15,21 @@ export async function GET(
 ) {
   try {
     const order = await OrderService.getOrderById(params.id);
-
+    console.log(JSON.stringify(order))
     if (!order) {
       const response: ApiResponse<never> = {
         success: false,
         error: "Order not found",
       };
       return NextResponse.json(response, { status: 404 });
-    }
+ }
 
     const response: ApiResponse<OrderDetailDto> = {
       success: true,
       data: order,
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response,{status:200});
   } catch (error) {
     console.error("Error fetching order:", error);
 
