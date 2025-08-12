@@ -61,6 +61,9 @@ interface Order {
   updatedAt: string; // ISO date string
   isInQueue: boolean;
   subpackage: Subpackage;
+  // ELO fields are optional and may be null depending on the service/game
+  currentELO?: number | null;
+  targetELO?: number | null;
   // The following properties are from the OrderAssignment model but might not be on the initial queue object.
   // For this component, we primarily care about the queue data.
   // We'll assume the queue gives us the required count, but not who is assigned yet.
@@ -136,8 +139,8 @@ const OrderCard = ({
   return (
     <div className="p-px rounded-xl bg-gradient-to-br from-pink-500/50 via-purple-500/50 to-cyan-400/50">
       <div className="bg-[#1c0715] p-5 rounded-xl h-full">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 sm:gap-unset sm:flex-row justify-between items-start">
+          <div className="flex  items-center  gap-4">
             <img
               src={game.image || "/logo/logo.png"}
               alt={game.name}
@@ -166,6 +169,17 @@ const OrderCard = ({
                 {order.subpackage.name}
               </p>
             </div>
+            {order.currentELO != null && order.targetELO != null && (
+              <div>
+                <p className="text-xs text-gray-400 uppercase font-semibold">
+                  ELO
+                </p>
+                <p className="font-semibold text-orange-300 flex items-center gap-1">
+                  <Flame className="w-4 h-4" />
+                  {order.currentELO} 																										 									 	 	 		 		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 				 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 				 	 	 	 	 	 	 	 	 	 				 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 				 	 	 	 	 	 	 	 	 	 	 	 	 	 	 			 	 	 	 	 	 							 	 	 	 	 	 	 	 	 	 	 	 	 	 		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 		 	 	 					 	 	 	 	 	 	 	 	 	 	 	 	 	 	 			 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 → {order.targetELO}
+                </p>
+              </div>
+            )}
             <div>
               <p className="text-xs text-gray-400 uppercase font-semibold">
                 Price

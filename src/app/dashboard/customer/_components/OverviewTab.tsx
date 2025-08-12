@@ -16,6 +16,14 @@ import React from "react";
 
 import SafeImage from "@/components/ui/SafeImage";
 import { Toaster } from "sonner";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
 // --- Helper Functions & Components ---
 
 const getStatusIcon = (status: string) => {
@@ -77,8 +85,8 @@ const StatsCard = ({
   loading: any;
 }) => {
   return (
-    <div className="rounded-lg p-px bg-gradient-to-r from-pink-500/50 via-purple-500/50 to-cyan-400/50 hover:from-pink-500 hover:via-purple-500 hover:to-cyan-400 transition-all duration-300">
-      <div className="rounded-lg h-full bg-[#3a0f2a] p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]">
+    <div className="w-full rounded-lg p-px bg-gradient-to-r from-pink-500/50 via-purple-500/50 to-cyan-400/50 hover:from-pink-500 hover:via-purple-500 hover:to-cyan-400 transition-all duration-300">
+      <div className="w-full rounded-lg h-full bg-[#3a0f2a] p-4 md:p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]">
         {loading ? (
           <div className="flex items-center justify-between animate-pulse">
             <div>
@@ -88,13 +96,13 @@ const StatsCard = ({
             <div className="w-12 h-12 bg-white/20 rounded-full"></div>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
+          <div className="flex w-full items-center justify-between">
             <div>
-              <p className="text-sm text-gray-300">{title}</p>
-              <p className="text-3xl font-bold text-white mt-1">{value}</p>
+              <p className="text-xs sm:text-sm text-gray-300">{title}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-white mt-1">{value}</p>
             </div>
-            <div className="p-3 bg-white/10 rounded-full">
-              <Icon className="w-6 h-6 text-cyan-300" />
+            <div className="p-2 md:p-3 bg-white/10 rounded-full">
+              <Icon className="w-5 h-5 md:w-6 md:h-6 text-cyan-300" />
             </div>
           </div>
         )}
@@ -165,22 +173,22 @@ const OverviewTab = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full">
        
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className=" w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statsCards.map((card, index) => (
           <StatsCard key={index} {...card} loading={loadingOrders} />
         ))}
       </div>
 
       {/* Recent Orders Table */}
-      <div className="rounded-lg p-px bg-gradient-to-b from-white/10 to-transparent">
-        <div className="rounded-lg bg-[#2a0a1e] h-full shadow-2xl">
+      <div className=" w-full rounded-lg p-px bg-gradient-to-b overflow-x-auto from-white/10 to-transparent">
+        <div className=" rounded-lg bg-[#2a0a1e] w-full h-full shadow-2xl">
           {loadingOrders ? (
             <RecentOrdersSkeleton />
           ) : !ordersData?.orders?.length ? (
-            <div className="text-center py-20 px-6">
+            <div className=" text-center py-20 px-6">
               <Inbox className="w-16 h-16 mx-auto text-gray-500" />
               <h3 className="mt-4 text-2xl font-semibold text-white">
                 No Orders Yet
@@ -193,121 +201,88 @@ const OverviewTab = () => {
               </button>
             </div>
           ) : (
-            <div>
-              <div className="p-6 border-b border-white/10">
+            <div >
+              <div className="p-4 sm:p-6 border-b border-white/10">
                 <h3 className="text-xl font-semibold text-white flex items-center">
                   <Clock className="w-5 h-5 mr-3 text-cyan-300" /> Recent Orders
                 </h3>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px] text-sm text-left">
-                  <thead className="bg-white/5">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="py-3 px-6 font-semibold text-gray-300 uppercase tracking-wider"
-                      >
-                        Game & Service
-                      </th>
-                      <th
-                        scope="col"
-                        className="py-3 px-6 font-semibold text-gray-300 uppercase tracking-wider"
-                      >
-                        Package
-                      </th>
-                      <th
-                        scope="col"
-                        className="py-3 px-6 font-semibold text-gray-300 uppercase tracking-wider"
-                      >
-                        Providers
-                      </th>
-                      <th
-                        scope="col"
-                        className="py-3 px-6 font-semibold text-gray-300 uppercase tracking-wider"
-                      >
-                        Price
-                      </th>
-                      <th
-                        scope="col"
-                        className="py-3 px-6 font-semibold text-gray-300 uppercase tracking-wider"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        className="py-3 px-6 font-semibold text-gray-300 uppercase tracking-wider text-center"
-                      >
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {ordersData.orders.map((order: CustomerOrderListDto) => (
-                      <tr
-                        key={order.id}
-                        className="hover:bg-white/5 transition-colors duration-200"
-                      >
-                        <td className="py-4 px-6">
-                          <div className="flex items-center space-x-3">
-                            <SafeImage
-                              placeholder="/images/placeholder.png"
-                              src={
-                                order?.subpackage?.service?.game?.image ||
-                                "/logo/logo.png"
-                              }
-                              className="w-10 h-10 rounded-md object-cover"
-                              alt={order?.subpackage?.service?.game?.name}
-                            />
-                            <div>
-                              <div className="font-semibold text-white">
-                                {order?.subpackage?.service?.game?.name}
-                              </div>
-                              <div className="text-gray-400">
-                                {order?.subpackage?.service?.name}
-                              </div>
+              <div className="overflow-x-scroll">
+                <Table className=" text-left text-xs sm:text-sm">
+                <TableHeader className="bg-white/5">
+                  <TableRow>
+                    <TableHead className="py-3 px-3 sm:px-6">Game & Service</TableHead>
+                    <TableHead className="py-3 px-3 sm:px-6">Package</TableHead>
+                    <TableHead className="py-3 px-3 sm:px-6">Providers</TableHead>
+                    <TableHead className="py-3 px-3 sm:px-6">Price</TableHead>
+                    <TableHead className="py-3 px-3 sm:px-6">Status</TableHead>
+                    <TableHead className="py-3 px-3 sm:px-6 text-center">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className=" divide-y divide-white/10">
+                  {ordersData.orders.map((order: CustomerOrderListDto) => (
+                    <TableRow key={order.id} className="hover:bg-white/5 transition-colors duration-200">
+                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6">
+                        <div className="flex items-center space-x-3">
+                          <SafeImage
+                            placeholder="/images/placeholder.png"
+                            src={
+                              order?.subpackage?.service?.game?.image ||
+                              "/logo/logo.png"
+                            }
+                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-md object-cover"
+                            alt={order?.subpackage?.service?.game?.name}
+                          />
+                          <div>
+                            <div className="font-semibold text-white">
+                              {order?.subpackage?.service?.game?.name}
+                            </div>
+                            <div className="text-gray-400">
+                              {order?.subpackage?.service?.name}
                             </div>
                           </div>
-                        </td>
-                        <td
-                          className="py-4 px-6 font-medium text-gray-300 max-w-[200px] truncate"
-                          title={order?.subpackage?.name}
+                        </div>
+                      </TableCell>
+                      <TableCell
+                        className="py-3 px-3 sm:py-4 sm:px-6 font-medium text-gray-300 max-w-[200px] truncate"
+                        title={order?.subpackage?.name}
+                      >
+                        {order?.subpackage?.name}
+                      </TableCell>
+                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6 text-gray-300">
+                        {getProviderDisplay(order)}
+                      </TableCell>
+                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6 font-semibold text-white">
+                        $ {order?.price.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6">
+                        <span
+                          className={`py-1.5 px-3 text-xs font-bold rounded-full inline-flex items-center gap-2 ${getStatusColor(
+                            order.status
+                          )}`}
                         >
-                          {order?.subpackage?.name}
-                        </td>
-                        <td className="py-4 px-6 text-gray-300">
-                          {getProviderDisplay(order)}
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-white">
-                          $ {order?.price.toFixed(2)}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`py-1.5 px-3 text-xs font-bold rounded-full inline-flex items-center gap-2 ${getStatusColor(
-                              order.status
-                            )}`}
-                          >
-                            {getStatusIcon(order.status)}
-                            <span className="capitalize">
-                              {order.status.replace("_", " ").toLowerCase()}
-                            </span>
+                          {getStatusIcon(order.status)}
+                          <span className="capitalize">
+                            {order.status.replace("_", " ").toLowerCase()}
                           </span>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <Link
-                            className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs"
-                            href={
-                              order.status === "PENDING"
-                                ? `/dashboard/customer/orders/${order.id}/pending`
-                                : `/dashboard/customer/orders/${order.id}`
-                            }
-                          >
-                            View Details
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6 text-center">
+                        <Link
+                          className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs"
+                          href={
+                            order.status === "PENDING"
+                              ? `/dashboard/customer/orders/${order.id}/pending`
+                              : `/dashboard/customer/orders/${order.id}`
+                          }
+                        >
+                          View Details
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
               </div>
             </div>
           )}

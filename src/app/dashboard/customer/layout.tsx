@@ -166,14 +166,14 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
 
 
 
-      <div className="flex pt-16">
+      <div className="flex pt-32 md:pt-16">
         {/* Sidebar */}
         <aside
-          className={`fixed top-16 bottom-0 left-0 z-40 bg-[#2a0a1e] transition-all duration-300 ease-in-out ${isSidebarOpen ? "w-64" : "w-20"
+          className={`fixed top-16 bottom-0 left-0 z-40 bg-[#2a0a1e] transition-all duration-300 ease-in-out hidden md:block ${isSidebarOpen ? "w-64" : "w-20"
             }`}
         >
           <div className="h-full flex flex-col">
-            <nav className="flex-grow p-2 space-y-1 mt-4">
+            <nav className=" sm:flex-grow p-2 space-y-1 mt-4">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -207,13 +207,39 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
 
         {/* Main Content */}
         <main
-          className={`flex-1 transition-all duration-300 ease-in-out ${isSidebarOpen ? "ml-64" : "ml-20"
+          className={` flex-1 transition-all duration-300 ease-in-out ml-0 ${isSidebarOpen ? "md:ml-64" : "md:ml-20"
             }`}
         >
-          <div className="h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+          <div className="h-[calc(100vh-4rem)] ">
+            <div className="p-4 sm:p-6 lg:p-8 pb-0">{children}</div>
           </div>
         </main>
+
+        {/* Mobile Top Navigation */}
+        <nav className="fixed top-16 left-0 right-0 z-40 bg-[#2a0a1e] border-b border-white/10 md:hidden">
+          <div className="flex justify-around items-center h-16 px-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center justify-center ${
+                  pathname === item.href ? "text-white" : "text-white/70"
+                }`}
+                title={item.label}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="text-[10px] mt-1">{item.label}</span>
+              </Link>
+            ))}
+            <button
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center text-white/90"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-[10px] mt-1">Logout</span>
+            </button>
+          </div>
+        </nav>
       </div>
     </div>
   );

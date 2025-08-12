@@ -15,6 +15,8 @@ import {
   Star,
   Cog,
 } from "lucide-react";
+import { PanelLeftIcon } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 // Main Profile Sidebar
 import { ProfileSidebar } from "./components/profile-sidebar";
@@ -58,11 +60,35 @@ export default function Dashboard() {
 
         {/* --- SCROLLABLE MAIN CONTENT --- */}
         <main className="flex-1 min-w-0">
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="py-4 sm:py-6 lg:py-8 px-1 sm:px-2 lg:px-3">
+            {/* --- MOBILE SIDEBAR TOGGLE + GREETING --- */}
+            <div className="flex items-center gap-3 lg:hidden mb-4 px-4 sm:px-8 lg:px-12">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="bg-white/10 hover:bg-white/20"
+                    aria-label="Open profile sidebar"
+                  >
+                    <PanelLeftIcon className="w-5 h-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-80 sm:max-w-sm">
+                  <ProfileSidebar />
+                </SheetContent>
+                <SheetTrigger asChild>
+                  <button className="text-xl font-semibold truncate">
+                    Welcome back, {user?.username || "Provider"}!
+                  </button>
+                </SheetTrigger>
+              </Sheet>
+            </div>
+
             {/* --- MAIN HEADER --- */}
-            <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+            <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 px-4 sm:px-8 lg:px-12">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">
+                <h1 className="text-3xl font-bold tracking-tight hidden lg:block">
                   Welcome back, {user?.username || "Provider"}!
                 </h1>
                 <p className="text-gray-400 mt-1">
@@ -77,13 +103,13 @@ export default function Dashboard() {
               onValueChange={setActiveTab}
               className="relative"
             >
-              <div className="sticky top-0 z-10 bg-[#3A0F2A]/50 backdrop-blur-lg py-2 -mx-8 px-8">
-                <TabsList className="p-1.5 h-auto bg-black/30 border border-white/10 rounded-xl grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
+              <div className="w-full sticky top-0 z-10 py-2  ">
+                <TabsList className="w-full py-1.5 h-auto bg-black/30 backdrop-blur-2xl border border-white/10 rounded-xl flex flex-wrap items-center gap-3">
                   {TABS.map(({ value, label, icon: Icon }) => (
                     <TabsTrigger
                       key={value}
                       value={value}
-                      className="w-full h-12 flex flex-col sm:flex-row items-center justify-center gap-2 px-2 text-gray-300 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-purple-600/20 transition-all duration-300"
+                      className="w-[80%] h-12 flex flex-col sm:flex-row items-center justify-center gap-2 px-2 text-gray-300 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-purple-600/20 transition-all duration-300"
                     >
                       <Icon className="w-4 h-4" />
                       <span className="text-xs sm:text-sm">{label}</span>

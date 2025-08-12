@@ -49,114 +49,6 @@ export async function GET(
 }
 
 
-
-// Update the assignment status from customer point of view. only able to change to "replaced", "Approved" & "Verified"
-
-
-// export async function PUT(
-//   request: NextRequest,
-//   { params }: { params: { id: string; assignmentId: string } }
-// ) {
-//   try {
-//     const body: AssignmentUpdateRequest = await request.json();
-//     const cookie = (await cookies()).get("session")?.value;
-
-//     const session = await decrypt(cookie);
-//     console.log('SESSION LOGGED SHABIR: ', session)
-//     const userId = session?.userId as string;
-//     if (!session?.userId) {
-//       return NextResponse.json({ error: "Missing session cookie", success: false }, { status: 401 });
-//     }
-//     const tipAmount = body?.tipAmount;
-
-//     if (!userId) {
-//       return NextResponse.json({ error: "Invalid session", success: false }, { status: 401 });
-//     }
-
-//     const { gamePlay, communication, attitude, reviewText } = body;
-
-//     if (
-//       typeof gamePlay !== "number" ||
-//       typeof communication !== "number" ||
-//       typeof attitude !== "number"
-//     ) {
-//       return NextResponse.json(
-//         { error: "Missing or invalid rating fields" },
-//         { status: 400 }
-//       );
-//     }
-    
-//     const reviewRating = (gamePlay + communication + attitude) / 3;
-    
-//     const update = await prisma.orderAssignment.update({
-//       where: { id: params.assignmentId },
-//       data: {
-//         reviewRating,
-//         reviewText,
-//         gamePlay,
-//         communication,
-//         attitude,
-//       },
-//     });
-
-//     if (!update) {
-//       toast('Review Update could be successful');
-//       return NextResponse.json({ success: false, error: "Update failed" }, { status: 500 });
-//     }
-
-//     // Handle tip balance deduction
-//     if (tipAmount) {
-//       const currentBalance = await getWalletBalance(userId);
-
-//       if (currentBalance.lessThan(tipAmount)) {
-//         return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
-//       }
-
-//       const updatedWallet = await prisma.wallet.update({
-//         where: { userId },
-//         data: {
-//           balance: {
-//             decrement: tipAmount,
-//           },
-//         },
-//       });
-
-//       if(updatedWallet) {
-//         const updatedAssignmentTip = await prisma.orderAssignment.update({
-//           where: {id: params.assignmentId},
-//           data: {
-//             tipAmount: tipAmount,
-//           }
-//         });
-
-//         if(!updatedAssignmentTip) {
-//           toast('Your tip could not be sent');
-//           return NextResponse.json('Your tip could not be sent', {status: 500});
-//         } 
-
-//         toast('Tip sent sucessfully!');
-//       }
-
-//       return NextResponse.json({ success: true, updatedWallet }, { status: 200 });
-//     }
-
-//     // If no tip, just return the updated assignment
-//     toast('Review updated successfully');
-//     return NextResponse.json({ success: true, update }, { status: 200 });
-
-//   } catch (error) {
-//     console.error("Error updating assignment:", error);
-//     const response: ApiResponse<never> = {
-//       success: false,
-//       error: "Failed to update assignment",
-//     };
-
-//     toast('Error updating assignment')
-//     return NextResponse.json(response, { status: 500 });
-//   }
-// }
-
-
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string; assignmentId: string } }
@@ -190,10 +82,6 @@ export async function PUT(
       );
     }
 
-    // if (reviewText === '') {
-    //   return NextResponse.json('Review description is must', {status: 404});
-    // }
-    
     const reviewRating = (gamePlay + communication + attitude) / 3;
     
     const updatedReview = await prisma.orderAssignment.update({

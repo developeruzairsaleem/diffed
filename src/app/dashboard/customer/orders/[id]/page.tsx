@@ -40,6 +40,20 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  
+  // Add wallet refetch function
+  const fetchWallet = async () => {
+    try {
+      const response = await fetch('/api/wallet/');
+      const walletData = await response.json();
+      if (walletData && !walletData.error) {
+        store.setWallet(walletData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch wallet:', error);
+    }
+  };
+
   const handleApproveAssignment = async (assingmentId: string) => {
     setApprovingId(assingmentId);
     try {
@@ -67,6 +81,8 @@ export default function OrderDetailPage() {
       message.success("Successfully Approved!");
       // Refetch order to update UI
       await fetchOrder();
+      // Also refetch wallet to ensure balance is up-to-date
+      await fetchWallet();
     } catch (error) {
       console.error("something went wrong", error);
       message.error("Something went wrong updating.");
@@ -98,8 +114,23 @@ export default function OrderDetailPage() {
   useEffect(() => {
     if (orderId) {
       fetchOrder();
+      fetchWallet(); // Also fetch wallet data to ensure it's up-to-date
     }
   }, [orderId]);
+
+  // Add effect to refresh wallet when user returns to the page
+  useEffect(() => {
+    const handleFocus = () => {
+      // Refresh wallet data when user returns to the page
+      fetchWallet();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   // --------------------------------------------------
   // status color depending on the current order status

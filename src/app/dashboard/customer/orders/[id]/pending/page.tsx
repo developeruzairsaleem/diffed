@@ -396,7 +396,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingAssignmentId, setProcessingAssignmentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchOrder = useCallback(
@@ -454,7 +454,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
 
   const handleAccept = useCallback(
     async (assignmentId: string) => {
-      setIsProcessing(true);
+      setProcessingAssignmentId(assignmentId);
       try {
         const response = await fetch(
           `/api/orders/${orderId}/assignments/${assignmentId}/approve`,
@@ -484,7 +484,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
         console.error("Error accepting provider:", err);
         setError(err.message);
       } finally {
-        setIsProcessing(false);
+        setProcessingAssignmentId(null);
       }
     },
     [orderId]
@@ -494,7 +494,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
     async (assignmentId: string) => {
       if (!order || order.rerollsLeft <= 0) return;
 
-      setIsProcessing(true);
+      setProcessingAssignmentId(assignmentId);
       try {
         const response = await fetch(
           `/api/orders/${orderId}/assignments/${assignmentId}/decline`,
@@ -524,7 +524,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
         console.error("Error declining provider:", err);
         setError(err.message);
       } finally {
-        setIsProcessing(false);
+        setProcessingAssignmentId(null);
       }
     },
     [orderId, order]
@@ -626,7 +626,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
                 onAccept={handleAccept}
                 onDecline={handleDecline}
                 rerollsLeft={order.rerollsLeft}
-                isProcessing={isProcessing}
+                isProcessing={processingAssignmentId === assignment.id}
               />
             ))}
           </div>

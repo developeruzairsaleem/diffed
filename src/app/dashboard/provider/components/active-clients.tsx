@@ -69,7 +69,7 @@ export function ActiveClients() {
             {clients.map((assignment) => (
               <div
                 key={assignment.id}
-                className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="flex flex-col sm:flex-row items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center space-x-4">
                   <Avatar className="w-12 h-12 border-2 border-pink-500/50">
