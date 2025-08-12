@@ -6,8 +6,10 @@ import {
   DropdownMenuItem,
 } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import NavButtons from "./NavButtons";
+import { X } from "lucide-react";
 const games = [
   { name: "Valorant", href: "/valorant" },
   { name: "CS2", href: "/cs2" },
@@ -20,9 +22,27 @@ const games = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [gamesOpen, setGamesOpen] = useState(false);
+  const [mobileGamesOpen, setMobileGamesOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
   return (
     <nav className="w-full sticky top-0 z-50 bg-[#581742]/90 backdrop-blur">
-      <div className="flex justify-between max-w-8xl py-8 w-full px-6 mx-auto">
+      <div className=" flex justify-between max-w-8xl py-8 w-full px-6 mx-auto">
         <Link href="/">
           <img src="/logo/logo.png" alt="Logo image" className="h-14 w-auto" />
         </Link>
@@ -107,51 +127,99 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
-      {mobileOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 z-40 flex flex-col items-center pt-32">
-          <ul className="main_nav uppercase text-2xl flex flex-col gap-8 mb-8">
-            <li onClick={() => setMobileOpen(false)}>Home</li>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <li className="relative flex items-center cursor-pointer select-none">
-                  Games
-                  <svg
-                    className="ml-1 w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
+      {/* Mobile Drawer via Portal to ensure proper fixed positioning */}
+      {isMounted && mobileOpen &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-[60] bg-black/50 lg:hidden"
+              onClick={() => setMobileOpen(false)}
+            />
+            <div className="fixed top-0 right-0 bottom-0 lg:hidden z-[70] w-full max-w-[400px] bg-[#581742]/95 backdrop-blur-md pl-10 pr-6  pb-10 flex flex-col overflow-y-auto h-screen">
+              <div className="ml-auto mt-12" onClick={() => setMobileOpen(false)}>
+               <X />
+              </div>
+              <ul className="pt-28 uppercase text-xl sm:text-2xl flex flex-col gap-6 ">
+                <li>
+                  <Link
+                    href="/"
+                    className="block w-full py-2 text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMobileOpen(false)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                    Home
+                  </Link>
                 </li>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black border border-gray-700 rounded-md mt-2 min-w-[180px] py-2 z-50">
-                {games.map((game) => (
-                  <DropdownMenuItem key={game.name} asChild>
-                    <Link
-                      href={game.href}
-                      className="block px-4 py-2 text-white hover:bg-gray-800 transition-colors w-full text-left"
-                      onClick={() => setMobileOpen(false)}
+                <li>
+                  <button
+                    className="w-full flex items-center gap-6 py-2 text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMobileGamesOpen((v) => !v)}
+                    aria-expanded={mobileGamesOpen}
+                    aria-controls="mobile-games-list"
+                  >
+                    <span>GAMES</span>
+                    <svg
+                      className={`ml-2 w-5 h-5 transition-transform ${
+                        mobileGamesOpen ? "rotate-180" : "rotate-0"
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
                     >
-                      {game.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <li onClick={() => setMobileOpen(false)}>Features</li>
-            <li onClick={() => setMobileOpen(false)}>Customer Reviews</li>
-            <li onClick={() => setMobileOpen(false)}>About</li>
-          </ul>
-          <NavButtons />
-        </div>
-      )}
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {mobileGamesOpen && (
+                    <ul id="mobile-games-list" className="mt-2 pl-4 flex flex-col gap-3">
+                      {games.map((game) => (
+                        <li key={game.name}>
+                          <Link
+                            href={game.href}
+                            className="block w-full py-2 text-white/90 hover:text-white transition-colors"
+                            onClick={() => setMobileOpen(false)}
+                          >
+                            {game.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+                <li>
+                  <Link
+                    href="#why-us"
+                    className="block w-full py-2 text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#customer-reviews"
+                    className="block w-full py-2 text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Customer Reviews
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about"
+                    className="block w-full py-2 text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    About
+                  </Link>
+                </li>
+              </ul>
+              <div className="mt-8">
+                <NavButtons />
+              </div>
+            </div>
+          </>,
+          document.body
+        )}
     </nav>
   );
 }

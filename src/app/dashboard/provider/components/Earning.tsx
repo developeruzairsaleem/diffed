@@ -182,7 +182,7 @@ export default function EarningPage() {
           <h3 className={`${orbitron.className} text-2xl`}>
             AVAILABLE BALANCE
           </h3>
-          <div className="flex items-end justify-between mt-2">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:items-end justify-between mt-2">
             <h3 className={`${orbitron.className} text-5xl`}>
               ${toNum(availableBalance).toFixed(2)}
             </h3>

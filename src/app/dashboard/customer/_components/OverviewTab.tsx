@@ -28,7 +28,9 @@ import Link from "next/link";
 import React, { useMemo } from "react";
 
 import SafeImage from "@/components/ui/SafeImage";
+
 import { orbitron } from "@/fonts/fonts";
+
 // --- Helper Functions & Components ---
 
 const getStatusIcon = (status: string) => {
@@ -94,6 +96,7 @@ const StatsCard = ({
   loading: boolean;
 }) => {
   return (
+
     <div
       className="rounded-xl p-1 transition-all duration-300 hover:scale-105"
       style={{
@@ -102,6 +105,7 @@ const StatsCard = ({
       }}
     >
       <div className="bg-[#5E2047] rounded-xl p-6 h-full">
+
         {loading ? (
           <div className="animate-pulse">
             <div className="flex items-center justify-between mb-4">
@@ -112,6 +116,7 @@ const StatsCard = ({
             <div className="h-8 w-16 bg-gray-600 rounded"></div>
           </div>
         ) : (
+
           <>
             <div className="flex items-center justify-between mb-4">
               <div
@@ -129,6 +134,7 @@ const StatsCard = ({
                   {trend}
                 </span>
               )}
+
             </div>
           </>
         )}
@@ -396,6 +402,7 @@ const OverviewTab = () => {
   }
 
   return (
+
     <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Welcome Card */}
@@ -600,6 +607,7 @@ const OverviewTab = () => {
                     </div>
                   </>
                 )}
+
               </div>
             </div>
           </div>

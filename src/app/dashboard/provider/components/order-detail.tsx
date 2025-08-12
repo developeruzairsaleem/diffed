@@ -21,6 +21,7 @@ import {
   Upload,
   Store,
   Router,
+  Flame,
 } from "lucide-react";
 import { orbitron } from "@/fonts/fonts";
 import { Label } from "@/components/ui/label";
@@ -87,6 +88,15 @@ const OrderDetailsCard = ({ order }: { order: any }) => (
           ${order.price.toFixed(2)}
         </span>
       </p>
+      {order?.currentELO != null && order?.targetELO != null && (
+        <p className="text-white/70">
+          <strong>ELO:</strong>{" "}
+          <span className="font-bold text-orange-300 inline-flex items-center gap-1">
+            <Flame className="w-4 h-4" />
+            {order.currentELO} → {order.targetELO}
+          </span>
+        </p>
+      )}
       <p className="text-white/70">
         <strong>Order Status:</strong>{" "}
         <span className="font-bold text-yellow-400">{order.status}</span>

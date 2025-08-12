@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { Flame } from "lucide-react";
 
 // Helper function to get status colors
 const getStatusVariant = (status: any) => {
@@ -74,6 +75,17 @@ export function OrderAssignmentCard({ assignment }: { assignment: any }) {
               )}
             </div>
           </div>
+          {order?.currentELO != null && order?.targetELO != null && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-white/60 uppercase text-xs font-semibold">
+                ELO
+              </span>
+              <span className="font-semibold text-orange-300 flex items-center gap-1">
+                <Flame className="w-4 h-4" />
+                {order.currentELO} → {order.targetELO}
+              </span>
+            </div>
+          )}
           <p className="text-sm text-white/60">
             <span className="font-bold text-white/80">Order ID:</span>{" "}
             {orderNumber}
