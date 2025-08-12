@@ -537,9 +537,53 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
-        <p className="text-gray-400 text-lg">Loading your order...</p>
+      <div className="space-y-8 animate-pulse">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <div className="h-6 w-40 bg-gray-700 rounded mb-2"></div>
+            <div className="h-4 w-64 bg-gray-700 rounded"></div>
+          </div>
+          <div className="h-10 w-36 bg-gray-700 rounded"></div>
+        </div>
+
+        {/* Order Notes */}
+        <div className="h-28 bg-gray-800/60 rounded-lg"></div>
+
+        {/* Queue Status */}
+        <div className="h-60 bg-gray-800/60 rounded-lg"></div>
+
+        {/* Pending Applicants (simulate 2 cards) */}
+        {[...Array(2)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-gradient-to-r p-1 rounded-lg from-pink-600 via-purple-400 to-cyan-400"
+          >
+            <div className="bg-[#3A0F2A] p-6 rounded-lg space-y-4">
+              <div className="h-6 w-32 bg-gray-700 rounded mx-auto"></div>
+              <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
+                <div className="flex flex-col sm:flex-row items-center gap-4 flex-1">
+                  <div className="w-24 h-24 bg-gray-700 rounded-xl"></div>
+                  <div className="space-y-2 w-full sm:w-auto">
+                    <div className="h-5 w-32 bg-gray-700 rounded"></div>
+                    <div className="h-4 w-28 bg-gray-700 rounded"></div>
+                    <div className="h-4 w-36 bg-gray-700 rounded"></div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-3 w-full lg:w-auto lg:min-w-[280px]">
+                  <div className="h-12 bg-gray-700 rounded"></div>
+                  <div className="h-12 bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Approved Team Section */}
+        <div className="space-y-4">
+          <div className="h-6 w-40 bg-gray-700 rounded"></div>
+          <div className="h-16 bg-gray-800/60 rounded-lg"></div>
+        </div>
       </div>
     );
   }

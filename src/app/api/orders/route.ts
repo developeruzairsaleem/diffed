@@ -67,6 +67,9 @@ export async function POST(request: NextRequest) {
       discordUsername,
       discordTag,
       notes,
+      finalPrice,
+      currentELO,
+      targetELO,
     } = await request.json();
 
     if (
@@ -137,7 +140,9 @@ export async function POST(request: NextRequest) {
       data: {
         customerId: session?.userId as string,
         subpackageId: subpackageId,
-        price: subpackage.price,
+        price: finalPrice,
+        currentELO,
+        targetELO: targetELO,
         requiredCount: subpackage.requiredProviders,
         discordTag: discordTag,
         discordUsername: discordUsername,
@@ -154,7 +159,7 @@ export async function POST(request: NextRequest) {
         data: {
           walletId: userWallet.id,
           type: "payment",
-          amount: subpackage.price,
+          amount: finalPrice,
           description: `Order payment for subpackage ${subpackage.name}`,
           stripePaymentIntentId: paymentIntentId,
           status: "completed",

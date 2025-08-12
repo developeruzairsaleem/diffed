@@ -156,7 +156,7 @@ export default function ChatInterface({
             <div className="flex items-center space-x-3">
               <Gamepad2 className="h-6 w-6 text-white" />
               <div>
-                <CardTitle className="text-white game-title">
+                <CardTitle className="text-white ">
                   Order #{orderNumber.slice(-8)}
                 </CardTitle>
                 <p className="text-sm text-white/80 flex items-center gap-2">

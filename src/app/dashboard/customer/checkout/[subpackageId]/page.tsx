@@ -2,7 +2,7 @@
 import { lato, orbitron, poppins } from "@/fonts/fonts";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -43,12 +43,18 @@ interface CheckoutFormProps {
   onPaymentSuccess?: (paymentMethodId: string) => void;
   subpackage: any;
   clientSecret: string;
+  currentELO: number;
+  targetELO: number;
+  finalPrice: number;
 }
 
 function CheckoutForm({
   onPaymentSuccess,
   clientSecret,
   subpackage,
+  currentELO,
+  targetELO,
+  finalPrice,
 }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
@@ -129,6 +135,9 @@ function CheckoutForm({
             discordTag: data.discordTag,
             notes: data.notes,
             discordUsername: data.username,
+            currentELO,
+            targetELO,
+            finalPrice,
           }),
         });
         const orderJson = await orderRes.json();
@@ -339,11 +348,15 @@ function CheckoutForm({
 // --------------
 export default function CheckoutPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const subpackageId = params?.subpackageId;
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [clientSecret, setClientSecret] = useState("");
+  const [currentELO, setCurrentELO] = useState(0);
+  const [targetELO, setTargetELO] = useState(0);
   const [subpackage, setSubpackage] = useState({});
+  const [finalPrice, setFinalPrice] = useState(0);
   const router = useRouter();
   const store = useStore();
   const stripePromise = loadStripe(
@@ -358,10 +371,20 @@ export default function CheckoutPage() {
     async function fetchPackageAndCreateIntent() {
       setLoading(true);
       try {
-        const response = await fetch(
-          `/api/create-payment-intent?subpackageId=${subpackageId}&email=${store.user?.email}`,
-          { method: "GET" }
-        );
+        const currentELO = Number(searchParams?.get("currentELO"));
+        const targetELO = Number(searchParams?.get("targetELO"));
+        let response;
+        if (!currentELO && !targetELO) {
+          response = await fetch(
+            `/api/create-payment-intent?subpackageId=${subpackageId}&email=${store.user?.email}`,
+            { method: "GET" }
+          );
+        } else {
+          response = await fetch(
+            `/api/create-payment-intent?subpackageId=${subpackageId}&email=${store.user?.email}&currentELO=${currentELO}&targetELO=${targetELO}`,
+            { method: "GET" }
+          );
+        }
         const intentResponse = await response.json();
         if (!intentResponse?.success) {
           setPageError(
@@ -372,6 +395,11 @@ export default function CheckoutPage() {
         }
         setClientSecret(intentResponse.data.clientSecret);
         setSubpackage(intentResponse.data.subpackage);
+        if (intentResponse.data.currentELO || intentResponse.data.targetELO) {
+          setCurrentELO(intentResponse.data.currentELO);
+          setTargetELO(intentResponse.data.targetELO);
+          setFinalPrice(intentResponse.data.finalPrice);
+        }
       } catch (error) {
         console.error(error);
         setPageError("Something went wrong");
@@ -463,6 +491,13 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {(currentELO || targetELO) && (
+            <div className="sm:pl-6 text-[22px] my-7">
+              <div className="mb-4">Current ELO: {currentELO}</div>
+              <div>Target ELO: {targetELO}</div>
+            </div>
+          )}
+
           {/* Price breakdown info */}
           <div className="sm:pl-6 text-[24px] mt-12">
             <h4 className="mb-6">Price Breakdown:</h4>
@@ -475,9 +510,14 @@ export default function CheckoutPage() {
               <ul style={{ lineHeight: "230%" }}>
                 {/* @ts-ignore */}
                 <li>${subpackage.price}</li>
-                <li>$0</li>
-                {/* @ts-ignore */}
-                <li>${subpackage.price}</li>
+                <li>
+                  {/* @ts-ignore */}$
+                  {currentELO || targetELO ? finalPrice - subpackage.price : 0}
+                </li>
+                <li>
+                  {/* @ts-ignore */}$
+                  {currentELO || targetELO ? finalPrice : subpackage.price}
+                </li>
               </ul>
             </div>
           </div>
@@ -486,7 +526,10 @@ export default function CheckoutPage() {
           {clientSecret && (
             <Elements stripe={stripePromise}>
               <CheckoutForm
+                currentELO={currentELO}
+                targetELO={targetELO}
                 subpackage={subpackage}
+                finalPrice={finalPrice}
                 clientSecret={clientSecret}
               />
             </Elements>

@@ -15,6 +15,7 @@ import { useState } from "react";
 import Link from "next/link";
 import SafeImage from "@/components/ui/SafeImage";
 import { OrdersSkeleton } from "@/components/ui/OrdersSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -63,7 +64,123 @@ const OrdersTab = () => {
   });
 
   if (loadingOrders) {
-    return <OrdersSkeleton />;
+    return (
+      <div className="space-y-6 mb-20 flex flex-col">
+        <div
+          className="rounded-lg flex-1 mt-auto"
+          style={{
+            padding: "1px",
+            background:
+              "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+          }}
+        >
+          <div
+            style={{
+              padding: "1px",
+              background:
+                "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+            }}
+            className="h-full rounded-lg"
+          >
+            <div className="rounded-lg h-full bg-[#52103A]">
+              <div
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+                className="rounded-lg h-full shadow-sm w-full"
+              >
+                {/* Header */}
+                <div className="p-6 border-gray-200">
+                  <h3 className="text-xl font-semibold text-white flex items-center">
+                    <Clock className="w-5 h-5 mr-2" /> Orders
+                  </h3>
+                </div>
+
+                {/* Table Skeleton */}
+                <div className="p-6 overflow-x-auto w-full">
+                  <table
+                    className="w-full min-w-[600px] text-left"
+                    style={{ borderCollapse: "separate", borderSpacing: 0 }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          borderBottom: "3px solid",
+                          borderImage:
+                            "linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%) 1",
+                        }}
+                      >
+                        {[
+                          "Game",
+                          "Service",
+                          "Package",
+                          "Boosters/Coaches",
+                          "Price",
+                          "Status",
+                          "View",
+                        ].map((header) => (
+                          <th
+                            key={header}
+                            className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg"
+                          >
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.from({ length: 6 }).map((_, idx) => (
+                        <tr
+                          key={idx}
+                          className="hover:bg-white/5 transition-colors duration-200"
+                        >
+                          {/* Game */}
+                          <td className="py-4 px-4">
+                            <div className="flex items-center space-x-3">
+                              <Skeleton className="w-10 h-10 rounded-md bg-[#3A0F2A]" />
+                              <Skeleton className="h-4 w-24 rounded-md bg-[#3A0F2A] " />
+                            </div>
+                          </td>
+                          {/* Service */}
+                          <td className="py-4 px-4">
+                            <Skeleton className="h-4 w-28 rounded-md bg-[#3A0F2A]" />
+                          </td>
+                          {/* Package */}
+                          <td className="py-4 px-4">
+                            <Skeleton className="h-4 w-36 rounded-md bg-[#3A0F2A]" />
+                          </td>
+                          {/* Boosters/Coaches */}
+                          <td className="py-4 px-4">
+                            <Skeleton className="h-4 w-32 rounded-md bg-[#3A0F2A]" />
+                          </td>
+                          {/* Price */}
+                          <td className="py-4 px-4">
+                            <Skeleton className="h-4 w-16 rounded-md bg-[#3A0F2A]" />
+                          </td>
+                          {/* Status */}
+                          <td className="py-4 px-4">
+                            <Skeleton className="h-6 w-20 rounded-full  bg-[#3A0F2A]" />
+                          </td>
+                          {/* View */}
+                          <td className="py-4 px-4">
+                            <Skeleton className="h-8 w-24 rounded-lg  bg-[#3A0F2A]" />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Pagination Skeleton */}
+                  <div className="flex justify-center items-center gap-4 mt-6">
+                    <Skeleton className="h-10 w-24 rounded-lg bg-[#3A0F2A]" />
+                    <Skeleton className="h-6 w-16 rounded-md bg-[#3A0F2A]" />
+                    <Skeleton className="h-10 w-24 rounded-lg  bg-[#3A0F2A]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

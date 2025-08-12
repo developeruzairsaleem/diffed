@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { lato, orbitron } from "@/fonts/fonts";
-import { message, Modal } from "antd";
+import { message } from "antd";
 import SafeImage from "@/components/ui/SafeImage";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SkeletonLoader from "@/components/ui/SkeletonLoader"; // 1. Import the skeleton
 
@@ -14,12 +13,39 @@ const GamesComponent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSubpackage, setSelectedSubpackage] = useState<any>(null);
   const [isPaying, setIsPaying] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [currentELO, setCurrentELO] = useState<number>(0);
+  const [targetELO, setTargetELO] = useState<number>(0);
   const router = useRouter();
 
   // Reset active package index when game changes
   useEffect(() => {
     setSelectedServiceIndex(0);
   }, [selectedGame]);
+
+  // Reset ELO values when subpackage changes
+  useEffect(() => {
+    if (selectedSubpackage) {
+      setCurrentELO(selectedSubpackage.minELO || 0);
+      setTargetELO(selectedSubpackage.maxELO || 1000);
+    }
+  }, [selectedSubpackage]);
+
+  // Calculate total price for dynamic pricing
+  const calculateTotalPrice = () => {
+    if (!selectedSubpackage) return 0;
+
+    if (
+      selectedSubpackage.dynamicPricing &&
+      selectedSubpackage.basePricePerELO
+    ) {
+      const eloDifference = Math.abs(targetELO - currentELO);
+      const eloCost = eloDifference * selectedSubpackage.basePricePerELO;
+      return selectedSubpackage.price + eloCost;
+    }
+
+    return selectedSubpackage.price;
+  };
 
   // fetching games
   useEffect(() => {
@@ -62,6 +88,20 @@ const GamesComponent = () => {
     setIsModalOpen(true);
   };
 
+  const handleCheckout = (subpackage: any) => {
+    setSelectedSubpackage(subpackage);
+    setIsCheckoutModalOpen(true);
+  };
+  const confirmCheckout = () => {
+    if (!selectedSubpackage) return;
+    if (!currentELO || !targetELO) {
+      router.push(`/dashboard/customer/checkout/${selectedSubpackage.id}`);
+    } else {
+      router.push(
+        `/dashboard/customer/checkout/${selectedSubpackage.id}?currentELO=${currentELO}&targetELO=${targetELO}`
+      );
+    }
+  };
   const confirmQuickPay = async () => {
     if (!selectedSubpackage) return;
 
@@ -72,7 +112,13 @@ const GamesComponent = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ subpackageId: selectedSubpackage.id }),
+        body: JSON.stringify({
+          subpackageId: selectedSubpackage.id,
+          currentELO: selectedSubpackage.dynamicPricing
+            ? currentELO
+            : undefined,
+          targetELO: selectedSubpackage.dynamicPricing ? targetELO : undefined,
+        }),
       });
 
       const result = await response.json();
@@ -193,7 +239,7 @@ const GamesComponent = () => {
                                   selectedServiceIndex === index
                                     ? `group
                                     bg-gradient-to-r from-pink-500 gap-3 via-purple-500 to-cyan-400`
-                                    : "text-gray-300 hover:text-white hover:bg-[rgba(255, 255, 255, 0.15)]"
+                                    : "text-gray-300 hover:text-white hover:bg-[#rgba(255, 255, 255, 0.15)]"
                                 }`}
                               >
                                 {service.name}
@@ -257,6 +303,9 @@ const GamesComponent = () => {
                                 Price
                               </th>
                               <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
+                                Type
+                              </th>
+                              <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg">
                                 Description
                               </th>
                               <th className="py-3 px-4 text-[#E1E1E1] font-semibold text-lg text-center">
@@ -318,6 +367,28 @@ const GamesComponent = () => {
                                   </span>
                                 </td>
                                 <td
+                                  className={`py-5 px-4 text-center ${
+                                    itemIndex !==
+                                    selectedGame?.services[selectedServiceIndex]
+                                      .subpackages.length -
+                                      1
+                                      ? "border-b border-white"
+                                      : ""
+                                  }`}
+                                >
+                                  {item?.dynamicPricing ? (
+                                    <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                                      <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
+                                      ELO-Based
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">
+                                      <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                                      Fixed
+                                    </span>
+                                  )}
+                                </td>
+                                <td
                                   className={`py-5 px-4 text-[#E1E1E1] max-w-md ${
                                     itemIndex !==
                                     selectedGame?.services[selectedServiceIndex]
@@ -363,12 +434,17 @@ const GamesComponent = () => {
                                       : ""
                                   }`}
                                 >
-                                  <Link
-                                    href={`/dashboard/customer/checkout/${item.id}`}
-                                    className="bg-gradient-to-r cursor-pointer from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 text-sm"
+                                  <button
+                                    className={` px-4 py-2 flex cursor-pointer items-center justify-center ${lato.className} relative cursor-pointer group
+                                      bg-gradient-to-r from-pink-500 gap-3 via-purple-500 to-cyan-400
+                                      transition-all
+                                      hover:scale-105
+                                      rounded-lg
+                                    `}
+                                    onClick={() => handleCheckout(item)}
                                   >
                                     Checkout
-                                  </Link>
+                                  </button>
                                 </td>
                               </tr>
                             ))}
@@ -391,30 +467,404 @@ const GamesComponent = () => {
         )}
       </div>
 
-      <Modal
-        title="Confirm Quick Pay"
-        visible={isModalOpen}
-        onOk={confirmQuickPay}
-        onCancel={() => setIsModalOpen(false)}
-        confirmLoading={isPaying}
-        okText="Confirm & Pay"
-        cancelText="Cancel"
-      >
-        {selectedSubpackage && (
-          <div>
-            <p>
-              You are about to purchase the following package from your wallet:
-            </p>
-            <p>
-              <strong>Package:</strong> {selectedSubpackage.name}
-            </p>
-            <p>
-              <strong>Price:</strong> ${selectedSubpackage.price}
-            </p>
-            <p>This amount will be deducted from your wallet balance.</p>
+      {/* Custom QuickPay Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsModalOpen(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-md mx-4">
+            <div
+              className="rounded-2xl p-1"
+              style={{
+                background:
+                  "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              }}
+            >
+              <div className="bg-[#5E2047] rounded-2xl p-6">
+                {/* Header */}
+                <div className="text-center mb-6">
+                  <h3
+                    className={`${orbitron.className} text-2xl font-bold text-white mb-2`}
+                  >
+                    Confirm Quick Pay
+                  </h3>
+                  <div
+                    className="w-16 h-1 mx-auto rounded-full"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%)",
+                    }}
+                  />
+                </div>
+
+                {/* Package Details */}
+                {selectedSubpackage && (
+                  <div className="space-y-4 mb-6">
+                    <div className="bg-gray-900/30 rounded-lg p-4 border border-gray-600/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">Package</span>
+                        <span className="text-white font-semibold">
+                          {selectedSubpackage.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">
+                          Base Price
+                        </span>
+                        <span className="text-green-400 font-bold text-lg">
+                          ${selectedSubpackage.price}
+                        </span>
+                      </div>
+
+                      {/* Dynamic Pricing ELO Sliders */}
+                      {selectedSubpackage.dynamicPricing &&
+                        selectedSubpackage.basePricePerELO && (
+                          <div className="space-y-4 pt-3 border-t border-gray-600/50">
+                            <div className="text-center">
+                              <span className="text-cyan-400 text-sm font-medium">
+                                Dynamic Pricing: +$
+                                {selectedSubpackage.basePricePerELO}/ELO
+                              </span>
+                            </div>
+
+                            {/* Current ELO Slider */}
+                            <div>
+                              <div className="flex justify-between text-sm text-gray-300 mb-2">
+                                <span>Current ELO</span>
+                                <span className="text-white font-semibold">
+                                  {currentELO}
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min={selectedSubpackage.minELO || 0}
+                                max={selectedSubpackage.maxELO || 1000}
+                                value={currentELO}
+                                onChange={(e) =>
+                                  setCurrentELO(Number(e.target.value))
+                                }
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                style={{
+                                  background: `linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%)`,
+                                }}
+                              />
+                            </div>
+
+                            {/* Target ELO Slider */}
+                            <div>
+                              <div className="flex justify-between text-sm text-gray-300 mb-2">
+                                <span>Target ELO</span>
+                                <span className="text-white font-semibold">
+                                  {targetELO}
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min={selectedSubpackage.minELO || 0}
+                                max={selectedSubpackage.maxELO || 1000}
+                                value={targetELO}
+                                onChange={(e) =>
+                                  setTargetELO(Number(e.target.value))
+                                }
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                style={{
+                                  background: `linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%)`,
+                                }}
+                              />
+                            </div>
+
+                            {/* ELO Difference and Additional Cost */}
+                            <div className="bg-gray-800/50 rounded-lg p-3">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-gray-300">
+                                  ELO Difference
+                                </span>
+                                <span className="text-cyan-400 font-semibold">
+                                  {Math.abs(targetELO - currentELO)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-300">
+                                  Additional Cost
+                                </span>
+                                <span className="text-cyan-400 font-semibold">
+                                  $
+                                  {(
+                                    Math.abs(targetELO - currentELO) *
+                                    selectedSubpackage.basePricePerELO
+                                  ).toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Total Price */}
+                      <div className="pt-3 border-t border-gray-600/50">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-300 text-sm">
+                            Total Price
+                          </span>
+                          <span className="text-green-400 font-bold text-xl">
+                            ${calculateTotalPrice().toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="text-center text-gray-400 text-xs mt-1">
+                          This amount will be deducted from your wallet balance
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmQuickPay}
+                    disabled={isPaying}
+                    className="flex-1 px-4 py-3 rounded-lg font-semibold text-white transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+                    }}
+                  >
+                    {isPaying ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                        Processing...
+                      </div>
+                    ) : (
+                      "Confirm & Pay"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </Modal>
+        </div>
+      )}
+
+      {/* modal for continue to checkout */}
+      {/* Custom QuickPay Modal */}
+      {isCheckoutModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsCheckoutModalOpen(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-md mx-4">
+            <div
+              className="rounded-2xl p-1"
+              style={{
+                background:
+                  "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              }}
+            >
+              <div className="bg-[#5E2047] rounded-2xl p-6">
+                {/* Header */}
+                <div className="text-center mb-6">
+                  <h3
+                    className={`${orbitron.className} text-2xl font-bold text-white mb-2`}
+                  >
+                    Continue to Checkout
+                  </h3>
+                  <div
+                    className="w-16 h-1 mx-auto rounded-full"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%)",
+                    }}
+                  />
+                </div>
+
+                {/* Package Details */}
+                {selectedSubpackage && (
+                  <div className="space-y-4 mb-6">
+                    <div className="bg-gray-900/30 rounded-lg p-4 border border-gray-600/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">Package</span>
+                        <span className="text-white font-semibold">
+                          {selectedSubpackage.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">
+                          Base Price
+                        </span>
+                        <span className="text-green-400 font-bold text-lg">
+                          ${selectedSubpackage.price}
+                        </span>
+                      </div>
+
+                      {/* Dynamic Pricing ELO Sliders */}
+                      {selectedSubpackage.dynamicPricing &&
+                        selectedSubpackage.basePricePerELO && (
+                          <div className="space-y-4 pt-3 border-t border-gray-600/50">
+                            <div className="text-center">
+                              <span className="text-cyan-400 text-sm font-medium">
+                                Dynamic Pricing: +$
+                                {selectedSubpackage.basePricePerELO}/ELO
+                              </span>
+                            </div>
+
+                            {/* Current ELO Slider */}
+                            <div>
+                              <div className="flex justify-between text-sm text-gray-300 mb-2">
+                                <span>Current ELO</span>
+                                <span className="text-white font-semibold">
+                                  {currentELO}
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min={selectedSubpackage.minELO || 0}
+                                max={selectedSubpackage.maxELO || 1000}
+                                value={currentELO}
+                                onChange={(e) =>
+                                  setCurrentELO(Number(e.target.value))
+                                }
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                style={{
+                                  background: `linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%)`,
+                                }}
+                              />
+                            </div>
+
+                            {/* Target ELO Slider */}
+                            <div>
+                              <div className="flex justify-between text-sm text-gray-300 mb-2">
+                                <span>Target ELO</span>
+                                <span className="text-white font-semibold">
+                                  {targetELO}
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min={selectedSubpackage.minELO || 0}
+                                max={selectedSubpackage.maxELO || 1000}
+                                value={targetELO}
+                                onChange={(e) =>
+                                  setTargetELO(Number(e.target.value))
+                                }
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                style={{
+                                  background: `linear-gradient(90deg, #00C3FF 0%, #FFFF1C 100%)`,
+                                }}
+                              />
+                            </div>
+
+                            {/* ELO Difference and Additional Cost */}
+                            <div className="bg-gray-800/50 rounded-lg p-3">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-gray-300">
+                                  ELO Difference
+                                </span>
+                                <span className="text-cyan-400 font-semibold">
+                                  {Math.abs(targetELO - currentELO)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-300">
+                                  Additional Cost
+                                </span>
+                                <span className="text-cyan-400 font-semibold">
+                                  $
+                                  {(
+                                    Math.abs(targetELO - currentELO) *
+                                    selectedSubpackage.basePricePerELO
+                                  ).toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Total Price */}
+                      <div className="pt-3 border-t border-gray-600/50">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-300 text-sm">
+                            Total Price
+                          </span>
+                          <span className="text-green-400 font-bold text-xl">
+                            ${calculateTotalPrice().toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="text-center text-gray-400 text-xs mt-1">
+                          This amount will be deducted on the checkout
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsCheckoutModalOpen(false)}
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmCheckout}
+                    disabled={isPaying}
+                    className="flex-1 px-4 py-3 rounded-lg font-semibold text-white transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+                    }}
+                  >
+                    {isPaying ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                        Processing...
+                      </div>
+                    ) : (
+                      "Continue to Checkout"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom CSS for slider styling */}
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: linear-gradient(90deg, #00c3ff 0%, #ffff1c 100%);
+          cursor: pointer;
+          border: 2px solid white;
+        }
+
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: linear-gradient(90deg, #00c3ff 0%, #ffff1c 100%);
+          cursor: pointer;
+          border: 2px solid white;
+        }
+      `}</style>
     </div>
   );
 };
