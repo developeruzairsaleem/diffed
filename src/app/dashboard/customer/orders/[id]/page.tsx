@@ -24,6 +24,7 @@ import ChatInterface from "@/components/chat/ChatInterface";
 import type { OrderDetailDto } from "@/types/order.dto";
 import { useStore } from "@/store/useStore";
 import { Button, message } from "antd";
+import OverlayLoader from "@/components/ui/OverlayLoader";
 
 // -------------------------------
 // order detail page for customer
@@ -171,14 +172,80 @@ export default function OrderDetailPage() {
   // ------------------------------------------------------
   if (loading) {
     return (
-      <div
-        className="min-h-screen 
-            transition-all flex items-center justify-center"
-      >
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      <div className="min-h-screen container mx-auto p-6 animate-pulse">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="h-5 w-5 bg-gray-700 rounded"></div>
+          <div className="h-5 w-32 bg-gray-700 rounded"></div>
+        </div>
+
+        {/* Tabs skeleton */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="h-10 bg-gray-700 rounded"></div>
+          <div className="h-10 bg-gray-700 rounded"></div>
+        </div>
+
+        {/* Order Status Card skeleton */}
+        <div className="space-y-6">
+          <div className="p-6 rounded-lg bg-gray-800/50">
+            <div className="flex justify-between mb-4">
+              <div className="h-5 w-32 bg-gray-700 rounded"></div>
+              <div className="h-5 w-20 bg-gray-700 rounded"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="text-center p-4 bg-gray-700/50 rounded-lg"
+                >
+                  <div className="h-8 w-8 mx-auto mb-2 bg-gray-600 rounded-full"></div>
+                  <div className="h-5 w-16 mx-auto bg-gray-600 rounded mb-2"></div>
+                  <div className="h-3 w-20 mx-auto bg-gray-600 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Service Details Card skeleton */}
+          <div className="p-6 rounded-lg bg-gray-800/50 space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 bg-gray-600 rounded-full"></div>
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-gray-600 rounded"></div>
+                <div className="h-3 w-24 bg-gray-600 rounded"></div>
+                <div className="h-3 w-20 bg-gray-600 rounded"></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-24 bg-gray-600 rounded"></div>
+              <div className="h-3 w-full bg-gray-600 rounded"></div>
+              <div className="h-3 w-3/4 bg-gray-600 rounded"></div>
+            </div>
+          </div>
+
+          {/* Provider Assignments skeleton */}
+          <div className="p-6 rounded-lg bg-gray-800/50 space-y-4">
+            {[...Array(2)].map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-gray-600 rounded-full"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-28 bg-gray-600 rounded"></div>
+                    <div className="h-3 w-36 bg-gray-600 rounded"></div>
+                  </div>
+                </div>
+                <div className="h-8 w-28 bg-gray-600 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
+
   // If no order exist return the message that no order found
   if (!order) {
     return (
@@ -253,8 +320,8 @@ export default function OrderDetailPage() {
               <span>Back to Orders</span>
             </div>
           </Link>
-          <Separator orientation="vertical" className="h-6 bg-white/30" />
-          <h1 className="text-2xl font-bold text-white game-title">
+          <Separator orientation="vertical" className="h-6 bg-white" />
+          <h1 className="text-2xl text-gradient-to-r from-pink-500 to-cyan-500 p-2 font-bold text-white">
             Order #{order.orderNumber.slice(-8)}
           </h1>
         </div>
@@ -403,18 +470,19 @@ export default function OrderDetailPage() {
                               <p className="font-medium">
                                 {assignment.provider.username}{" "}
                                 <Badge
-                                  className={`mb-2 ${assignment.status === "APPROVED"
-                                    ? "bg-green-500"
-                                    : assignment.status === "COMPLETED"
+                                  className={`mb-2 ${
+                                    assignment.status === "APPROVED"
+                                      ? "bg-green-500"
+                                      : assignment.status === "COMPLETED"
                                       ? "bg-blue-500"
                                       : assignment.status === "VERIFIED"
-                                        ? "bg-purple-500"
-                                        : assignment.status === "PENDING"
-                                          ? "bg-yellow-500"
-                                          : assignment.status === "REPLACED"
-                                            ? "bg-red-500"
-                                            : "bg-gray-500"
-                                    } text-white`}
+                                      ? "bg-purple-500"
+                                      : assignment.status === "PENDING"
+                                      ? "bg-yellow-500"
+                                      : assignment.status === "REPLACED"
+                                      ? "bg-red-500"
+                                      : "bg-gray-500"
+                                  } text-white`}
                                 >
                                   {assignment.status}
                                 </Badge>
@@ -429,16 +497,17 @@ export default function OrderDetailPage() {
                             {
                               // Only show approve button if status is PENDING and approvedAssignmentsCount < requiredCount
                               assignment.status === "PENDING" &&
-                                approvedAssignmentsCount < order.requiredCount ? (
+                              approvedAssignmentsCount < order.requiredCount ? (
                                 <button
                                   onClick={() =>
                                     handleApproveAssignment(assignment.id)
                                   }
                                   disabled={approvingId === assignment.id}
-                                  className={` rounded-lg bg-gradient-to-r text-white text-semibold from-pink-500 p-3 mr-4 via-purple-500 to-cyan-400 transition-all flex items-center justify-center ${approvingId === assignment.id
-                                    ? "opacity-60 cursor-not-allowed"
-                                    : ""
-                                    }`}
+                                  className={` rounded-lg bg-gradient-to-r text-white text-semibold from-pink-500 p-3 mr-4 via-purple-500 to-cyan-400 transition-all flex items-center justify-center ${
+                                    approvingId === assignment.id
+                                      ? "opacity-60 cursor-not-allowed"
+                                      : ""
+                                  }`}
                                 >
                                   {approvingId === assignment.id ? (
                                     <span className="flex items-center gap-2">
@@ -478,8 +547,6 @@ export default function OrderDetailPage() {
                               )
                             }
 
-
-
                             {/* {assignment.status === "COMPLETED" && (assignment.gamePlay === null || assignment.communication === null || assignment.attitude === null) ? (
                                 
                                 <Link
@@ -497,8 +564,9 @@ export default function OrderDetailPage() {
                             </p>
                             )} */}
 
-                            {(assignment.status === "COMPLETED" ||assignment.status==="VERIFIED") && (
-                              !assignment?.reviewText ? (
+                            {(assignment.status === "COMPLETED" ||
+                              assignment.status === "VERIFIED") &&
+                              (!assignment?.reviewText ? (
                                 <Link
                                   href={`/dashboard/customer/orders/${order.id}/assignments/${assignment.id}/review`}
                                   className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor"
@@ -506,15 +574,10 @@ export default function OrderDetailPage() {
                                   Review
                                 </Link>
                               ) : (
-                                <p
-                                  className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor"
-                                >
+                                <p className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs pointer-cursor">
                                   Reviewed
                                 </p>
-                              )
-                            ) }
-
-
+                              ))}
                           </div>
                         </div>
                       ))}

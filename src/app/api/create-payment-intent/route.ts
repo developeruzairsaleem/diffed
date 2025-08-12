@@ -10,6 +10,9 @@ export async function GET(req: NextRequest) {
 
     const packageId: string = searchParams?.get("subpackageId") || "";
     const customerEmail: string = searchParams?.get("email") || "";
+    const currentELO: number = Number(searchParams?.get("currentELO"));
+    const targetELO: number = Number(searchParams?.get("targetELO"));
+
     if (!packageId || !customerEmail) {
       return NextResponse.json(
         { error: "DATA NOT PROVIDED for query params", success: false },
@@ -51,8 +54,17 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
+    let totalPriceInCents;
     // calculate price in cents
-    const totalPriceInCents = subpackage.price! * 100;
+    if (!currentELO && !targetELO) {
+      totalPriceInCents = subpackage.price! * 100;
+    } else {
+      totalPriceInCents =
+        (subpackage.price +
+          subpackage.basePricePerELO! * (targetELO - currentELO)) *
+        100;
+    }
+
     // create a payment intent for the customer
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(totalPriceInCents),
@@ -93,6 +105,9 @@ export async function GET(req: NextRequest) {
           amount: totalPriceInCents,
           currency: "usd",
           subpackage,
+          currentELO,
+          targetELO,
+          finalPrice: Math.round(totalPriceInCents / 100),
         },
       },
       { status: 200 }

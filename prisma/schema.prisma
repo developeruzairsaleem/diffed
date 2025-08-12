@@ -170,24 +170,26 @@ model Order {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   isInQueue       Boolean           @default(true)
+  currentELO      Int?
+  targetELO       Int?
   assignments     OrderAssignment[]
   chats           Chat[]
 }
 
 model OrderAssignment {
-  id           String                @id @default(cuid())
-  orderId      String
-  providerId   String
-  claimedAt    DateTime              @default(now())
-  status       OrderAssignmentStatus @default(PENDING)
-  approved     Boolean               @default(false)
-  completed    Boolean               @default(false)
-  leftEarly    Boolean               @default(false)
-  progress     Float                 @default(0.0) // percentage 0-100
-  proofUrl     String?
-  reviewRating Int?
-  reviewText   String?
-  gamePlay     Int?
+  id            String                @id @default(cuid())
+  orderId       String
+  providerId    String
+  claimedAt     DateTime              @default(now())
+  status        OrderAssignmentStatus @default(PENDING)
+  approved      Boolean               @default(false)
+  completed     Boolean               @default(false)
+  leftEarly     Boolean               @default(false)
+  progress      Float                 @default(0.0) // percentage 0-100
+  proofUrl      String?
+  reviewRating  Int?
+  reviewText    String?
+  gamePlay      Int?
   communication Int?
   attitude      Int?
   tipAmount     Int?

@@ -7,23 +7,30 @@ import {
   XCircle,
   AlertCircle,
   Inbox,
+  TrendingUp,
+  User,
+  ShoppingCart,
+  Star,
+  Calendar,
+  ArrowRight,
+  Eye,
+  Gamepad2,
+  Trophy,
+  Target,
+  Zap,
+  Crown,
+  ChevronRight,
 } from "lucide-react";
 import { useCustomerOrders } from "@/hooks/useOrders";
 import { useStore } from "@/store/useStore";
 import { CustomerOrderListDto } from "@/types/order.dto";
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
 
 import SafeImage from "@/components/ui/SafeImage";
-import { Toaster } from "sonner";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
+
+import { orbitron } from "@/fonts/fonts";
+
 // --- Helper Functions & Components ---
 
 const getStatusIcon = (status: string) => {
@@ -44,15 +51,15 @@ const getStatusIcon = (status: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case "COMPLETED":
-      return "bg-green-500/20 text-green-400";
+      return "bg-green-500/20 text-green-400 border-green-400";
     case "IN_PROGRESS":
-      return "bg-blue-500/20 text-blue-400";
+      return "bg-blue-500/20 text-blue-400 border-blue-400";
     case "PENDING":
-      return "bg-yellow-500/20 text-yellow-400";
+      return "bg-yellow-500/20 text-yellow-400 border-yellow-400";
     case "CANCELLED":
-      return "bg-red-500/20 text-red-400";
+      return "bg-red-500/20 text-red-400 border-red-400";
     default:
-      return "bg-gray-500/20 text-gray-400";
+      return "bg-gray-500/20 text-gray-400 border-gray-400";
   }
 };
 
@@ -77,72 +84,217 @@ const StatsCard = ({
   icon: Icon,
   title,
   value,
+  trend,
+  color,
   loading,
 }: {
   icon: any;
-  title: any;
-  value: any;
-  loading: any;
+  title: string;
+  value: string | number;
+  trend?: string;
+  color: string;
+  loading: boolean;
 }) => {
   return (
-    <div className="w-full rounded-lg p-px bg-gradient-to-r from-pink-500/50 via-purple-500/50 to-cyan-400/50 hover:from-pink-500 hover:via-purple-500 hover:to-cyan-400 transition-all duration-300">
-      <div className="w-full rounded-lg h-full bg-[#3a0f2a] p-4 md:p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]">
+
+    <div
+      className="rounded-xl p-1 transition-all duration-300 hover:scale-105"
+      style={{
+        background:
+          "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+      }}
+    >
+      <div className="bg-[#5E2047] rounded-xl p-6 h-full">
+
         {loading ? (
-          <div className="flex items-center justify-between animate-pulse">
-            <div>
-              <div className="h-4 w-24 bg-white/10 rounded mb-3"></div>
-              <div className="h-8 w-12 bg-white/10 rounded"></div>
+          <div className="animate-pulse">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gray-600 rounded-xl"></div>
+              <div className="w-6 h-6 bg-gray-600 rounded"></div>
             </div>
-            <div className="w-12 h-12 bg-white/20 rounded-full"></div>
+            <div className="h-4 w-20 bg-gray-600 rounded mb-2"></div>
+            <div className="h-8 w-16 bg-gray-600 rounded"></div>
           </div>
         ) : (
-          <div className="flex w-full items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-gray-300">{title}</p>
-              <p className="text-2xl sm:text-3xl font-bold text-white mt-1">{value}</p>
+
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <div
+                className={`w-12 h-12 bg-gradient-to-r ${color} rounded-xl flex items-center justify-center`}
+              >
+                <Icon className="w-6 h-6 text-white" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-green-400" />
             </div>
-            <div className="p-2 md:p-3 bg-white/10 rounded-full">
-              <Icon className="w-5 h-5 md:w-6 md:h-6 text-cyan-300" />
+            <p className="text-gray-300 text-sm font-medium mb-1">{title}</p>
+            <div className="flex items-baseline justify-between">
+              <p className="text-3xl font-bold text-white">{value}</p>
+              {trend && (
+                <span className="text-xs text-green-400 font-medium bg-green-400/10 px-2 py-1 rounded-full">
+                  {trend}
+                </span>
+              )}
+
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
   );
 };
 
-const RecentOrdersSkeleton = () => (
-  <div className="p-6">
-    <div className="h-7 w-48 bg-white/10 rounded animate-pulse mb-6"></div>
-    <div className="overflow-x-auto">
-      <div className="min-w-[800px]">
-        <div className="flex justify-between items-center py-3 px-6 bg-white/5 rounded-t-lg">
-          <div className="h-4 w-32 bg-white/10 rounded"></div>
-          <div className="h-4 w-24 bg-white/10 rounded"></div>
-          <div className="h-4 w-28 bg-white/10 rounded"></div>
-          <div className="h-4 w-16 bg-white/10 rounded"></div>
-          <div className="h-4 w-24 bg-white/10 rounded"></div>
-          <div className="h-4 w-20 bg-white/10 rounded"></div>
-        </div>
-        <div className="space-y-2 mt-2">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="flex gap-2 justify-between items-center p-4 rounded-lg bg-transparent animate-pulse border-b border-white/5"
-            >
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="w-10 h-10 rounded bg-white/10"></div>
-                <div className="space-y-2">
-                  <div className="h-4 w-32 bg-white/10 rounded"></div>
-                </div>
+const WelcomeCard = ({ user, loading }: { user: any; loading: boolean }) => {
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
+  return (
+    <div
+      className="rounded-xl p-1 mb-8"
+      style={{
+        background:
+          "linear-gradient(135deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+      }}
+    >
+      <div className="bg-[#5E2047] rounded-xl p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-2xl"></div>
+        <div className="relative z-10">
+          {loading ? (
+            <div className="animate-pulse">
+              <div className="h-8 w-64 bg-gray-600 rounded mb-3"></div>
+              <div className="h-5 w-96 bg-gray-600 rounded mb-6"></div>
+              <div className="flex gap-4">
+                <div className="h-12 w-32 bg-gray-600 rounded-lg"></div>
+                <div className="h-12 w-32 bg-gray-600 rounded-lg"></div>
               </div>
-              <div className="h-4 w-24 bg-white/10 rounded flex-1"></div>
-              <div className="h-4 w-28 bg-white/10 rounded flex-1"></div>
-              <div className="h-4 w-16 bg-white/10 rounded flex-1"></div>
-              <div className="h-6 w-24 bg-white/10 rounded-full flex-1"></div>
-              <div className="h-10 w-28 bg-white/10 rounded-lg flex-1"></div>
             </div>
-          ))}
+          ) : (
+            <>
+              <h1
+                className={`${orbitron.className} text-3xl md:text-4xl font-bold text-white mb-3`}
+              >
+                {getGreeting()}, {user?.username || "Gamer"}! 👋
+              </h1>
+              <p className="text-gray-300 text-lg mb-6">
+                Ready to level up your gaming experience? Check out your recent
+                activity and discover new services.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/dashboard/customer/orders"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-200 font-medium backdrop-blur-sm"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  View All Orders
+                </Link>
+                <Link
+                  href="/dashboard/customer/games"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
+                >
+                  <Gamepad2 className="w-5 h-5" />
+                  Browse Games
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DashboardSkeleton = () => (
+  <div className="min-h-screen p-4 md:p-6 animate-pulse">
+    <div className="max-w-7xl mx-auto">
+      {/* Welcome Card Skeleton */}
+      <div
+        className="rounded-xl p-1 mb-8"
+        style={{
+          background:
+            "linear-gradient(135deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+        }}
+      >
+        <div className="bg-[#5E2047] rounded-xl p-8">
+          <div className="h-8 w-64 bg-gray-600 rounded mb-3"></div>
+          <div className="h-5 w-96 bg-gray-600 rounded mb-6"></div>
+          <div className="flex gap-4">
+            <div className="h-12 w-32 bg-gray-600 rounded-lg"></div>
+            <div className="h-12 w-32 bg-gray-600 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="rounded-xl p-1"
+            style={{
+              background:
+                "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+            }}
+          >
+            <div className="bg-[#5E2047] rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-600 rounded-xl"></div>
+                <div className="w-6 h-6 bg-gray-600 rounded"></div>
+              </div>
+              <div className="h-4 w-20 bg-gray-600 rounded mb-2"></div>
+              <div className="h-8 w-16 bg-gray-600 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Activity & Quick Actions Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Recent Orders Skeleton */}
+        <div
+          className="lg:col-span-2 rounded-xl p-1"
+          style={{
+            background:
+              "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+          }}
+        >
+          <div className="bg-[#5E2047] rounded-xl p-6">
+            <div className="h-6 w-32 bg-gray-600 rounded mb-6"></div>
+            <div className="space-y-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="bg-gray-800/30 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-600 rounded-lg"></div>
+                    <div className="flex-1">
+                      <div className="h-4 w-32 bg-gray-600 rounded mb-2"></div>
+                      <div className="h-3 w-24 bg-gray-600 rounded"></div>
+                    </div>
+                    <div className="h-6 w-20 bg-gray-600 rounded-full"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions Skeleton */}
+        <div
+          className="rounded-xl p-1"
+          style={{
+            background:
+              "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+          }}
+        >
+          <div className="bg-[#5E2047] rounded-xl h-full p-2">
+            <div className="h-6 w-32 bg-gray-600 rounded mb-6"></div>
+            <div className="space-y-3 h-full">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div key={index} className="h-16 bg-gray-600  rounded-lg"></div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -155,137 +307,351 @@ const OverviewTab = () => {
   const { user } = useStore();
   const { data: ordersData, loading: loadingOrders } = useCustomerOrders({
     customerId: user?.id,
+    page: 1,
+    limit: 5, // Only show recent 5 orders
   });
 
+  // Calculate enhanced stats
+  const stats = useMemo(() => {
+    if (!ordersData)
+      return { total: 0, active: 0, completed: 0, totalSpent: 0, pending: 0 };
+
+    return {
+      total: ordersData.total || 0,
+      active:
+        ordersData.orders?.filter(
+          (o: CustomerOrderListDto) => o.status === "IN_PROGRESS"
+        ).length || 0,
+      completed:
+        ordersData.orders?.filter(
+          (o: CustomerOrderListDto) => o.status === "COMPLETED"
+        ).length || 0,
+      pending:
+        ordersData.orders?.filter(
+          (o: CustomerOrderListDto) => o.status === "PENDING"
+        ).length || 0,
+      totalSpent:
+        ordersData.orders?.reduce(
+          (sum: number, order: CustomerOrderListDto) =>
+            sum + (order.price || 0),
+          0
+        ) || 0,
+    };
+  }, [ordersData]);
+
   const statsCards = [
-    { title: "Total Orders", value: ordersData?.total ?? 0, icon: Package },
-    { title: "Active Orders", value: ordersData?.active ?? 0, icon: Activity },
+    {
+      title: "Total Orders",
+      value: stats.total,
+      icon: ShoppingCart,
+      color: "from-blue-500 to-cyan-400",
+      trend: stats.total > 0 ? "+12%" : undefined,
+    },
+    {
+      title: "Active Orders",
+      value: stats.active,
+      icon: Activity,
+      color: "from-orange-500 to-amber-400",
+      trend: stats.active > 0 ? "In Progress" : undefined,
+    },
     {
       title: "Completed",
-      value: ordersData?.completed ?? 0,
+      value: stats.completed,
       icon: CheckCircle,
+      color: "from-green-500 to-emerald-400",
+      trend: stats.completed > 0 ? "Success" : undefined,
     },
     {
       title: "Total Spent",
-      value: `$${ordersData?.totalSpent?.toFixed(2) ?? "0.00"}`,
+      value: `$${stats.totalSpent.toFixed(2)}`,
       icon: DollarSign,
+      color: "from-purple-500 to-pink-400",
+      trend: stats.totalSpent > 0 ? "Lifetime" : undefined,
     },
   ];
 
-  return (
-    <div className="space-y-8 w-full">
-       
-      {/* Stats Cards */}
-      <div className=" w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {statsCards.map((card, index) => (
-          <StatsCard key={index} {...card} loading={loadingOrders} />
-        ))}
-      </div>
+  const quickActions = [
+    {
+      title: "Browse Games",
+      icon: Gamepad2,
+      href: "/dashboard/customer/games",
+      color: "from-pink-500 to-purple-600",
+    },
+    {
+      title: "View All Orders",
+      icon: Package,
+      href: "/dashboard/customer/orders",
+      color: "from-blue-500 to-cyan-400",
+    },
+    {
+      title: "Wallet & Billing",
+      icon: DollarSign,
+      href: "/dashboard/customer/wallet",
+      color: "from-green-500 to-emerald-400",
+    },
+    {
+      title: "Reviews",
+      icon: User,
+      href: "/dashboard/customer/reviews",
+      color: "from-orange-500 to-amber-400",
+    },
+  ];
 
-      {/* Recent Orders Table */}
-      <div className=" w-full rounded-lg p-px bg-gradient-to-b overflow-x-auto from-white/10 to-transparent">
-        <div className=" rounded-lg bg-[#2a0a1e] w-full h-full shadow-2xl">
-          {loadingOrders ? (
-            <RecentOrdersSkeleton />
-          ) : !ordersData?.orders?.length ? (
-            <div className=" text-center py-20 px-6">
-              <Inbox className="w-16 h-16 mx-auto text-gray-500" />
-              <h3 className="mt-4 text-2xl font-semibold text-white">
-                No Orders Yet
-              </h3>
-              <p className="mt-2 text-gray-400">
-                When you place an order, it will appear here.
-              </p>
-              <button className="mt-6 font-semibold text-white bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 hover:opacity-90 transition-opacity duration-200 py-2 px-5 rounded-lg text-base">
-                Place New Order
-              </button>
-            </div>
-          ) : (
-            <div >
-              <div className="p-4 sm:p-6 border-b border-white/10">
-                <h3 className="text-xl font-semibold text-white flex items-center">
-                  <Clock className="w-5 h-5 mr-3 text-cyan-300" /> Recent Orders
-                </h3>
-              </div>
-              <div className="overflow-x-scroll">
-                <Table className=" text-left text-xs sm:text-sm">
-                <TableHeader className="bg-white/5">
-                  <TableRow>
-                    <TableHead className="py-3 px-3 sm:px-6">Game & Service</TableHead>
-                    <TableHead className="py-3 px-3 sm:px-6">Package</TableHead>
-                    <TableHead className="py-3 px-3 sm:px-6">Providers</TableHead>
-                    <TableHead className="py-3 px-3 sm:px-6">Price</TableHead>
-                    <TableHead className="py-3 px-3 sm:px-6">Status</TableHead>
-                    <TableHead className="py-3 px-3 sm:px-6 text-center">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className=" divide-y divide-white/10">
-                  {ordersData.orders.map((order: CustomerOrderListDto) => (
-                    <TableRow key={order.id} className="hover:bg-white/5 transition-colors duration-200">
-                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6">
-                        <div className="flex items-center space-x-3">
-                          <SafeImage
-                            placeholder="/images/placeholder.png"
-                            src={
-                              order?.subpackage?.service?.game?.image ||
-                              "/logo/logo.png"
-                            }
-                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-md object-cover"
-                            alt={order?.subpackage?.service?.game?.name}
-                          />
-                          <div>
-                            <div className="font-semibold text-white">
-                              {order?.subpackage?.service?.game?.name}
+  if (loadingOrders) {
+    return <DashboardSkeleton />;
+  }
+
+  return (
+
+    <div className="min-h-screen p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Welcome Card */}
+        <WelcomeCard user={user} loading={loadingOrders} />
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {statsCards.map((card, index) => (
+            <StatsCard key={index} {...card} loading={loadingOrders} />
+          ))}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Orders */}
+          <div className="lg:col-span-2">
+            <div
+              className="rounded-xl p-1"
+              style={{
+                background:
+                  "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              }}
+            >
+              <div className="bg-[#5E2047] rounded-xl">
+                <div className="p-6 border-b border-gray-600/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-6 h-6 text-pink-400" />
+                      <h2
+                        className={`${orbitron.className} text-xl font-bold text-white`}
+                      >
+                        Recent Activity
+                      </h2>
+                    </div>
+                    {ordersData?.orders?.length > 0 && (
+                      <Link
+                        href="/dashboard/customer/orders"
+                        className="text-pink-400 hover:text-pink-300 text-sm font-medium flex items-center gap-1 transition-colors"
+                      >
+                        View All
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+
+                {!ordersData?.orders?.length ? (
+                  <div className="text-center py-16 px-6">
+                    <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Inbox className="w-8 h-8 text-white" />
+                    </div>
+                    <h3
+                      className={`${orbitron.className} text-xl font-bold text-white mb-2`}
+                    >
+                      No Orders Yet
+                    </h3>
+                    <p className="text-gray-300 mb-6">
+                      Start your gaming journey by placing your first order!
+                    </p>
+                    <Link
+                      href="/dashboard/customer/games"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
+                    >
+                      <Gamepad2 className="w-5 h-5" />
+                      Browse Games
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    {/* Desktop View */}
+                    <div className="hidden md:block p-6">
+                      <div className="space-y-3">
+                        {ordersData.orders.map(
+                          (order: CustomerOrderListDto) => (
+                            <div
+                              key={order.id}
+                              className="bg-gray-800/30 rounded-lg p-4 hover:bg-gray-800/40 transition-colors border border-gray-600/30"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                  <SafeImage
+                                    src={
+                                      order?.subpackage?.service?.game?.image ||
+                                      "/logo/logo.png"
+                                    }
+                                    alt={order?.subpackage?.service?.game?.name}
+                                    placeholder="/images/placeholder.png"
+                                    className="w-12 h-12 rounded-lg object-cover"
+                                  />
+                                  <div>
+                                    <h4 className="font-semibold text-white">
+                                      {order?.subpackage?.service?.game?.name}
+                                    </h4>
+                                    <p className="text-gray-400 text-sm">
+                                      {order?.subpackage?.service?.name} •{" "}
+                                      {order?.subpackage?.name}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-6">
+                                  <div className="text-right">
+                                    <p className="text-white font-semibold">
+                                      ${order?.price.toFixed(2)}
+                                    </p>
+                                    <p className="text-gray-400 text-sm">
+                                      {getProviderDisplay(order)}
+                                    </p>
+                                  </div>
+
+                                  <span
+                                    className={`px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-2 border ${getStatusColor(
+                                      order.status
+                                    )}`}
+                                  >
+                                    {getStatusIcon(order.status)}
+                                    <span className="capitalize">
+                                      {order.status
+                                        .replace("_", " ")
+                                        .toLowerCase()}
+                                    </span>
+                                  </span>
+
+                                  <Link
+                                    href={
+                                      order.status === "PENDING"
+                                        ? `/dashboard/customer/orders/${order.id}/pending`
+                                        : `/dashboard/customer/orders/${order.id}`
+                                    }
+                                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center gap-2"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                    View
+                                  </Link>
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-gray-400">
-                              {order?.subpackage?.service?.name}
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Mobile View */}
+                    <div className="md:hidden p-4 space-y-4">
+                      {ordersData.orders.map((order: CustomerOrderListDto) => (
+                        <div
+                          key={order.id}
+                          className="bg-gray-800/30 rounded-lg p-4 border border-gray-600/30"
+                        >
+                          <div className="flex items-center gap-3 mb-4">
+                            <SafeImage
+                              src={
+                                order?.subpackage?.service?.game?.image ||
+                                "/logo/logo.png"
+                              }
+                              alt={order?.subpackage?.service?.game?.name}
+                              placeholder="/images/placeholder.png"
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-white text-sm">
+                                {order?.subpackage?.service?.game?.name}
+                              </h4>
+                              <p className="text-gray-400 text-xs">
+                                {order?.subpackage?.service?.name}
+                              </p>
                             </div>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1 border ${getStatusColor(
+                                order.status
+                              )}`}
+                            >
+                              {getStatusIcon(order.status)}
+                              <span className="capitalize">
+                                {order.status.replace("_", " ").toLowerCase()}
+                              </span>
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-white font-semibold">
+                                ${order?.price.toFixed(2)}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                {getProviderDisplay(order)}
+                              </p>
+                            </div>
+                            <Link
+                              href={
+                                order.status === "PENDING"
+                                  ? `/dashboard/customer/orders/${order.id}/pending`
+                                  : `/dashboard/customer/orders/${order.id}`
+                              }
+                              className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg text-sm font-medium"
+                            >
+                              View
+                            </Link>
                           </div>
                         </div>
-                      </TableCell>
-                      <TableCell
-                        className="py-3 px-3 sm:py-4 sm:px-6 font-medium text-gray-300 max-w-[200px] truncate"
-                        title={order?.subpackage?.name}
-                      >
-                        {order?.subpackage?.name}
-                      </TableCell>
-                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6 text-gray-300">
-                        {getProviderDisplay(order)}
-                      </TableCell>
-                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6 font-semibold text-white">
-                        $ {order?.price.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6">
-                        <span
-                          className={`py-1.5 px-3 text-xs font-bold rounded-full inline-flex items-center gap-2 ${getStatusColor(
-                            order.status
-                          )}`}
-                        >
-                          {getStatusIcon(order.status)}
-                          <span className="capitalize">
-                            {order.status.replace("_", " ").toLowerCase()}
-                          </span>
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-3 px-3 sm:py-4 sm:px-6 text-center">
-                        <Link
-                          className="font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg py-2 px-4 rounded-lg inline-flex items-center justify-center whitespace-nowrap text-xs"
-                          href={
-                            order.status === "PENDING"
-                              ? `/dashboard/customer/orders/${order.id}/pending`
-                              : `/dashboard/customer/orders/${order.id}`
-                          }
-                        >
-                          View Details
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      ))}
+                    </div>
+                  </>
+                )}
+
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Quick Actions Sidebar */}
+          <div className="">
+            <div
+              className="rounded-xl p-1 h-full"
+              style={{
+                background:
+                  "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
+              }}
+            >
+              <div className="bg-[#5E2047] rounded-xl h-full p-6">
+                <h3
+                  className={`${orbitron.className} text-xl font-bold text-white mb-6 flex items-center gap-2`}
+                >
+                  <Zap className="w-5 h-5 text-yellow-400" />
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
+                  {quickActions.map((action, index) => (
+                    <Link
+                      key={index}
+                      href={action.href}
+                      className="flex items-center gap-4 p-8  bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-all duration-200 border border-gray-600/30 group"
+                    >
+                      <div
+                        className={`w-10 h-10 bg-gradient-to-r ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}
+                      >
+                        <action.icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-medium group-hover:text-pink-300 transition-colors">
+                          {action.title}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-pink-400 transition-colors" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
