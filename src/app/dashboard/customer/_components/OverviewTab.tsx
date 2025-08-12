@@ -456,7 +456,7 @@ const OverviewTab = () => {
                       Start your gaming journey by placing your first order!
                     </p>
                     <Link
-                      href="/dashboard/customer"
+                      href="/dashboard/customer/games"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
                     >
                       <Gamepad2 className="w-5 h-5" />
