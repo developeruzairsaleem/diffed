@@ -100,7 +100,7 @@ const LoginForm = () => {
                   },
                 })}
                 type="email"
-                className={`w-full px-4 py-3 text-black border rounded-lg focus:outline-none ${
+                className={`w-full px-4 py-3  border rounded-lg focus:outline-none ${
                   errors.email ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Your email address"
@@ -124,7 +124,7 @@ const LoginForm = () => {
                     required: "Password is required",
                   })}
                   type={showPassword ? "text" : "password"}
-                  className={`w-full px-4 py-3 pr-24 border text-black rounded-lg focus:outline-none  ${
+                  className={`w-full px-4 py-3 pr-24 border  rounded-lg focus:outline-none  ${
                     errors.password ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Your password"
@@ -134,7 +134,7 @@ const LoginForm = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-black"
+                    className=""
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
