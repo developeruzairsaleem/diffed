@@ -96,7 +96,6 @@ const StatsCard = ({
   loading: boolean;
 }) => {
   return (
-
     <div
       className="rounded-xl p-1 transition-all duration-300 hover:scale-105"
       style={{
@@ -105,7 +104,6 @@ const StatsCard = ({
       }}
     >
       <div className="bg-[#5E2047] rounded-xl p-6 h-full">
-
         {loading ? (
           <div className="animate-pulse">
             <div className="flex items-center justify-between mb-4">
@@ -116,7 +114,6 @@ const StatsCard = ({
             <div className="h-8 w-16 bg-gray-600 rounded"></div>
           </div>
         ) : (
-
           <>
             <div className="flex items-center justify-between mb-4">
               <div
@@ -134,7 +131,6 @@ const StatsCard = ({
                   {trend}
                 </span>
               )}
-
             </div>
           </>
         )}
@@ -402,7 +398,6 @@ const OverviewTab = () => {
   }
 
   return (
-
     <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Welcome Card */}
@@ -416,31 +411,32 @@ const OverviewTab = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Recent Orders */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 flex flex-col">
             <div
-              className="rounded-xl p-1"
+              className="rounded-xl p-1 flex flex-col flex-1"
               style={{
                 background:
                   "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
               }}
             >
-              <div className="bg-[#5E2047] rounded-xl">
-                <div className="p-6 border-b border-gray-600/30">
-                  <div className="flex items-center justify-between">
+              <div className="bg-[#5E2047] rounded-xl flex flex-col flex-1">
+                <div className="p-4 sm:p-6 border-b border-gray-600/30 flex-shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <Clock className="w-6 h-6 text-pink-400" />
+                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-pink-400" />
                       <h2
-                        className={`${orbitron.className} text-xl font-bold text-white`}
+                        className={`${orbitron.className} text-lg sm:text-xl font-bold text-white`}
                       >
                         Recent Activity
                       </h2>
                     </div>
+                    {/* @ts-ignore */}
                     {ordersData?.orders?.length > 0 && (
                       <Link
                         href="/dashboard/customer/orders"
-                        className="text-pink-400 hover:text-pink-300 text-sm font-medium flex items-center gap-1 transition-colors"
+                        className="text-pink-400 hover:text-pink-300 text-sm font-medium flex items-center gap-1 transition-colors self-start sm:self-center"
                       >
                         View All
                         <ChevronRight className="w-4 h-4" />
@@ -607,7 +603,6 @@ const OverviewTab = () => {
                     </div>
                   </>
                 )}
-
               </div>
             </div>
           </div>
