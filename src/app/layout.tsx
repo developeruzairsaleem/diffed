@@ -34,8 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${lato.variable} ${orbitron.variable} ${poppins.variable} antialiased`}>
-        <SmoothScrollScript />
+      <body
+        className={`${lato.variable} ${orbitron.variable} ${poppins.variable} antialiased`}
+      >
+        {/* <SmoothScrollScript /> */}
         <main>{children}</main>
         {/* <Footer /> */}
       </body>
