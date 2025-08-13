@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description: "View and manage game details, services, and subpackages",
 };
 
-interface GameDetailPageProps {
-  params: {
-    id: string;
-  };
-}
+// interface GameDetailPageProps {
+//   params: {
+//     id: string;
+//   };
+// }
 
-export default function GameDetailPage({ params }: GameDetailPageProps) {
+export default function GameDetailPage({ params }: any) {
   return (
     <div style={{ padding: "24px" }}>
       <GameDetail gameId={params.id} />

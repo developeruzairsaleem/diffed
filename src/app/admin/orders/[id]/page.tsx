@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description: "View and manage order details",
 };
 
-interface OrderDetailPageProps {
-  params: {
-    id: string;
-  };
-}
+// interface OrderDetailPageProps {
+//   params: {
+//     id: string;
+//   };
+// }
 
-export default function OrderDetailPage({ params }: OrderDetailPageProps) {
+export default function OrderDetailPage({ params }: any) {
   return (
     <div style={{ padding: "24px" }}>
       <OrderDetail orderId={params.id} />

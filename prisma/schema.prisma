@@ -165,13 +165,11 @@ model Order {
   approvedCount   Int               @default(0) // redundant no need to change
   requiredCount   Int               @default(1) // how many providers needed
   stripeSessId    String?
-  currentELO Int?
-  targetELO Int?
+  currentELO      Int?
+  targetELO       Int?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   isInQueue       Boolean           @default(true)
-  currentELO      Int?
-  targetELO       Int?
   assignments     OrderAssignment[]
   chats           Chat[]
 }

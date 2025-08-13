@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description: "View and manage service details and subpackages",
 };
 
-interface ServiceDetailPageProps {
-  params: {
-    id: string;
-  };
-}
+// interface ServiceDetailPageProps {
+//   params: {
+//     id: string;
+//   };
+// }
 
-export default function ServiceDetailPage({ params }: ServiceDetailPageProps) {
+export default function ServiceDetailPage({ params }: any) {
   return (
     <div style={{ padding: "24px" }}>
       <ServiceDetail serviceId={params.id} />

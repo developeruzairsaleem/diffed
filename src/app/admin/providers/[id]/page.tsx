@@ -6,15 +6,13 @@ export const metadata: Metadata = {
   description: "View and manage provider details",
 };
 
-interface ProviderDetailPageProps {
-  params: {
-    id: string;
-  };
-}
+// interface ProviderDetailPageProps {
+//   params: {
+//     id: string;
+//   };
+// }
 
-export default function ProviderDetailPage({
-  params,
-}: ProviderDetailPageProps) {
+export default function ProviderDetailPage({ params }: any) {
   return (
     <div style={{ padding: "24px" }}>
       <ProviderDetail providerId={params.id} />

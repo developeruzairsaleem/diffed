@@ -6,15 +6,7 @@ export const metadata: Metadata = {
   description: "View and manage customer details",
 };
 
-interface CustomerDetailPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function CustomerDetailPage({
-  params,
-}: CustomerDetailPageProps) {
+export default function CustomerDetailPage({ params }: any) {
   return (
     <div style={{ padding: "24px" }}>
       <CustomerDetail customerId={params.id} />
