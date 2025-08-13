@@ -2,8 +2,11 @@ import { prisma } from "@/lib/prisma";
 import dynamic from "next/dynamic";
 import ReviewsTable from "./ReviewsTable";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 async function getReviews() {
-  return await prisma.review.findMany({
+  return await prisma.platformReview.findMany({
     orderBy: { id: "desc" },
   });
 }

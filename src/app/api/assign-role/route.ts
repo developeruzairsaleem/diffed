@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 // Assuming you use NextAuth.js
 // import { authOptions } from "@/lib/auth"; // Your NextAuth options
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/sessions";
-const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   // 1. Authenticate the user making the request
