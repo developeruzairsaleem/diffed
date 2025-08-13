@@ -187,7 +187,7 @@ const GamesComponent = () => {
               )}
             </div>
             <span
-              className={`mt-2 text-sm font-medium ${
+              className={`mt-2 block mx-auto text-center text-sm font-medium ${
                 currentStep >= step.number ? "text-pink-400" : "text-gray-400"
               }`}
             >
@@ -221,7 +221,7 @@ const GamesComponent = () => {
             <p className="text-gray-300 text-center mb-12 text-lg">
               Choose the game you want to boost your performance in
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {games.map((game, index) => (
                 <div
                   key={index}
@@ -229,19 +229,19 @@ const GamesComponent = () => {
                   className="relative group cursor-pointer rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
                 >
                   <div
-                    className="rounded-xl p-1"
+                    className="rounded-xl p-1 h-full"
                     style={{
                       background:
                         "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
                     }}
                   >
-                    <div className="bg-[#5E2047] rounded-xl overflow-hidden">
+                    <div className="bg-[#5E2047] h-full rounded-xl overflow-hidden">
                       <div className="aspect-[5/4] relative">
                         <SafeImage
                           src={game.image}
                           alt={game.name}
                           placeholder="/images/placeholder.png"
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          className="w-full h-full object-cover transition-transform duration-300 "
                         />
                       </div>
                       <div className="p-6">
@@ -291,7 +291,7 @@ const GamesComponent = () => {
                   className="cursor-pointer group transition-all duration-300 transform hover:scale-105"
                 >
                   <div
-                    className="rounded-xl p-1"
+                    className="rounded-xl h-full p-1"
                     style={{
                       background:
                         "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
@@ -299,7 +299,7 @@ const GamesComponent = () => {
                   >
                     <div className="bg-[#5E2047] rounded-xl p-6 h-full">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-lg flex items-center justify-center mr-4">
+                        <div className="w-12 h-12 bg-gradient-to-r p-3 from-pink-500 to-cyan-400 rounded-lg flex items-center justify-center mr-2">
                           <span className="text-white font-bold text-lg">
                             {index + 1}
                           </span>
@@ -370,7 +370,7 @@ const GamesComponent = () => {
                 ← Back to Services
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
               {selectedService?.subpackages?.map(
                 (item: any, itemIndex: any) => (
                   <div
@@ -378,7 +378,7 @@ const GamesComponent = () => {
                     className="group transition-all duration-300 transform hover:scale-105"
                   >
                     <div
-                      className="rounded-xl p-1"
+                      className="rounded-xl h-full p-1"
                       style={{
                         background:
                           "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",

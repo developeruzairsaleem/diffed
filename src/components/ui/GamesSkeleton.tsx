@@ -4,7 +4,7 @@ import React from "react";
 const GamesSkeleton = () => {
   return (
     <div className="min-h-screen p-6 pt-0 animate-pulse">
-      <div className="max-w-7xl h-full mx-auto">
+      <div className="max-w-6xl h-full mx-auto">
         {/* Stepper Skeleton */}
         <div className="flex items-center justify-center mb-12">
           {Array.from({ length: 3 }).map((_, index) => (
@@ -13,9 +13,7 @@ const GamesSkeleton = () => {
                 <div className="w-12 h-12 rounded-full bg-gray-700 border-2 border-gray-600"></div>
                 <div className="mt-2 h-4 w-20 bg-gray-700 rounded-md"></div>
               </div>
-              {index < 2 && (
-                <div className="w-20 h-0.5 mx-4 bg-gray-600"></div>
-              )}
+              {index < 2 && <div className="w-20 h-0.5 mx-4 bg-gray-600"></div>}
             </div>
           ))}
         </div>
@@ -35,7 +33,8 @@ const GamesSkeleton = () => {
                 key={index}
                 className="rounded-xl p-1"
                 style={{
-                  background: "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)"
+                  background:
+                    "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
                 }}
               >
                 <div className="bg-[#5E2047] rounded-xl overflow-hidden">
@@ -63,20 +62,42 @@ export const ServicesStepSkeleton = () => {
           {Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="flex items-center">
               <div className="flex flex-col items-center">
-                <div className={`w-12 h-12 rounded-full border-2 ${
-                  index < 2 ? 'bg-pink-500 border-pink-500' : 'bg-gray-700 border-gray-600'
-                }`}>
+                <div
+                  className={`w-12 h-12 rounded-full border-2 ${
+                    index < 2
+                      ? "bg-pink-500 border-pink-500"
+                      : "bg-gray-700 border-gray-600"
+                  }`}
+                >
                   {index === 0 && (
-                    <svg className="w-6 h-6 text-white m-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-6 h-6 text-white m-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
-                  {index === 1 && <span className="text-white text-lg font-bold leading-12 text-center block mt-2">2</span>}
+                  {index === 1 && (
+                    <span className="text-white text-lg font-bold leading-12 text-center block mt-2">
+                      2
+                    </span>
+                  )}
                 </div>
                 <div className="mt-2 h-4 w-20 bg-gray-700 rounded-md"></div>
               </div>
               {index < 2 && (
-                <div className={`w-20 h-0.5 mx-4 ${index === 0 ? 'bg-pink-500' : 'bg-gray-600'}`}></div>
+                <div
+                  className={`w-20 h-0.5 mx-4 ${
+                    index === 0 ? "bg-pink-500" : "bg-gray-600"
+                  }`}
+                ></div>
               )}
             </div>
           ))}
@@ -98,7 +119,8 @@ export const ServicesStepSkeleton = () => {
                 key={index}
                 className="rounded-xl p-1"
                 style={{
-                  background: "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)"
+                  background:
+                    "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
                 }}
               >
                 <div className="bg-[#5E2047] rounded-xl p-6 h-full">
@@ -136,18 +158,28 @@ export const PackagesStepSkeleton = () => {
               <div className="flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-pink-500 border-2 border-pink-500">
                   {index < 2 ? (
-                    <svg className="w-6 h-6 text-white m-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-6 h-6 text-white m-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   ) : (
-                    <span className="text-white text-lg font-bold leading-12 text-center block mt-2">3</span>
+                    <span className="text-white text-lg font-bold leading-12 text-center block mt-2">
+                      3
+                    </span>
                   )}
                 </div>
                 <div className="mt-2 h-4 w-20 bg-gray-700 rounded-md"></div>
               </div>
-              {index < 2 && (
-                <div className="w-20 h-0.5 mx-4 bg-pink-500"></div>
-              )}
+              {index < 2 && <div className="w-20 h-0.5 mx-4 bg-pink-500"></div>}
             </div>
           ))}
         </div>
@@ -168,7 +200,8 @@ export const PackagesStepSkeleton = () => {
                 key={index}
                 className="rounded-xl p-1"
                 style={{
-                  background: "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)"
+                  background:
+                    "linear-gradient(90deg, #EE2C81 0%, #FE0FD0 33%, #58B9E3 66%, #F79FC5 100%)",
                 }}
               >
                 <div className="bg-[#5E2047] rounded-xl p-6 h-full flex flex-col">
