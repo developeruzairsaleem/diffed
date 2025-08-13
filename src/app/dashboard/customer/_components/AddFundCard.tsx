@@ -149,7 +149,7 @@ function AddFundsForm({
                 </Label>
                 <input
                   id="amount"
-                  className="p-3 outline-none border border-white rounded-md w-full"
+                  className="p-3 outline-none border border-white rounded-md w-full bg-transparent text-white placeholder:text-gray-300"
                   type="number"
                   step="0.01"
                   min="1"

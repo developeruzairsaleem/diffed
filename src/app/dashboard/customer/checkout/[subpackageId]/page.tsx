@@ -177,7 +177,7 @@ function CheckoutForm({
           </FormLabel>
           <FormControl asChild>
             <input
-              className={`w-full px-3 py-3 rounded  border border-white  text-[18px] text-white  focus:outline-none ${lato.className}`}
+              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
               {...register("username")}
             />
           </FormControl>
@@ -194,7 +194,7 @@ function CheckoutForm({
           </FormLabel>
           <FormControl asChild>
             <input
-              className={`w-full px-3 py-3 rounded border border-white text-[18px] text-white focus:outline-none  ${lato.className}`}
+              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
               type="text"
               {...register("discordTag")}
             />
@@ -213,7 +213,7 @@ function CheckoutForm({
           </FormLabel>
           <FormControl asChild>
             <input
-              className={`w-full px-3 py-3 rounded border border-white text-[18px] text-white focus:outline-none  ${lato.className}`}
+              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
               type="text"
               {...register("notes")}
             />
@@ -320,7 +320,7 @@ function CheckoutForm({
           </FormLabel>
           <FormControl asChild>
             <input
-              className={`w-full px-3 py-3 rounded border border-white text-[18px] text-white focus:outline-none  ${lato.className}`}
+              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
               type="text"
               {...register("cardholderName")}
             />

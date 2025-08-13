@@ -100,7 +100,7 @@ const LoginForm = () => {
                   },
                 })}
                 type="email"
-                className={`w-full px-4 py-3  border rounded-lg focus:outline-none ${
+                className={`w-full px-4 py-3 border rounded-lg bg-transparent text-white placeholder:text-gray-300 focus:outline-none ${
                   errors.email ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Your email address"
@@ -124,7 +124,7 @@ const LoginForm = () => {
                     required: "Password is required",
                   })}
                   type={showPassword ? "text" : "password"}
-                  className={`w-full px-4 py-3 pr-24 border  rounded-lg focus:outline-none  ${
+                  className={`w-full px-4 py-3 pr-24 border rounded-lg bg-transparent text-white placeholder:text-gray-300 focus:outline-none ${
                     errors.password ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Your password"
