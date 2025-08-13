@@ -162,7 +162,7 @@ const SignupForm = () => {
                       "Username can only contain letters, numbers, and underscores",
                   },
                 })}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none  ${
+                className={`w-full px-4 py-3 border text-black rounded-lg focus:outline-none  ${
                   errors.username ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Your username"
@@ -189,7 +189,7 @@ const SignupForm = () => {
                   },
                 })}
                 type="email"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none ${
+                className={`w-full px-4 py-3 border text-black rounded-lg focus:outline-none ${
                   errors.email ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Your email address"
@@ -231,7 +231,7 @@ const SignupForm = () => {
                     },
                   })}
                   type={showPassword ? "text" : "password"}
-                  className={`w-full px-4 py-3 pr-24 border rounded-lg focus:outline-none  ${
+                  className={`w-full px-4 py-3 pr-24 text-black border rounded-lg focus:outline-none  ${
                     errors.password ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Your password"
@@ -241,7 +241,7 @@ const SignupForm = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-100 hover:text-gray-200"
+                    className="text-black"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
