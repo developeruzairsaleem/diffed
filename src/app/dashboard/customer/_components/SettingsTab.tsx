@@ -21,7 +21,7 @@ const SettingsTab = () => (
             <input
               type="email"
               value="customer@example.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-white placeholder:text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               readOnly
             />
           </div>
@@ -32,14 +32,14 @@ const SettingsTab = () => (
             <input
               type="text"
               value="GameMaster_2024"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-white placeholder:text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Time Zone
             </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-transparent text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
               <option>UTC+1 (Central European Time)</option>
               <option>UTC+0 (Greenwich Mean Time)</option>
               <option>UTC-5 (Eastern Standard Time)</option>
