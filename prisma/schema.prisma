@@ -62,16 +62,20 @@ model Transaction {
   amount                Decimal           @db.Decimal(10, 2)
   description           String?
   stripePaymentIntentId String?           @map("stripe_payment_intent_id")
+  paypalOrderId         String?           @map("paypal_order_id")
+  paypalCaptureId       String?           @map("paypal_capture_id")
+  paymentMethod         PaymentMethod     @default(stripe)
   status                TransactionStatus @default(pending)
   metadata              Json?
   createdAt             DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  updatedAt             DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([walletId], name: "idx_transactions_wallet_id")
   @@index([type], name: "idx_transactions_type")
   @@index([status], name: "idx_transactions_status")
+  @@index([paymentMethod], name: "idx_transactions_payment_method")
 }
 
 model Game {
@@ -165,6 +169,8 @@ model Order {
   approvedCount   Int               @default(0) // redundant no need to change
   requiredCount   Int               @default(1) // how many providers needed
   stripeSessId    String?
+  paypalOrderId   String?           @map("paypal_order_id")
+  paymentMethod   PaymentMethod     @default(stripe)
   currentELO      Int?
   targetELO       Int?
   createdAt       DateTime          @default(now())
@@ -222,4 +228,9 @@ enum OrderAssignmentStatus {
   APPROVED
   COMPLETED
   VERIFIED
+}
+
+enum PaymentMethod {
+  stripe
+  paypal
 }

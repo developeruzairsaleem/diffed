@@ -64,6 +64,9 @@ export async function POST(request: NextRequest) {
     const {
       subpackageId,
       paymentIntentId,
+      paypalOrderId,
+      paypalCaptureId,
+      paymentMethod,
       discordUsername,
       discordTag,
       notes,
@@ -74,14 +77,17 @@ export async function POST(request: NextRequest) {
 
     if (
       !subpackageId ||
-      !paymentIntentId ||
       !discordUsername ||
       !discordTag ||
-      (notes && typeof notes !== "string")
+      (notes && typeof notes !== "string") ||
+      !(
+        (paymentIntentId && paymentMethod === "stripe") ||
+        (paypalOrderId && paypalCaptureId && paymentMethod === "paypal")
+      )
     ) {
       return NextResponse.json(
         {
-          error: "Invalid request body.Cant' create the order",
+          error: "Invalid request body. Can't create the order",
           success: false,
         },
         {
@@ -117,18 +123,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate payment intent with Stripe
-    // const stri = stripe;
-    let paymentIntent;
-    try {
-      paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    } catch (err) {
-      return NextResponse.json(
-        { error: "Invalid payment intent", success: false },
-        { status: 400 }
-      );
+    // Validate payment based on payment method
+    let paymentValid = false;
+
+    if (paymentMethod === "stripe") {
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(
+          paymentIntentId
+        );
+        paymentValid = paymentIntent && paymentIntent.status === "succeeded";
+      } catch (err) {
+        return NextResponse.json(
+          { error: "Invalid Stripe payment intent", success: false },
+          { status: 400 }
+        );
+      }
+    } else if (paymentMethod === "paypal") {
+      // PayPal payment is already validated by the capture endpoint
+      paymentValid = true;
     }
-    if (!paymentIntent || paymentIntent.status !== "succeeded") {
+
+    if (!paymentValid) {
       return NextResponse.json(
         { error: "Payment not successful", success: false },
         { status: 400 }
@@ -147,6 +162,9 @@ export async function POST(request: NextRequest) {
         discordTag: discordTag,
         discordUsername: discordUsername,
         notes: notes || null,
+        paymentMethod: paymentMethod,
+        paypalOrderId: paymentMethod === "paypal" ? paypalOrderId : null,
+        stripeSessId: paymentMethod === "stripe" ? paymentIntentId : null,
       },
     });
 
@@ -161,7 +179,11 @@ export async function POST(request: NextRequest) {
           type: "payment",
           amount: finalPrice,
           description: `Order payment for subpackage ${subpackage.name}`,
-          stripePaymentIntentId: paymentIntentId,
+          paymentMethod: paymentMethod,
+          stripePaymentIntentId:
+            paymentMethod === "stripe" ? paymentIntentId : null,
+          paypalOrderId: paymentMethod === "paypal" ? paypalOrderId : null,
+          paypalCaptureId: paymentMethod === "paypal" ? paypalCaptureId : null,
           status: "completed",
           metadata: {
             orderId: order.id,
