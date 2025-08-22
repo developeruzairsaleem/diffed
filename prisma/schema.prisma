@@ -97,6 +97,7 @@ model User {
   username     String   @unique
   email        String   @unique
   password     String
+  bio          String?
   role         Role
   status       Status   @default(active)
   stripeCustId String?  @map("stripe_customer_id")
