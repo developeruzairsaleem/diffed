@@ -6,19 +6,28 @@ import type { ChatMessage, TypingData } from "../lib/socket";
 
 // ------------------------------------------
 // connect the socket connection for realtime
-// -----------------------------------------
+// ------------------------------------------
 export function useSocket() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io(
-      process.env.NODE_ENV === "production" ? "" : "http://localhost:3000",
-      {
-        path: "/api/socket",
-        addTrailingSlash: false,
-      }
-    );
+    // Fix for production: use window.location.origin instead of empty string
+    const socketUrl =
+      process.env.NODE_ENV === "production"
+        ? window.location.origin
+        : "http://localhost:3000";
+
+    const socketInstance = io(socketUrl, {
+      path: "/api/socket",
+      addTrailingSlash: false,
+      // Add production-specific options
+      transports: ["websocket", "polling"],
+      timeout: 20000,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
 
     socketInstance.on("connect", () => {
       console.log("Connected to socket server");
@@ -27,6 +36,11 @@ export function useSocket() {
 
     socketInstance.on("disconnect", () => {
       console.log("Disconnected from socket server");
+      setIsConnected(false);
+    });
+
+    socketInstance.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
       setIsConnected(false);
     });
 
@@ -50,6 +64,35 @@ export function useOrderChat(
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
 
+  // Sound functions
+  const playNotificationSound = () => {
+    // Check if sound is enabled in localStorage
+    const soundEnabled = localStorage.getItem("chatSoundEnabled") !== "false";
+    if (!soundEnabled) return;
+
+    try {
+      const audio = new Audio("/sounds/notification.wav");
+      audio.volume = 0.5;
+      audio.play().catch(console.error);
+    } catch (error) {
+      console.error("Failed to play notification sound:", error);
+    }
+  };
+
+  const playSendSound = () => {
+    // Check if sound is enabled in localStorage
+    const soundEnabled = localStorage.getItem("chatSoundEnabled") !== "false";
+    if (!soundEnabled) return;
+
+    try {
+      const audio = new Audio("/sounds/send.mp3");
+      audio.volume = 0.3;
+      audio.play().catch(console.error);
+    } catch (error) {
+      console.error("Failed to play send sound:", error);
+    }
+  };
+
   useEffect(() => {
     if (!socket || !orderId) return;
 
@@ -62,6 +105,11 @@ export function useOrderChat(
         if (exists) return prev;
         return [...prev, message].sort((a, b) => a.timestamp - b.timestamp);
       });
+
+      // Play notification sound for messages from other users
+      if (message.senderId !== currentUser.id) {
+        playNotificationSound();
+      }
     });
 
     socket.on("user-typing", (data: TypingData) => {
@@ -113,6 +161,9 @@ export function useOrderChat(
       timestamp: Date.now(),
       type: "message",
     };
+
+    // Play send sound
+    playSendSound();
 
     socket.emit("send-message", messageData);
 

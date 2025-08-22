@@ -10,7 +10,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Send, Wifi, WifiOff, MessageCircle, Gamepad2 } from "lucide-react";
+import {
+  Send,
+  Wifi,
+  WifiOff,
+  MessageCircle,
+  Gamepad2,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useOrderChat } from "@/hooks/useSocket";
 import type { ChatMessage } from "@/lib/socket";
 import { cn } from "@/lib/utils";
@@ -35,8 +43,9 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   const [messageInput, setMessageInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>(null); //updated might cause issue
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); //updated might cause issue
 
   const { messages, typingUsers, isConnected, sendMessage, sendTyping } =
     useOrderChat(orderId, currentUser);
@@ -98,6 +107,29 @@ export default function ChatInterface({
       minute: "2-digit",
     });
   };
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled);
+    // Store preference in localStorage
+    localStorage.setItem("chatSoundEnabled", (!soundEnabled).toString());
+
+    // Test sound when enabling
+    if (!soundEnabled) {
+      setTimeout(() => {
+        const audio = new Audio("/sounds/notification.wav");
+        audio.volume = 0.3;
+        audio.play().catch(console.error);
+      }, 100);
+    }
+  };
+
+  // Load sound preference from localStorage
+  useEffect(() => {
+    const savedSoundPreference = localStorage.getItem("chatSoundEnabled");
+    if (savedSoundPreference !== null) {
+      setSoundEnabled(savedSoundPreference === "true");
+    }
+  }, []);
 
   return (
     <div className={cn("w-full max-w-4xl mx-auto", className)}>
@@ -165,28 +197,46 @@ export default function ChatInterface({
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              {isConnected ? (
-                <>
-                  <Wifi className="h-4 w-4 text-green-400" />
-                  <Badge
-                    variant="outline"
-                    className="text-green-400 border-green-400"
-                  >
-                    Connected
-                  </Badge>
-                </>
-              ) : (
-                <>
-                  <WifiOff className="h-4 w-4 text-red-400" />
-                  <Badge
-                    variant="outline"
-                    className="text-red-400 border-red-400"
-                  >
-                    Connecting...
-                  </Badge>
-                </>
-              )}
+            <div className="flex items-center space-x-3">
+              {/* Sound Toggle Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSound}
+                className="text-white hover:bg-white/20"
+                title={soundEnabled ? "Disable sound" : "Enable sound"}
+              >
+                {soundEnabled ? (
+                  <Volume2 className="h-4 w-4" />
+                ) : (
+                  <VolumeX className="h-4 w-4" />
+                )}
+              </Button>
+
+              {/* Connection Status */}
+              <div className="flex items-center space-x-2">
+                {isConnected ? (
+                  <>
+                    <Wifi className="h-4 w-4 text-green-400" />
+                    <Badge
+                      variant="outline"
+                      className="text-green-400 border-green-400"
+                    >
+                      Connected
+                    </Badge>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff className="h-4 w-4 text-red-400" />
+                    <Badge
+                      variant="outline"
+                      className="text-red-400 border-red-400"
+                    >
+                      Connecting...
+                    </Badge>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </CardHeader>
