@@ -1,24 +1,24 @@
 // prisma/seed.ts
 import { faker } from "@faker-js/faker";
 import { prisma } from "../src/lib/prisma";
-import { LoginFormSchema, SignupFormSchema } from "../src/lib/definitions";
-import { createSession, deleteSession } from "../src/lib/sessions";
-import { createWallet, getWallet } from "../src/lib/wallet";
+import { SignupFormSchema } from "../src/lib/definitions";
+import { createWallet } from "../src/lib/wallet";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 
 async function signup() {
   try {
     const validatedFields = SignupFormSchema.safeParse({
-      username: 'test1',
-      email: "test1@gmail.com",
-      password: 'password',
-      role: 'customer',
+      username: "test2",
+      email: "test2@gmail.com",
+      password: "passwordA1!",
+      role: "customer",
     });
 
     // If any form fields are invalid, return early
     if (!validatedFields.success) {
-      throw new Error("Invalid registration data, please make sure it is valid");
+      throw new Error(
+        "Invalid registration data, please make sure it is valid"
+      );
     }
 
     // prepare the user data for db insertion
@@ -55,21 +55,21 @@ async function signup() {
     });
     // something went wrong while creating a user
     if (!user) {
-       throw new Error("Something went wrong registering")
-      
+      throw new Error("Something went wrong registering");
     }
 
     // create user wallet entry in the database
     const wallet = await createWallet(user.id);
-    return { userId:user.id, walletId:wallet.id}; 
+    return { userId: user.id, walletId: wallet.id };
   } catch (error) {
-    throw new Error ("semething went wrong ");  
+    console.log(error);
+    throw new Error("semething went wrong ");
   }
 }
 
 async function main() {
-  const {userId,walletId }= await signup()
-  const mainCustomerId = userId
+  const { userId, walletId } = await signup();
+  const mainCustomerId = userId;
   const mainCustomerWalletId = walletId;
 
   // Create games with services and subpackages
@@ -106,28 +106,26 @@ async function main() {
               duration: `${2 + j}h`,
               serviceId: service.id,
               requiredProviders: j + 1,
-              type: 'pergame'
+              type: "pergame",
             },
           });
         }
 
-
-        
         for (let j = 0; j < 2; j++) {
           await prisma.subpackage.create({
             data: {
-              name: `SubPkg ${j + 1 +j} `,
+              name: `SubPkg ${j + 1 + j} `,
               description: `Boost level team ${j + 1} in ${name}`,
               price: (j + 1) * 15,
               duration: `${2 + j}h`,
               serviceId: service.id,
               requiredProviders: j + 1,
-              type: 'pergame',
-              ranks:[
-                {name:"Silver",additionalCost:10},
-                {name:"Gold",additionalCost:20},
-                {name:"Platinum",additionalCost:30}
-              ]
+              type: "pergame",
+              ranks: [
+                { name: "Silver", additionalCost: 10 },
+                { name: "Gold", additionalCost: 20 },
+                { name: "Platinum", additionalCost: 30 },
+              ],
             },
           });
         }
@@ -135,23 +133,21 @@ async function main() {
         for (let j = 0; j < 2; j++) {
           await prisma.subpackage.create({
             data: {
-              name: `SubPkg ${j + 1 +j+j} `,
+              name: `SubPkg ${j + 1 + j + j} `,
               description: `Boost level team ${j + 1} in ${name}`,
               price: (j + 1) * 15,
               duration: `${2 + j}h`,
               serviceId: service.id,
               requiredProviders: j + 1,
               type: "perteammate",
-              ranks:[
-                {name:"Silver",additionalCost:10},
-                {name:"Gold",additionalCost:20},
-                {name:"Platinum",additionalCost:30}
-              ]
+              ranks: [
+                { name: "Silver", additionalCost: 10 },
+                { name: "Gold", additionalCost: 20 },
+                { name: "Platinum", additionalCost: 30 },
+              ],
             },
           });
         }
-
-
       }
 
       return game;
@@ -193,8 +189,8 @@ async function main() {
         price: subpackage.price,
         requiredCount: subpackage.requiredProviders,
         discordTag: `#12314${i}`,
-        rank: {name:"Gold",additionalCost:20},
-        gamesCount: subpackage.type !== 'pergame' ? 3 : 4,
+        rank: { name: "Gold", additionalCost: 20 },
+        gamesCount: subpackage.type !== "pergame" ? 3 : 4,
         packageType: subpackage.type,
         discordUsername: `uzairkhan${i}`,
         notes: Math.random() > 0.5 ? faker.lorem.sentence() : null,
