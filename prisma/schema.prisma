@@ -135,22 +135,24 @@ model Service {
 }
 
 model Subpackage {
-  id                String   @id @default(cuid())
+  id                String         @id @default(cuid())
   name              String
   description       String
+  ranks             Json?
+  type              SubpackageType
   price             Float
   duration          String? // e.g. "3h"
-  dynamicPricing    Boolean  @default(false)
+  dynamicPricing    Boolean        @default(false)
   basePricePerELO   Float?
   minELO            Int?
   maxELO            Int?
   serviceId         String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  service           Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  stripeProdId      String?  @unique
-  stripePriceId     String?  @unique
-  requiredProviders Int      @default(1)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  service           Service        @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  stripeProdId      String?        @unique
+  stripePriceId     String?        @unique
+  requiredProviders Int            @default(1)
   orders            Order[]
 }
 
@@ -166,6 +168,10 @@ model Order {
   price           Float
   status          OrderStatus       @default(PENDING)
   notes           String?
+  rank            Json?
+  gamesCount      Int
+  teammatesCount  Int
+  packageType     SubpackageType
   rerollsLeft     Int               @default(3)
   approvedCount   Int               @default(0) // redundant no need to change
   requiredCount   Int               @default(1) // how many providers needed
@@ -234,4 +240,9 @@ enum OrderAssignmentStatus {
 enum PaymentMethod {
   stripe
   paypal
+}
+
+enum SubpackageType {
+  pergame
+  perteammate
 }
