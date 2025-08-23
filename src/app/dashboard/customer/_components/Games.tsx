@@ -109,13 +109,9 @@ const GamesComponent = () => {
   };
   const confirmCheckout = () => {
     if (!selectedSubpackage) return;
-    if (!currentELO || !targetELO) {
-      router.push(`/dashboard/customer/checkout/${selectedSubpackage.id}`);
-    } else {
-      router.push(
-        `/dashboard/customer/checkout/${selectedSubpackage.id}?currentELO=${currentELO}&targetELO=${targetELO}&numberOfGames=${numGamesMap[selectedSubpackage.id] || 1}&numberOfTeammates=${numTeammatesMap[selectedSubpackage.id] || 1}`
-      );
-    }
+  
+    router.push(`/dashboard/customer/checkout/${selectedSubpackage.id}?rankName=${selectedRank?.name || ''}?numberOfGames=${numGamesMap[selectedSubpackage.id] || 1}&numberOfTeammates=${numTeammatesMap[selectedSubpackage.id] || 1}`);
+    
   };
   const confirmQuickPay = async () => {
     if (!selectedSubpackage) return;
