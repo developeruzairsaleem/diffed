@@ -23,6 +23,7 @@ interface Transaction {
   createdAt: string;
   description: string;
   status: string;
+  paymentMethod?: string;
 }
 
 interface DashboardState {

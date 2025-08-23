@@ -423,7 +423,7 @@ export default function ProviderDetail({ providerId }: ProviderDetailProps) {
     },
     {
       key: "assignments",
-      label: `Assignments (${provider.assignments.length})`,
+      label: `Orders (${provider.assignments.length})`,
       children: (
         <Table
           columns={assignmentColumns}

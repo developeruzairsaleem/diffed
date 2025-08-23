@@ -118,6 +118,18 @@ export default function OrdersTable() {
       ),
     },
     {
+      title: "Providers",
+      key: "providers",
+      width: 200,
+      render: (_, record: OrderListDto) => {
+        const usernames = record.assignments
+          ?.map((a: { provider?: { username?: string } }) => a.provider?.username)
+          .filter(Boolean)
+          .join(", ");
+        return <span>{usernames || "-"}</span>;
+      },
+    },
+    {
       title: "Service",
       key: "service",
       width: 250,

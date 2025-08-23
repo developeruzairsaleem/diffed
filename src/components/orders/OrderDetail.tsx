@@ -391,10 +391,10 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
                 // setEditModalVisible(true);
               }}
             >
-              Mark Order As Completed
+              Mark Order As Verified
             </Button>
           ) : (
-            <Button disabled={true}>Marked As Completed</Button>
+            <Button disabled={true}>Marked As Verified</Button>
           )}
         </Space>
       </div>

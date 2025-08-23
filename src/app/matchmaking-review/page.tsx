@@ -186,7 +186,7 @@ const MatchMakingReview = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-2  gap-[0.625rem] md:gap-[1.25rem] xl:gap-[1.875rem] 2xl:gap-[2.5rem] capitalize w-full font-[poppins] justify-start">
+            <div className="grid grid-cols-2 grid-rows-auto gap-[0.625rem] md:gap-[1.25rem] xl:gap-[1.875rem] 2xl:gap-[2.5rem] capitalize w-full font-[poppins] justify-start">
               <div
                 onClick={() => {
                   setTipAmount(1);
@@ -237,6 +237,19 @@ const MatchMakingReview = () => {
               >
                 <p className="md:text-[2.5rem] font-[400]  ">5$</p>
               </div>
+                <div
+                  onClick={() => {
+                    setTipAmount(0);
+                    setCustomAmount(0);
+                  }}
+                  className={`px-[1.25rem] mx-auto w-full py-[0.375rem] sm:py-[0.5rem] md:py-[0.75rem] text-center ${
+                    tipAmount === 0 && customAmount === 0
+                      ? `bg-[#232323] text-white scale-[0.97]`
+                      : `bg-[#E5E5E5] text-black `
+                  } rounded-[0.473125rem] border border-gray-300`}
+                >
+                  <p className="md:text-[1.5rem] font-[400] whitespace-nowrap">No Tip</p>
+                </div>
             </div>
           </div>
         </div>

@@ -88,7 +88,7 @@ const OrderDetailsCard = ({ order }: { order: any }) => (
           ${order.price.toFixed(2)}
         </span>
       </p>
-      {order?.currentELO != null && order?.targetELO != null && (
+      {order?.currentELO != null && order?.targetELO != null && order?.currentELO != 0 && order?.targetELO != 0 && (
         <p className="text-white/70">
           <strong>ELO:</strong>{" "}
           <span className="font-bold text-orange-300 inline-flex items-center gap-1">
@@ -99,7 +99,7 @@ const OrderDetailsCard = ({ order }: { order: any }) => (
       )}
       <p className="text-white/70">
         <strong>Order Status:</strong>{" "}
-        <span className="font-bold text-yellow-400">{order.status}</span>
+        <span className="font-bold text-green-400">{order.status}</span>
       </p>
     </CardContent>
   </Card>
@@ -176,6 +176,10 @@ const ActionsCard = ({
 // --- THE MAIN PAGE COMPONENT ---
 
 export default function ProviderSetupPage() {
+  // Back button handler
+  const handleBack = () => {
+    window.location.href = "/dashboard/provider";
+  };
   const params = useParams();
   const assignmentId = params!.id as string;
   const [assignment, setAssignment] = useState<any>(null);
@@ -233,6 +237,15 @@ export default function ProviderSetupPage() {
           },
         }}
       />
+      {/* Back Button */}
+      <div className="absolute top-3 left-3 p-4">
+        <button
+          onClick={handleBack}
+          className="bg-black/70 text-white mb-4 px-4 py-2 hover:bg-black/50  rounded-lg shadow transition-all"
+        >
+        Back to Dashboard
+        </button>
+      </div>
       <div className="p-4 md:p-6 space-y-8">
         <div
           className="h-32 md:h-48 bg-cover bg-center rounded-lg flex items-end p-6"

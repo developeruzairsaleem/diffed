@@ -96,6 +96,7 @@ model User {
   id           String   @id @default(cuid())
   username     String   @unique
   email        String   @unique
+  bio          String? 
   password     String
   bio          String?
   role         Role
@@ -235,3 +236,4 @@ enum PaymentMethod {
   stripe
   paypal
 }
+

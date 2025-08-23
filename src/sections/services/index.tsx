@@ -58,7 +58,7 @@ const Services = () => {
           </div>
           <div className="flex flex-col gap-[14px] mb-[47px] px-[7px]">
             <p className="text-[24px] font-[500] line-height-[111%] letter-spacing-[3.5%]">
-              Boosting
+              Play with a Teammate
             </p>
             <p className="text-[18px] font-[500] line-height-[86%] letter-spacing-[3.5%] capitalize">
               Get fast rank-ups from top-tier pros. <br />
@@ -72,7 +72,7 @@ const Services = () => {
             onClick={() => router.push("/login")}
           >
             <p className="text-[16px] font-[700] letter-spacing-[4%] skew-x-20">
-              exlore teammate
+              Get A teammate
             </p>
           </button>
         </div>

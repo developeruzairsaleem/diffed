@@ -12,7 +12,7 @@ import SafeImage from "@/components/ui/SafeImage";
 const StatCard = ({ icon: Icon, title, value, description }) => (
   <div
     style={{ borderColor: "#EE2C81" }}
-    className="bg-black/30 backdrop-blur-sm p-6 rounded-lg border-l-4 shadow-lg transition-all hover:scale-105 hover:shadow-pink-900/50"
+    className="bg-black/30 backdrop-blur-sm p-6 rounded-lg border-l-4 shadow-lg  "
   >
     <div className="flex items-center justify-between">
       <h3 className="text-sm font-medium text-white/70">{title}</h3>
@@ -28,7 +28,7 @@ const StatCard = ({ icon: Icon, title, value, description }) => (
 );
 
 const GameStatCard = ({ game }) => (
-  <div className="bg-[#3A0F2A]/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 flex items-center space-x-4 transition-all hover:border-cyan-400/50">
+  <div className="bg-[#3A0F2A]/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 flex items-center space-x-4 ">
     <SafeImage
       src={game.gameImage}
       alt={game.gameName}

@@ -32,8 +32,10 @@ const WalletTab = () => {
           createdAt: idTx.createdAt,
           description: idTx.description,
           status: idTx.status,
+          paymentMethod: idTx.paymentMethod,
         };
       });
+      console.log("txData", txData);
       store.setTransactions(txData);
     } catch (error) {
       console.error("Error refreshing wallet data:", error);
@@ -155,6 +157,11 @@ const WalletTab = () => {
                         <div className="text-sm text-gray-100">
                           {formatDate(transaction.createdAt)}
                         </div>
+                        {transaction.paymentMethod && (
+                          <div className="text-sm text-gray-100 capitalize">
+                            via {transaction.paymentMethod}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="text-right">
@@ -171,6 +178,7 @@ const WalletTab = () => {
                       <div className="text-sm text-gray-100 capitalize">
                         {transaction.status}
                       </div>
+                     
                     </div>
                   </div>
                 ))}
