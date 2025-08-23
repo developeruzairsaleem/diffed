@@ -96,9 +96,8 @@ model User {
   id           String   @id @default(cuid())
   username     String   @unique
   email        String   @unique
-  bio          String? 
-  password     String
   bio          String?
+  password     String
   role         Role
   status       Status   @default(active)
   stripeCustId String?  @map("stripe_customer_id")
@@ -236,4 +235,3 @@ enum PaymentMethod {
   stripe
   paypal
 }
-
