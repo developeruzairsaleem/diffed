@@ -40,24 +40,15 @@
 3. **Fix any bugs** in the current implementation
 4. **Ensure checkout works** before production deployment
 
-## What We Can Skip For Now
 
-- Webhook implementation (can add later)
-- Business account verification (not needed for development)
-- Production credentials (can add later)
-
-## Timeline
-
-- **You provide credentials** → I complete integration in 2-3 days
-- **You don't provide** → PayPal checkout remains broken
 
 ## Next Steps
 
-1. **Create PayPal Developer account** (takes 10 minutes)
-2. **Create app and get credentials** (takes 5 minutes)
-3. **Share credentials with me** (takes 1 minute)
-4. **I complete development** (takes 2-3 days)
+1. **Create PayPal Developer account**
+2. **Create app and get credentials** 
+3. **Share credentials along with developer account credentials with me** 
+4. **I complete development**
 
 ---
 
-**Bottom Line:** I need your PayPal Developer account access to complete the PayPal checkout integration. This is the only blocker preventing me from finishing the development.
+**Bottom Line:** I need your PayPal Developer account access to complete the PayPal checkout integration. This is the only blocker preventing me from integrating paypal.
