@@ -8,8 +8,8 @@ import bcrypt from "bcryptjs";
 async function signup() {
   try {
     const validatedFields = SignupFormSchema.safeParse({
-      username: "test2",
-      email: "test2@gmail.com",
+      username: "test33",
+      email: "test33@gmail.com",
       password: "passwordA1!",
       role: "customer",
     });
@@ -145,6 +145,40 @@ async function main() {
                 { name: "Gold", additionalCost: 20 },
                 { name: "Platinum", additionalCost: 30 },
               ],
+            },
+          });
+        }
+
+        for (let j = 0; j < 2; j++) {
+          await prisma.subpackage.create({
+            data: {
+              name: `SubPkg CS2 ${j + 1 + j + j + j} `,
+              description: `Boost level team ${j + 1} in ${name}`,
+              price: (j + 1) * 55,
+              basePricePerELO: 0,
+              dynamicPricing: true,
+              serviceId: service.id,
+              requiredProviders: 1,
+              type: "perteammate",
+              minELO: j * 1 + 1000,
+              maxELO: j * 1 + 1200,
+            },
+          });
+        }
+
+        for (let j = 0; j < 2; j++) {
+          await prisma.subpackage.create({
+            data: {
+              name: `SubPkg CS12 ${j + 1 + j + j + j} `,
+              description: `Boost level team ${j + 1} in ${name}`,
+              price: (j + 1) * 55,
+              basePricePerELO: 0,
+              dynamicPricing: true,
+              serviceId: service.id,
+              requiredProviders: 1,
+              type: "pergame",
+              minELO: j * 1 + 1000,
+              maxELO: j * 1 + 1200,
             },
           });
         }

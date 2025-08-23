@@ -10,12 +10,6 @@ export type NextApiResponseServerIO = NextApiResponse & {
   };
 };
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export interface ChatMessage {
   id: string;
   orderId: string;

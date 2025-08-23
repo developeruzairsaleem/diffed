@@ -57,10 +57,12 @@ export default function ChatInterface({
   const handleSendMessage = async () => {
     if (!messageInput.trim()) return;
 
-    await sendMessage(messageInput);
-    setMessageInput("");
+    const message = messageInput.trim();
+    setMessageInput(""); // Clear input immediately for better UX
     setIsTyping(false);
     sendTyping(false);
+
+    await sendMessage(message); // Send the saved message
   };
 
   const handleInputChange = (value: string) => {
@@ -199,7 +201,7 @@ export default function ChatInterface({
             </div>
             <div className="flex items-center space-x-3">
               {/* Sound Toggle Button */}
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleSound}
@@ -211,11 +213,11 @@ export default function ChatInterface({
                 ) : (
                   <VolumeX className="h-4 w-4" />
                 )}
-              </Button>
+              </Button> */}
 
               {/* Connection Status */}
               <div className="flex items-center space-x-2">
-                {isConnected ? (
+                {/* {isConnected ? (
                   <>
                     <Wifi className="h-4 w-4 text-green-400" />
                     <Badge
@@ -235,7 +237,7 @@ export default function ChatInterface({
                       Connecting...
                     </Badge>
                   </>
-                )}
+                )} */}
               </div>
             </div>
           </div>

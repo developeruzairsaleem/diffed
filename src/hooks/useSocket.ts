@@ -19,29 +19,44 @@ export function useSocket() {
         : "http://localhost:3000";
 
     const socketInstance = io(socketUrl, {
-      path: "/api/socket",
-      addTrailingSlash: false,
-      // Add production-specific options
-      transports: ["websocket", "polling"],
-      timeout: 20000,
+      path: "/api/socket/",
+      addTrailingSlash: true,
+      // Force polling first to avoid WebSocket upgrade issues
+      transports: ["polling"],
+      timeout: 30000,
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000,
+      // Additional stability options
+      forceNew: true,
+      upgrade: false, // Disable WebSocket upgrade to prevent disconnects
     });
 
     socketInstance.on("connect", () => {
-      console.log("Connected to socket server");
+      console.log("✅ CONNECTED to socket server - ID:", socketInstance.id);
+      console.log("🔌 Transport:", socketInstance.io.engine.transport.name);
       setIsConnected(true);
     });
 
-    socketInstance.on("disconnect", () => {
-      console.log("Disconnected from socket server");
+    socketInstance.on("disconnect", (reason) => {
+      console.log("❌ DISCONNECTED from socket server");
+      console.log("📍 Disconnect reason:", reason);
+      console.log("🔍 Socket ID was:", socketInstance.id);
       setIsConnected(false);
     });
 
     socketInstance.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
+      console.error("💥 Socket connection error:", error);
       setIsConnected(false);
+    });
+
+    // Additional event handlers for debugging
+    socketInstance.io.on("error", (error) => {
+      console.error("🚨 Engine error:", error);
+    });
+
+    socketInstance.io.engine.on("close", (reason) => {
+      console.log("🔒 Engine closed:", reason);
     });
 
     setSocket(socketInstance);
