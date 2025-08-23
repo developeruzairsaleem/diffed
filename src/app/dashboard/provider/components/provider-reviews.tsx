@@ -96,7 +96,7 @@ export function ProviderReviews() {
                     </div>
                     <div>
                       <span className="font-medium text-white">
-                        {review.order.customer.username}
+                        Customer
                       </span>
                       <div className="flex mt-1">
                         {Array.from({ length: 5 }).map((_, index) => (

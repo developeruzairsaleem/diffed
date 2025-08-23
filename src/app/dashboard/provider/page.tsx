@@ -42,10 +42,10 @@ export default function Dashboard() {
   const { user } = useStore();
   const TABS = [
     { value: "overview", label: "Overview", icon: LayoutGrid },
-    { value: "queue", label: "Queue", icon: List },
+    { value: "queue", label: "Services", icon: List },
     { value: "orders", label: "Orders", icon: Package },
     { value: "earnings", label: "Earnings", icon: DollarSign },
-    { value: "clients", label: "Clients", icon: Users },
+    // { value: "clients", label: "Clients", icon: Users },
     { value: "reviews", label: "Reviews", icon: Star },
     { value: "settings", label: "Settings", icon: Settings },
   ];

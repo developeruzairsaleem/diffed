@@ -18,9 +18,9 @@ import {
   Rate,
   Progress,
   Form,
-  message,
   Modal,
 } from "antd";
+import { toast } from "sonner";
 import {
   EyeOutlined,
   EditOutlined,
@@ -89,11 +89,10 @@ export default function ProvidersTable() {
           if (!res.ok) throw new Error("Failed to delete");
           else {
             await refetch();
-            message.success("Customer deleted");
+            toast.success("Customer deleted");
           }
-          // refetch data if needed
         } catch (err) {
-          message.error("Error deleting customer");
+          toast.error("Error deleting customer");
         } finally {
           setDeletingProviderId("");
         }
@@ -170,12 +169,12 @@ export default function ProvidersTable() {
       width: 120,
       render: (_, record: ProviderListDto) => {
         const rate =
-          record.assignmentsCount > 0
-            ? (record.completedAssignments / record.assignmentsCount) * 100
+        record.assignmentsCount > 0
+        ? (record.completedAssignments / record.assignmentsCount) * 100
             : 0;
         return (
           <Progress
-            percent={rate}
+          percent={rate}
             size="small"
             format={(percent) => `${percent?.toFixed(0)}%`}
           />
@@ -189,7 +188,7 @@ export default function ProvidersTable() {
       width: 120,
       render: (amount: number) => (
         <span
-          style={{ fontWeight: 500, color: amount > 0 ? "#52c41a" : "#999" }}
+        style={{ fontWeight: 500, color: amount > 0 ? "#52c41a" : "#999" }}
         >
           ${amount.toFixed(2)}
         </span>
@@ -229,6 +228,40 @@ export default function ProvidersTable() {
       key: "createdAt",
       width: 120,
       render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: "Activate",
+      key: "activate",
+      width: 140,
+      render: (_, record: ProviderListDto) => (
+        <Select
+          value={record.status}
+          style={{ width: 120 }}
+          onChange={async (value) => {
+            try {
+              const res = await fetch(`/api/admin/providers/${record.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: value }),
+              });
+              const result = await res.json();
+              if (!res.ok || !result.success) {
+                toast.error(result.error || "Error updating status");
+              }
+              if (res.ok && result.success) {
+                toast.success(result.message || "Provider status updated");
+                await refetch();
+              }
+            } catch (err) {
+              toast.error("Error updating status");
+            }
+          }}
+        >
+          <Option value={Status.active}>{statusLabels[Status.active]}</Option>
+          <Option value={Status.inactive}>{statusLabels[Status.inactive]}</Option>
+          <Option value={Status.suspended}>{statusLabels[Status.suspended]}</Option>
+        </Select>
+      ),
     },
     {
       title: "Actions",

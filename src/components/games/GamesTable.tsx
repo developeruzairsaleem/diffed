@@ -406,7 +406,6 @@ export default function GamesTable() {
                 }
               />
             </Space.Compact>
-            <Button icon={<FilterOutlined />}>More Filters</Button>
           </Space>
           <Button
             type="primary"

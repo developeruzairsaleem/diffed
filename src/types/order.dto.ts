@@ -73,6 +73,7 @@ export interface OrderListDto {
   createdAt: Date;
   updatedAt: Date;
   assignmentsCount: number;
+  assignments?: OrderAssignmentDto[];
 }
 
 // Order DTOs

@@ -487,10 +487,6 @@ export default function OrderDetailPage() {
                                   {assignment.status}
                                 </Badge>
                               </p>
-
-                              <p className="text-sm text-gray-100">
-                                {assignment.provider.email}
-                              </p>
                             </div>
                           </div>
                           <div className="text-right flex gap-2">

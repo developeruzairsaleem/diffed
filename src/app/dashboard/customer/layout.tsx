@@ -63,6 +63,7 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
           createdAt: idTx.createdAt,
           description: idTx.description,
           status: idTx.status,
+          paymentMethod: idTx.paymentMethod,
         };
       });
       store.setTransactions(txData);
