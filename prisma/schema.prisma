@@ -170,7 +170,6 @@ model Order {
   notes           String?
   rank            Json?
   gamesCount      Int
-  teammatesCount  Int
   packageType     SubpackageType
   rerollsLeft     Int               @default(3)
   approvedCount   Int               @default(0) // redundant no need to change

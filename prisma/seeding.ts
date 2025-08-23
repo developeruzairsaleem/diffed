@@ -40,9 +40,52 @@ async function main() {
               duration: `${2 + j}h`,
               serviceId: service.id,
               requiredProviders: j + 1,
+              type: 'pergame'
             },
           });
         }
+
+
+        
+        for (let j = 0; j < 2; j++) {
+          await prisma.subpackage.create({
+            data: {
+              name: `SubPkg ${j + 1 +j} `,
+              description: `Boost level team ${j + 1} in ${name}`,
+              price: (j + 1) * 15,
+              duration: `${2 + j}h`,
+              serviceId: service.id,
+              requiredProviders: j + 1,
+              type: 'pergame',
+              ranks:[
+                {name:"Silver",additionalCost:10},
+                {name:"Gold",additionalCost:20},
+                {name:"Platinum",additionalCost:30}
+              ]
+            },
+          });
+        }
+
+        for (let j = 0; j < 2; j++) {
+          await prisma.subpackage.create({
+            data: {
+              name: `SubPkg ${j + 1 +j} `,
+              description: `Boost level team ${j + 1} in ${name}`,
+              price: (j + 1) * 15,
+              duration: `${2 + j}h`,
+              serviceId: service.id,
+              requiredProviders: j + 1,
+              type: "perteammate",
+              ranks:[
+                {name:"Silver",additionalCost:10},
+                {name:"Gold",additionalCost:20},
+                {name:"Platinum",additionalCost:30}
+              ]
+            },
+          });
+        }
+
+
       }
 
       return game;
@@ -84,6 +127,9 @@ async function main() {
         price: subpackage.price,
         requiredCount: subpackage.requiredProviders,
         discordTag: `#12314${i}`,
+        rank: {name:"Gold",additionalCost:20},
+        gamesCount: subpackage.type !== 'pergame' ? 3 : 4,
+        packageType: subpackage.type,
         discordUsername: `uzairkhan${i}`,
         notes: Math.random() > 0.5 ? faker.lorem.sentence() : null,
       },
