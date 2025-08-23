@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import GamesSkeleton from "@/components/ui/GamesSkeleton"; // Import the new Games skeleton
 
 const GamesComponent = () => {
+  const [numGamesMap, setNumGamesMap] = useState<{ [key: string]: number }>({});
+  const [numTeammatesMap, setNumTeammatesMap] = useState<{ [key: string]: number }>({});
+  const [selectedRank, setSelectedRank] = useState<any>(null);
   const [games, setGames] = useState<any[]>([]);
   const [selectedGame, setSelectedGame] = useState<any>(null);
   const [loading, setLoading] = useState(true); // 2. Set initial loading to true
@@ -91,11 +94,16 @@ const GamesComponent = () => {
   }, []);
 
   const handleQuickPay = (subpackage: any) => {
+    // setSelectedRank(null);
     setSelectedSubpackage(subpackage);
     setIsModalOpen(true);
   };
 
   const handleCheckout = (subpackage: any) => {
+    // setSelectedRank(null);
+    const choosedPackage = { ...subpackage };
+    console.log("choosedPackage", choosedPackage);
+    console.log("no of games", numGamesMap);
     setSelectedSubpackage(subpackage);
     setIsCheckoutModalOpen(true);
   };
@@ -105,7 +113,7 @@ const GamesComponent = () => {
       router.push(`/dashboard/customer/checkout/${selectedSubpackage.id}`);
     } else {
       router.push(
-        `/dashboard/customer/checkout/${selectedSubpackage.id}?currentELO=${currentELO}&targetELO=${targetELO}`
+        `/dashboard/customer/checkout/${selectedSubpackage.id}?currentELO=${currentELO}&targetELO=${targetELO}&numberOfGames=${numGamesMap[selectedSubpackage.id] || 1}&numberOfTeammates=${numTeammatesMap[selectedSubpackage.id] || 1}`
       );
     }
   };
@@ -162,11 +170,10 @@ const GamesComponent = () => {
         <div key={step.number} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                currentStep >= step.number
-                  ? "border-pink-500 bg-pink-500 text-white"
-                  : "border-gray-500 text-gray-400"
-              }`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${currentStep >= step.number
+                ? "border-pink-500 bg-pink-500 text-white"
+                : "border-gray-500 text-gray-400"
+                }`}
             >
               {step.completed ? (
                 <svg
@@ -187,18 +194,16 @@ const GamesComponent = () => {
               )}
             </div>
             <span
-              className={`mt-2 block mx-auto text-center text-sm font-medium ${
-                currentStep >= step.number ? "text-pink-400" : "text-gray-400"
-              }`}
+              className={`mt-2 block mx-auto text-center text-sm font-medium ${currentStep >= step.number ? "text-pink-400" : "text-gray-400"
+                }`}
             >
               {step.title}
             </span>
           </div>
           {index < steps.length - 1 && (
             <div
-              className={`w-20 h-0.5 mx-4 transition-all duration-300 ${
-                currentStep > step.number ? "bg-pink-500" : "bg-gray-600"
-              }`}
+              className={`w-20 h-0.5 mx-4 transition-all duration-300 ${currentStep > step.number ? "bg-pink-500" : "bg-gray-600"
+                }`}
             />
           )}
         </div>
@@ -335,13 +340,13 @@ const GamesComponent = () => {
                   </div>
                 </div>
               )) || (
-                <div className="col-span-full text-center py-12">
-                  <div className="text-6xl mb-4">🎮</div>
-                  <p className="text-gray-400 text-lg">
-                    No services available for this game yet.
-                  </p>
-                </div>
-              )}
+                  <div className="col-span-full text-center py-12">
+                    <div className="text-6xl mb-4">🎮</div>
+                    <p className="text-gray-400 text-lg">
+                      No services available for this game yet.
+                    </p>
+                  </div>
+                )}
             </div>
           </div>
         )}
@@ -408,16 +413,143 @@ const GamesComponent = () => {
                                 </span>
                               )}
                             </div>
+
+                            {/* Show ELO Difference if dynamicPricing and minELO/maxELO are present */}
+                            {item.dynamicPricing && typeof item.minELO === 'number' && typeof item.maxELO === 'number' && (
+                              <div className="mb-3">
+                                <div className="text-xs text-cyan-400 font-semibold">ELO Range:</div>
+                                <div className="text-lg text-cyan-300 font-bold">{item.minELO} - {item.maxELO}</div>
+                              </div>
+                            )}
+
+                            {/*Per Game or Per Teammate UI */}
+                            {item.type === 'pergame' && (
+                              <div className="flex items-center gap-5 my-6">
+                                <span className="text-sm text-gray-300 font-semibold">No. of Games:</span>
+                                <div>
+                                  <button
+                                    type="button"
+                                    className="px-2 rounded-full bg-red-900 text-white font-bold text-lg"
+                                    onClick={() => {
+                                      setNumGamesMap(prev => ({
+                                        ...prev,
+                                        [item.id]: Math.max(1, (prev[item.id] || 1) - 1)
+                                      }));
+                                    }}
+                                  >-</button>
+                                  <span className="px-3 py-1 rounded text-white font-bold text-lg">{numGamesMap[item.id] || 1}</span>
+                                  <button
+                                    type="button"
+                                    className="px-2 rounded-full bg-red-900 text-white font-bold text-lg"
+                                    onClick={() => {
+                                      setNumGamesMap(prev => ({
+                                        ...prev,
+                                        [item.id]: (prev[item.id] || 1) + 1
+                                      }));
+                                    }}
+                                  >+</button>
+                                </div>
+                              </div>
+                            )}
+                            {item.type === 'perteammate' && (
+                              <div className="flex flex-col items-start">
+
+                                <div className="flex items-center gap-5 my-6">
+                                  <span className="text-sm text-gray-300 font-semibold">No. of Games:</span>
+                                  <div>
+                                    <button
+                                      type="button"
+                                      className="px-2 rounded-full bg-red-900 text-white font-bold text-lg"
+                                      onClick={() => {
+                                        setNumGamesMap(prev => ({
+                                          ...prev,
+                                          [item.id]: Math.max(1, (prev[item.id] || 1) - 1)
+                                        }));
+                                      }}
+                                    >-</button>
+                                    <span className="px-3 py-1 rounded text-white font-bold text-lg">{numGamesMap[item.id] || 1}</span>
+                                    <button
+                                      type="button"
+                                      className="px-2 rounded-full bg-red-900 text-white font-bold text-lg"
+                                      onClick={() => {
+                                        setNumGamesMap(prev => ({
+                                          ...prev,
+                                          [item.id]: (prev[item.id] || 1) + 1
+                                        }));
+                                      }}
+                                    >+</button>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-5 my-6">
+                                  <span className="text-sm text-gray-300 font-semibold">No. of Teammates:</span>
+                                  <div>
+                                    <button
+                                      type="button"
+                                      className="px-2 rounded-full bg-red-900 text-white font-bold text-lg"
+                                      onClick={() => {
+                                        setNumTeammatesMap(prev => ({
+                                          ...prev,
+                                          [item.id]: Math.max(1, (prev[item.id] || 1) - 1)
+                                        }));
+                                      }}
+                                    >-</button>
+                                    <span className="px-3 py-1 rounded  text-white font-bold text-lg">{numTeammatesMap[item.id] || 1}</span>
+                                    <button
+                                      type="button"
+                                      className="px-2 rounded-full bg-red-900 text-white font-bold text-lg"
+                                      onClick={() => {
+                                        setNumTeammatesMap(prev => ({
+                                          ...prev,
+                                          [item.id]: (prev[item.id] || 1) + 1
+                                        }));
+                                      }}
+                                    >+</button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {/* Ranks Array Details - Selectable */}
+                            {Array.isArray(item.ranks) && item.ranks.length > 0 && (
+                              <div className="mb-3">
+                                <div className="text-sm text-gray-300 font-semibold mb-1">Ranks:</div>
+                                <div className="flex flex-wrap gap-2">
+                                  {item.ranks.map((rank: any, rankIdx: number) => (
+                                    <button
+                                      key={rankIdx}
+                                      type="button"
+                                      className={`px-3 py-1 rounded-full border-2 text-xs flex items-center gap-2 focus:outline-none transition-colors relative
+                                         ${selectedSubpackage === item && selectedRank?.name === rank.name
+                                          ? 'bg-pink-500 text-white border-pink-400 shadow-lg scale-105'
+                                          : 'bg-gray-700/40 text-gray-200 border-gray-600/30 hover:bg-pink-400 hover:text-white'}
+                                       `}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedSubpackage(item);
+                                        setSelectedRank(selectedRank?.name === rank.name ? null : rank);
+                                      }}
+                                    >
+                                      {selectedSubpackage === item && selectedRank?.name === rank.name && (
+                                        <span className="absolute left-1 top-1">
+                                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="10" cy="10" r="10" fill="#fff" />
+                                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#EE2C81" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                          </svg>
+                                        </span>
+                                      )}
+                                      <span className="font-bold ml-4">{rank.name}</span>
+                                      <span className="text-cyan-400">+${rank.additionalCost}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+
                           </div>
                           <div className="text-right">
                             <div className="text-2xl font-bold text-green-400">
                               ${item?.price}
                             </div>
-                            {item?.dynamicPricing && (
-                              <div className="text-xs text-cyan-400">
-                                +${item.basePricePerELO}/ELO
-                              </div>
-                            )}
                           </div>
                         </div>
 
@@ -456,13 +588,13 @@ const GamesComponent = () => {
                   </div>
                 )
               ) || (
-                <div className="col-span-full text-center py-12">
-                  <div className="text-6xl mb-4">📦</div>
-                  <p className="text-gray-400 text-lg">
-                    No packages available for this service yet.
-                  </p>
-                </div>
-              )}
+                  <div className="col-span-full text-center py-12">
+                    <div className="text-6xl mb-4">📦</div>
+                    <p className="text-gray-400 text-lg">
+                      No packages available for this service yet.
+                    </p>
+                  </div>
+                )}
             </div>
           </div>
         )}
@@ -710,7 +842,15 @@ const GamesComponent = () => {
                           ${selectedSubpackage.price}
                         </span>
                       </div>
-
+                      {/* Selected Rank Details */}
+                      {Array.isArray(selectedSubpackage.ranks) && selectedSubpackage.ranks.length > 0 && selectedRank && (
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-gray-300 text-sm">Selected Rank</span>
+                          <span className="text-pink-400 font-semibold">
+                            {selectedRank.name} <span className="text-cyan-400">(+${selectedRank.additionalCost})</span>
+                          </span>
+                        </div>
+                      )}
                       {/* Dynamic Pricing ELO Sliders */}
                       {selectedSubpackage.dynamicPricing &&
                         selectedSubpackage.basePricePerELO && (

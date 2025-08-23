@@ -8,9 +8,9 @@ import bcrypt from "bcryptjs";
 async function signup() {
   try {
     const validatedFields = SignupFormSchema.safeParse({
-      username: "test2",
-      email: "test2@gmail.com",
-      password: "passwordA1!",
+      username: "test3",
+      email: "test3@gmail.com",
+      password: "Shabir123035!",
       role: "customer",
     });
 
