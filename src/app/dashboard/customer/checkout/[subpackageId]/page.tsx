@@ -4,348 +4,13 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormField,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@radix-ui/react-form";
-import {
-  useStripe,
-  useElements,
-  CardNumberElement,
-  CardExpiryElement,
-  CardCvcElement,
-} from "@stripe/react-stripe-js";
-
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import WhiteLoader from "@/components/ui/WhiteLoader";
 import OverlayLoader from "@/components/ui/OverlayLoader";
 import { useStore } from "@/store/useStore";
-import { Router } from "lucide-react";
 import SafeImage from "@/components/ui/SafeImage";
-import { message } from "antd";
+import CheckoutForm from "@/components/checkout/CheckoutForm";
 
-// schema for the order
-const schema = z.object({
-  username: z.string().min(1, "Enter your Discord Username is required"),
-  discordTag: z.string().min(1, "Enter Discord tag"),
-  notes: z.string().optional(),
-  cardholderName: z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
-
-interface CheckoutFormProps {
-  onPaymentSuccess?: (paymentMethodId: string) => void;
-  subpackage: any;
-  clientSecret: string;
-  currentELO: number;
-  targetELO: number;
-  finalPrice: number;
-}
-
-function CheckoutForm({
-  onPaymentSuccess,
-  clientSecret,
-  subpackage,
-  currentELO,
-  targetELO,
-  finalPrice,
-}: CheckoutFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [cardError, setCardError] = useState<string | null>(null);
-  const router = useRouter();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, touchedFields, submitCount, isSubmitting, isValid },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    mode: "onTouched", // or "onChange" for live validation
-    defaultValues: {
-      username: "",
-      discordTag: "",
-      notes: "",
-      cardholderName: "",
-    },
-  });
-
-  const onSubmit = async (data: FormData) => {
-    setError(null);
-    setCardError(null);
-    setLoading(true);
-
-    if (!stripe || !elements) {
-      setError("Stripe is not loaded");
-      setLoading(false);
-      return;
-    }
-
-    if (!clientSecret) {
-      setError(
-        "Payment could not be initialized. Please refresh and try again."
-      );
-      setLoading(false);
-      return;
-    }
-
-    // Confirm the card payment
-    const cardElement = elements.getElement(CardNumberElement);
-    if (!cardElement) {
-      setCardError("Card number element not found");
-      setLoading(false);
-      return;
-    }
-
-    const { paymentIntent, error: stripeError } =
-      await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: data.cardholderName,
-          },
-        },
-      });
-
-    if (stripeError) {
-      console.log(stripeError);
-      setCardError(stripeError.message || "Payment error");
-      setLoading(false);
-      return;
-    }
-
-    if (paymentIntent && paymentIntent.status === "succeeded") {
-      // Payment succeeded, now create the order and transaction in your backend
-      try {
-        message.success("Payment succeeded");
-        const orderRes = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            subpackageId: subpackage.id,
-            paymentIntentId: paymentIntent.id,
-            discordTag: data.discordTag,
-            notes: data.notes,
-            discordUsername: data.username,
-            currentELO,
-            targetELO,
-            finalPrice,
-          }),
-        });
-        const orderJson = await orderRes.json();
-        if (!orderJson.success) {
-          setError(
-            orderJson.error || "Order creation failed. Please contact support."
-          );
-          setLoading(false);
-          return;
-        }
-        console.log(orderJson);
-        router.push(`/dashboard/customer/orders/${orderJson.data}/pending`); // Redirect or show success
-      } catch (err) {
-        setError("Order creation failed. Please try again or contact support.");
-        setLoading(false);
-        message.error("Order Creation was not successful");
-      }
-    } else {
-      setError("Payment was not successful. Please try again.");
-      setLoading(false);
-      message.error("Payment was not successful");
-    }
-  };
-
-  return (
-    <Form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full block lg:p-8 rounded-lg "
-    >
-      <div className="">
-        <h3 className={`${poppins.className} w-full text-[24px] mb-8`}>
-          Contact information
-        </h3>
-        <FormField name="name" className="mb-6">
-          <FormLabel className="block text-white mb-2 text-[16px] ">
-            Name / Username (Discord)
-          </FormLabel>
-          <FormControl asChild>
-            <input
-              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
-              {...register("username")}
-            />
-          </FormControl>
-          {(touchedFields.username || submitCount > 0) &&
-            errors.username?.message && (
-              <FormMessage className="text-pink-500 text-sm mt-1">
-                {errors.username.message}
-              </FormMessage>
-            )}
-        </FormField>
-        <FormField name="discordTag" className="mb-6">
-          <FormLabel className="block mb-2 text-[16px] text-white">
-            Discord Tag
-          </FormLabel>
-          <FormControl asChild>
-            <input
-              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
-              type="text"
-              {...register("discordTag")}
-            />
-          </FormControl>
-          {(touchedFields.discordTag || submitCount > 0) &&
-            errors.discordTag?.message && (
-              <FormMessage className="text-pink-500 text-sm mt-1">
-                {errors.discordTag.message}
-              </FormMessage>
-            )}
-        </FormField>
-
-        <FormField name="notes" className="mb-6">
-          <FormLabel className="block mb-2 text-[16px] text-white">
-            Preferences / Notes (Optional)
-          </FormLabel>
-          <FormControl asChild>
-            <input
-              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
-              type="text"
-              {...register("notes")}
-            />
-          </FormControl>
-          {(touchedFields.notes || submitCount > 0) &&
-            errors.notes?.message && (
-              <FormMessage className="text-pink-500 text-sm mt-1">
-                {errors.notes.message}
-              </FormMessage>
-            )}
-        </FormField>
-        {/* Card Number */}
-
-        <h3 className={`${poppins.className} mt-24 text-[24px] mb-8`}>
-          Payment method
-        </h3>
-        <div className="block mb-2 text-[18px] text-white">
-          Card information
-        </div>
-        <div className="border border-white rounded-lg">
-          <FormField name="cardNumber" className="">
-            <FormControl asChild>
-              <div className="w-full  border-b border-white text-[18px] text-white bg-transparent focus-within:ring-2 focus-within:ring-pink-500 px-5 py-5">
-                <CardNumberElement
-                  options={{
-                    style: {
-                      base: {
-                        color: "#fff",
-                        fontFamily: lato.className,
-                        fontSize: "18px",
-                        "::placeholder": { color: "#fff8" },
-                      },
-                      invalid: { color: "#ff6b81" },
-                    },
-                  }}
-                  onChange={(e) => {
-                    if (e.error) setCardError(e.error.message || "");
-                    else setCardError(null);
-                  }}
-                />
-              </div>
-            </FormControl>
-          </FormField>
-          {/* Expiry */}
-          <div className="flex w-full">
-            <FormField name="cardExpiry" className="w-1/2">
-              <FormControl asChild>
-                <div
-                  className={`w-full px-5 py-5 rounded text-[18px] text-white bg-transparent ${lato.className}`}
-                >
-                  <CardExpiryElement
-                    options={{
-                      style: {
-                        base: {
-                          color: "#fff",
-                          fontFamily: lato.className,
-                          fontSize: "18px",
-                          "::placeholder": { color: "#fff8" },
-                        },
-                        invalid: { color: "#ff6b81" },
-                      },
-                    }}
-                    onChange={(e) => {
-                      if (e.error) setCardError(e.error.message || "");
-                      else setCardError(null);
-                    }}
-                  />
-                </div>
-              </FormControl>
-            </FormField>
-            {/* CVC */}
-            <FormField name="cardCvc" className="w-1/2">
-              <FormControl asChild>
-                <div className="w-full px-5 py-5 rounded text-[18px] text-white bg-transparent focus-within:ring-2 focus-within:ring-pink-500">
-                  <CardCvcElement
-                    options={{
-                      style: {
-                        base: {
-                          color: "#fff",
-                          fontFamily: lato.className,
-                          fontSize: "18px",
-                          "::placeholder": { color: "#fff8" },
-                        },
-                        invalid: { color: "#ff6b81" },
-                      },
-                    }}
-                    onChange={(e) => {
-                      if (e.error) setCardError(e.error.message || "");
-                      else setCardError(null);
-                    }}
-                  />
-                </div>
-              </FormControl>
-            </FormField>
-          </div>
-        </div>
-        {(error || cardError) && (
-          <div className="text-pink-500 mb-4 text-sm">{error || cardError}</div>
-        )}
-
-        <FormField name="cardholderName" className="mb-6">
-          <FormLabel className="block mb-3 mt-8 text-[16px] text-white">
-            Cardholder name (Optional)
-          </FormLabel>
-          <FormControl asChild>
-            <input
-              className={`w-full px-3 py-3 rounded border border-white bg-transparent text-[18px] text-white focus:outline-none ${lato.className}`}
-              type="text"
-              {...register("cardholderName")}
-            />
-          </FormControl>
-          {(touchedFields.cardholderName || submitCount > 0) &&
-            errors.cardholderName?.message && (
-              <FormMessage className="text-pink-500 text-sm mt-1">
-                {errors.cardholderName.message}
-              </FormMessage>
-            )}
-        </FormField>
-        <button
-          type="submit"
-          className="py-6 text-center w-full bg-gradient-to-r rounded-full  from-pink-500 via-purple-400  to-cyan-400 to- hover:scale-105 transition-all cursor-pointer text-white text-[24px] mt-16 disabled:opacity-50"
-          disabled={!isValid || loading || isSubmitting}
-        >
-          {loading || isSubmitting ? "Processing..." : "Subscribe"}
-        </button>
-      </div>
-    </Form>
-  );
-}
-// --------------
-// checkout Page
-// --------------
 export default function CheckoutPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -523,17 +188,24 @@ export default function CheckoutPage() {
           </div>
         </div>
         <div className="form w-full mt-20 lg:mt-0 lg:ml-10 lg:justify-self-start xl:justify-self-end ">
-          {clientSecret && (
-            <Elements stripe={stripePromise}>
-              <CheckoutForm
-                currentELO={currentELO}
-                targetELO={targetELO}
-                subpackage={subpackage}
-                finalPrice={finalPrice}
-                clientSecret={clientSecret}
-              />
-            </Elements>
-          )}
+          <PayPalScriptProvider
+            options={{
+              clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+              currency: "USD",
+            }}
+          >
+            {clientSecret && (
+              <Elements stripe={stripePromise}>
+                <CheckoutForm
+                  currentELO={currentELO}
+                  targetELO={targetELO}
+                  subpackage={subpackage}
+                  finalPrice={finalPrice}
+                  clientSecret={clientSecret}
+                />
+              </Elements>
+            )}
+          </PayPalScriptProvider>
         </div>
       </div>
     </div>
