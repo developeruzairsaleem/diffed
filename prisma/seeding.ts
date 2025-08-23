@@ -1,10 +1,76 @@
 // prisma/seed.ts
 import { faker } from "@faker-js/faker";
 import { prisma } from "../src/lib/prisma";
+import { LoginFormSchema, SignupFormSchema } from "../src/lib/definitions";
+import { createSession, deleteSession } from "../src/lib/sessions";
+import { createWallet, getWallet } from "../src/lib/wallet";
+import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
+
+async function signup() {
+  try {
+    const validatedFields = SignupFormSchema.safeParse({
+      username: 'test1',
+      email: "test1@gmail.com",
+      password: 'password',
+      role: 'customer',
+    });
+
+    // If any form fields are invalid, return early
+    if (!validatedFields.success) {
+      throw new Error("Invalid registration data, please make sure it is valid");
+    }
+
+    // prepare the user data for db insertion
+    const { username, email, password, role } = validatedFields.data;
+    // check for existing emails and usernames
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
+    });
+
+    //if user already exist return error
+    if (existingUser) {
+      //  if email matches
+      if (existingUser.email === email) {
+        throw new Error("Email already exists");
+      }
+      // if username matches
+      if (existingUser.username === username) {
+        throw new Error("Username already exists");
+      }
+    }
+    // hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Insert the user into the database
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        role,
+      },
+    });
+    // something went wrong while creating a user
+    if (!user) {
+       throw new Error("Something went wrong registering")
+      
+    }
+
+    // create user wallet entry in the database
+    const wallet = await createWallet(user.id);
+    return { userId:user.id, walletId:wallet.id}; 
+  } catch (error) {
+    throw new Error ("semething went wrong ");  
+  }
+}
 
 async function main() {
-  const mainCustomerId = "cmdyc5gmj0000v00gbw03rkyg";
-  const mainCustomerWalletId = "cmdyc5h400002v00g2j4u72mz";
+  const {userId,walletId }= await signup()
+  const mainCustomerId = userId
+  const mainCustomerWalletId = walletId;
 
   // Create games with services and subpackages
   const games = await Promise.all(
@@ -69,7 +135,7 @@ async function main() {
         for (let j = 0; j < 2; j++) {
           await prisma.subpackage.create({
             data: {
-              name: `SubPkg ${j + 1 +j} `,
+              name: `SubPkg ${j + 1 +j+j} `,
               description: `Boost level team ${j + 1} in ${name}`,
               price: (j + 1) * 15,
               duration: `${2 + j}h`,
