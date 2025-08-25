@@ -82,7 +82,7 @@ export const POST = async (request: NextRequest) => {
     }
     let priceWithRank = basePrice + additionalCost;
     let games = typeof numberOfGames === "number" ? numberOfGames : 1;
-    let teammates = typeof numberOfTeammates === "number" ? numberOfTeammates : 1;
+    let teammates = subpackage.type==="perteammate"? numberOfTeammates : subpackage.requiredProviders;
     let finalPriceNumber = priceWithRank * games * teammates;
 
     // Ensure wallet has enough balance
