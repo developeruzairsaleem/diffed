@@ -36,38 +36,44 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     async function getCustomerDashboard() {
       // API response
-      const user = await fetch("/api/user/me").then((res) => res.json());
-      const userData = {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        isLoggedIn: true,
-        role: user.role,
-      };
-      store.setUser(userData);
-      const wallet = await fetch("/api/wallet").then((res) => res.json());
-
-      const walletData = {
-        id: wallet.id,
-        balance: wallet.balance,
-        currency: wallet.currency,
-      };
-      store.setWallet(walletData);
-      const tx = await fetch("/api/transaction/me").then((res) => res.json());
-      const txData = tx.map((idTx: any) => {
-        return {
-          id: idTx.id,
-          type: idTx.type,
-          amount: idTx.amount,
-          walletId: idTx.walletId,
-          createdAt: idTx.createdAt,
-          description: idTx.description,
-          status: idTx.status,
-          paymentMethod: idTx.paymentMethod,
+      try {
+        const user = await fetch("/api/user/me").then((res) => res.json());
+        const userData = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          isLoggedIn: true,
+          role: user.role,
         };
-      });
-      store.setTransactions(txData);
+        store.setUser(userData);
+        const wallet = await fetch("/api/wallet").then((res) => res.json());
+
+        const walletData = {
+          id: wallet.id,
+          balance: wallet.balance,
+          currency: wallet.currency,
+        };
+        store.setWallet(walletData);
+        const tx = await fetch("/api/transaction/me").then((res) => res.json());
+        const txData = tx.map((idTx: any) => {
+          return {
+            id: idTx.id,
+            type: idTx.type,
+            amount: idTx.amount,
+            walletId: idTx.walletId,
+            createdAt: idTx.createdAt,
+            description: idTx.description,
+            status: idTx.status,
+            paymentMethod: idTx.paymentMethod,
+          };
+        });
+        store.setTransactions(txData);
+      } catch (error) {
+        console.log("error getting customer dashboard");
+        console.log(error);
+      }
     }
+
     getCustomerDashboard();
   }, []);
 

@@ -62,6 +62,7 @@ export class OrderService {
               email: true,
               role: true,
               profileImage: true,
+              bio: true,
             },
           },
           subpackage: {
@@ -180,6 +181,7 @@ export class OrderService {
                 email: true,
                 role: true,
                 profileImage: true,
+                bio: true,
               },
             },
           },
@@ -193,6 +195,7 @@ export class OrderService {
                 email: true,
                 role: true,
                 profileImage: true,
+                bio: true,
               },
             },
           },
@@ -221,6 +224,10 @@ export class OrderService {
         name: order.subpackage.name,
         description: order.subpackage.description,
         price: order.subpackage.price,
+        dynamicPricing: order.subpackage.dynamicPricing ?? undefined,
+        basePricePerELO: order.subpackage.basePricePerELO ?? undefined,
+        minELO: order.subpackage.minELO ?? null,
+        maxELO: order.subpackage.maxELO ?? null,
         requiredProviders: order.subpackage.requiredProviders,
         duration: order.subpackage.duration || undefined,
         service: {
@@ -248,6 +255,11 @@ export class OrderService {
       ),
       requiredCount: order.requiredCount,
       stripeSessId: order.stripeSessId || undefined,
+      gamesCount: (order as any)?.gamesCount as any,
+      rank: (order as any)?.rank as any,
+      // include ELO values when present on order
+      // provider components already use these fields similarly
+      // so we expose them for customer detail too
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       assignments: order.assignments.map((assignment) => ({
@@ -285,8 +297,6 @@ export class OrderService {
         },
       })),
     };
-
-
   }
 
   static async updateOrder(
@@ -305,30 +315,55 @@ export class OrderService {
     return this.getOrderById(updatedOrder.id);
   }
 
-
   static async updateAssignment(
     assignmentId: string,
     data: AssignmentUpdateRequest
   ): Promise<boolean> {
+    console.log("Updating assignment:", assignmentId, data);
     try {
+      if (!assignmentId) {
+        throw new Error("Missing assignmentId");
+      }
+
+      // Coerce plain string status to valid uppercase enum string
+      const updateData: any = { ...data };
+      if (typeof updateData.status === "string") {
+        const upper = updateData.status.toUpperCase();
+        const valid = [
+          "REPLACED",
+          "PENDING",
+          "APPROVED",
+          "COMPLETED",
+          "VERIFIED",
+        ];
+        if (!valid.includes(upper)) {
+          throw new Error(`Invalid status value: ${updateData.status}`);
+        }
+        updateData.status = upper;
+      }
+
       await prisma.orderAssignment.update({
         where: { id: assignmentId },
-        data,
+        data: updateData,
       });
       return true;
     } catch (error) {
-      console.error("Error updating assignment:", error);
+      const anyErr: any = error as any;
+      console.error(
+        "Error updating assignment:",
+        anyErr?.code || anyErr?.name || "",
+        anyErr?.meta || "",
+        anyErr?.message || anyErr
+      );
       return false;
     }
   }
 
-  static async getAssignment(
-    assignmentId: string,
-  ): Promise<any> {
+  static async getAssignment(assignmentId: string): Promise<any> {
     try {
-       const assignment = await prisma.orderAssignment.findUnique({
+      const assignment = await prisma.orderAssignment.findUnique({
         where: { id: assignmentId },
-        include: {provider: true}
+        include: { provider: true },
       });
       return assignment;
     } catch (error) {
@@ -450,6 +485,10 @@ export class OrderService {
         description: order.subpackage.description,
         price: order.subpackage.price,
         duration: order.subpackage.duration || undefined,
+        dynamicPricing: order.subpackage.dynamicPricing ?? undefined,
+        basePricePerELO: order.subpackage.basePricePerELO ?? undefined,
+        minELO: order.subpackage.minELO ?? null,
+        maxELO: order.subpackage.maxELO ?? null,
         requiredProviders: order.subpackage.requiredProviders,
         service: {
           id: order.subpackage.service.id,
@@ -475,6 +514,8 @@ export class OrderService {
       rerollsLeft: order.rerollsLeft,
       approvedCount: order.approvedCount,
       requiredCount: order.requiredCount,
+      gamesCount: order.gamesCount as any,
+      rank: (order.rank as any) || null,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     }));

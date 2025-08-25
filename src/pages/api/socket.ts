@@ -2,6 +2,12 @@ import type { NextApiRequest } from "next";
 import { Server as ServerIO } from "socket.io";
 import type { NextApiResponseServerIO } from "../../lib/socket";
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function SocketHandler(
   req: NextApiRequest,
   res: NextApiResponseServerIO
@@ -11,8 +17,8 @@ export default async function SocketHandler(
   } else {
     console.log("Socket is initializing");
     const io = new ServerIO(res.socket.server as any, {
-      path: "/api/socket",
-      addTrailingSlash: false,
+      path: "/api/socket/",
+      addTrailingSlash: true,
       cors: {
         origin: "*",
         methods: ["GET", "POST"],

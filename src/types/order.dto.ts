@@ -11,6 +11,7 @@ export interface UserDto {
   email: string;
   role: Role;
   profileImage?: string;
+  bio?: string;
 }
 
 export interface SubpackageDto {
@@ -20,6 +21,10 @@ export interface SubpackageDto {
   description: string;
   price: number;
   duration?: string;
+  dynamicPricing?: boolean;
+  basePricePerELO?: number;
+  minELO?: number | null;
+  maxELO?: number | null;
   service: {
     id: string;
     name: string;
@@ -87,6 +92,8 @@ export interface CustomerOrderListDto {
   rerollsLeft: number;
   approvedCount: number;
   requiredCount: number;
+  gamesCount?: number;
+  rank?: { name?: string; additionalCost?: number } | null;
   createdAt: Date;
   updatedAt: Date;
   providers: Array<{
@@ -110,6 +117,10 @@ export interface OrderDetailDto {
   approvedCount: number;
   requiredCount: number;
   stripeSessId?: string;
+  gamesCount?: number;
+  rank?: { name?: string; additionalCost?: number } | null;
+  currentELO?: number | null;
+  targetELO?: number | null;
   createdAt: Date;
   updatedAt: Date;
   assignments: OrderAssignmentDto[];
@@ -183,7 +194,6 @@ export interface AssignmentUpdateRequestShabir {
   tipAmount?: number;
   providerId?: string;
 }
-
 
 export interface ApiResponse<T> {
   success: boolean;

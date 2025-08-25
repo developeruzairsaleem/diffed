@@ -470,74 +470,147 @@ const OverviewTab = () => {
                   <>
                     {/* Desktop View */}
                     <div className="hidden md:block p-6">
-                      <div className="space-y-3">
-                        {ordersData.orders.map(
-                          (order: CustomerOrderListDto) => (
-                            <div
-                              key={order.id}
-                              className="bg-gray-800/30 rounded-lg p-4 hover:bg-gray-800/40 transition-colors border border-gray-600/30"
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                  <SafeImage
-                                    src={
-                                      order?.subpackage?.service?.game?.image ||
-                                      "/logo/logo.png"
-                                    }
-                                    alt={order?.subpackage?.service?.game?.name}
-                                    placeholder="/images/placeholder.png"
-                                    className="w-12 h-12 rounded-lg object-cover"
-                                  />
-                                  <div>
-                                    <h4 className="font-semibold text-white">
+                      <div className="overflow-x-auto">
+                        <div className="min-w-[1400px]">
+                          {/* Header */}
+                          <div className="grid grid-cols-[240px_260px_160px_160px_120px_140px_180px_160px_120px] text-gray-300 text-xs uppercase tracking-wide bg-gray-900/40 border border-gray-600/40 rounded-md">
+                            <div className="px-4 py-2">Game</div>
+                            <div className="px-4 py-2">Package</div>
+                            <div className="px-4 py-2 text-center">Price</div>
+                            <div className="px-4 py-2 text-center">Status</div>
+                            <div className="px-4 py-2 text-center">Games</div>
+                            <div className="px-4 py-2 text-center">
+                              Teammates
+                            </div>
+                            <div className="px-4 py-2">Rank</div>
+                            <div className="px-4 py-2 text-center">ELO</div>
+                            <div className="px-4 py-2 text-right">Action</div>
+                          </div>
+
+                          {/* Rows */}
+                          <div className="mt-2 space-y-2">
+                            {ordersData.orders.map(
+                              (order: CustomerOrderListDto) => (
+                                <div
+                                  key={order.id}
+                                  className="grid grid-cols-[240px_260px_160px_160px_120px_140px_180px_160px_120px] items-center bg-gray-800/30 hover:bg-gray-800/40 border border-gray-600/30 rounded-md"
+                                >
+                                  {/* Col 1: Game */}
+                                  <div className="px-4 py-3 flex items-center gap-3">
+                                    <SafeImage
+                                      src={
+                                        order?.subpackage?.service?.game
+                                          ?.image || "/logo/logo.png"
+                                      }
+                                      alt={
+                                        order?.subpackage?.service?.game?.name
+                                      }
+                                      placeholder="/images/placeholder.png"
+                                      className="w-12 h-12 rounded-lg object-cover"
+                                    />
+                                    <h4 className="font-semibold text-white truncate">
                                       {order?.subpackage?.service?.game?.name}
                                     </h4>
-                                    <p className="text-gray-400 text-sm">
+                                  </div>
+
+                                  {/* Col 2: Service • Package */}
+                                  <div className="px-4 py-3 border-l border-gray-700">
+                                    <p className="text-gray-300 text-sm truncate">
                                       {order?.subpackage?.service?.name} •{" "}
                                       {order?.subpackage?.name}
                                     </p>
                                   </div>
-                                </div>
 
-                                <div className="flex items-center gap-6">
-                                  <div className="text-right">
+                                  {/* Col 3: Price + Provider */}
+                                  <div className="px-4 py-3 border-l border-gray-700 text-center">
                                     <p className="text-white font-semibold">
                                       ${order?.price.toFixed(2)}
                                     </p>
-                                    <p className="text-gray-400 text-sm">
+                                    <p className="text-gray-400 text-xs truncate">
                                       {getProviderDisplay(order)}
                                     </p>
                                   </div>
 
-                                  <span
-                                    className={`px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-2 border ${getStatusColor(
-                                      order.status
-                                    )}`}
-                                  >
-                                    {getStatusIcon(order.status)}
-                                    <span className="capitalize">
-                                      {order.status
-                                        .replace("_", " ")
-                                        .toLowerCase()}
+                                  {/* Col 4: Status */}
+                                  <div className="px-4 py-3 border-l border-gray-700 flex justify-center">
+                                    <span
+                                      className={`px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-2 border ${getStatusColor(
+                                        order.status
+                                      )}`}
+                                    >
+                                      {getStatusIcon(order.status)}
+                                      <span className="capitalize">
+                                        {order.status
+                                          .replace("_", " ")
+                                          .toLowerCase()}
+                                      </span>
                                     </span>
-                                  </span>
+                                  </div>
 
-                                  <Link
-                                    href={
-                                      order.status === "PENDING"
-                                        ? `/dashboard/customer/orders/${order.id}/pending`
-                                        : `/dashboard/customer/orders/${order.id}`
-                                    }
-                                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center gap-2"
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                    View
-                                  </Link>
+                                  {/* Col 5: Games */}
+                                  <div className="px-4 py-3 border-l border-gray-700 text-center">
+                                    <span className="text-white text-sm">
+                                      {order?.gamesCount != null &&
+                                      order.gamesCount > 0
+                                        ? order.gamesCount
+                                        : "-"}
+                                    </span>
+                                  </div>
+
+                                  {/* Col 6: Teammates */}
+                                  <div className="px-4 py-3 border-l border-gray-700 text-center">
+                                    <span className="text-white text-sm">
+                                      {order?.requiredCount != null
+                                        ? order.requiredCount
+                                        : "-"}
+                                    </span>
+                                  </div>
+
+                                  {/* Col 7: Rank */}
+                                  <div className="px-4 py-3 border-l border-gray-700">
+                                    <span className="text-white text-sm truncate block">
+                                      {order?.rank?.name
+                                        ? `${order.rank.name}${
+                                            typeof order?.rank
+                                              ?.additionalCost === "number" &&
+                                            order.rank.additionalCost > 0
+                                              ? ` +$${order.rank.additionalCost}`
+                                              : ""
+                                          }`
+                                        : "-"}
+                                    </span>
+                                  </div>
+
+                                  {/* Col 8: ELO */}
+                                  <div className="px-4 py-3 border-l border-gray-700 text-center">
+                                    <span className="text-white text-sm">
+                                      {order?.subpackage?.dynamicPricing &&
+                                      order?.subpackage?.minELO != null &&
+                                      order?.subpackage?.maxELO != null
+                                        ? `${order.subpackage.minELO}-${order.subpackage.maxELO}`
+                                        : "-"}
+                                    </span>
+                                  </div>
+
+                                  {/* Col 9: Action */}
+                                  <div className="px-4 py-3 border-l border-gray-700 flex justify-end">
+                                    <Link
+                                      href={
+                                        order.status === "PENDING"
+                                          ? `/dashboard/customer/orders/${order.id}/pending`
+                                          : `/dashboard/customer/orders/${order.id}`
+                                      }
+                                      className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center gap-2"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                      View
+                                    </Link>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          )
-                        )}
+                              )
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -586,6 +659,45 @@ const OverviewTab = () => {
                               <p className="text-gray-400 text-xs">
                                 {getProviderDisplay(order)}
                               </p>
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap max-w-[50%] justify-end">
+                              {order?.gamesCount != null &&
+                                order.gamesCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                    <Gamepad2 className="w-3 h-3" />
+                                    <span>{order.gamesCount}</span>
+                                  </span>
+                                )}
+                              {order?.requiredCount != null &&
+                                order.requiredCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    <User className="w-3 h-3" />
+                                    <span>{order.requiredCount}</span>
+                                  </span>
+                                )}
+                              {order?.rank?.name && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                  <Crown className="w-3 h-3" />
+                                  <span>
+                                    {order.rank.name}
+                                    {typeof order?.rank?.additionalCost ===
+                                      "number" && order.rank.additionalCost > 0
+                                      ? ` +$${order.rank.additionalCost}`
+                                      : ""}
+                                  </span>
+                                </span>
+                              )}
+                              {order?.subpackage?.dynamicPricing &&
+                                order?.subpackage?.minELO != null &&
+                                order?.subpackage?.maxELO != null && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                                    <Target className="w-3 h-3" />
+                                    <span>
+                                      {order.subpackage.minELO}-
+                                      {order.subpackage.maxELO}
+                                    </span>
+                                  </span>
+                                )}
                             </div>
                             <Link
                               href={

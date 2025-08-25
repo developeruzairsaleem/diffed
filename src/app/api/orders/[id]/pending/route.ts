@@ -137,9 +137,15 @@ export async function GET(
             image: order.subpackage.service.game.image,
           },
         },
+        dynamicPricing: order.subpackage.dynamicPricing,
+        basePricePerELO: order.subpackage.basePricePerELO,
+        minELO: order.subpackage.minELO,
+        maxELO: order.subpackage.maxELO,
       },
       assignments: enrichedAssignments,
       updatedAt: order.updatedAt.toISOString(),
+      gamesCount: (order as any)?.gamesCount ?? null,
+      rank: (order as any)?.rank ?? null,
     };
 
     return NextResponse.json({
@@ -155,8 +161,6 @@ export async function GET(
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -199,7 +203,5 @@ export async function PUT(
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
