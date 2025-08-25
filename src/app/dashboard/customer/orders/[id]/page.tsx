@@ -583,6 +583,15 @@ export default function OrderDetailPage() {
                                       {assignment.status}
                                     </Badge>
                                   </p>
+                                  {assignment?.provider?.bio ? (
+                                    <p className="text-sm text-gray-300 max-w-md truncate">
+                                      {assignment.provider.bio}
+                                    </p>
+                                  ) : (
+                                    <p className="text-sm text-gray-300 max-w-md truncate">
+                                      No bio available
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                               <div className="text-right flex gap-2">

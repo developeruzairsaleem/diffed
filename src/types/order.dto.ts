@@ -11,6 +11,7 @@ export interface UserDto {
   email: string;
   role: Role;
   profileImage?: string;
+  bio?: string;
 }
 
 export interface SubpackageDto {

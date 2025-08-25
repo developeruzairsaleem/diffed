@@ -62,6 +62,7 @@ export class OrderService {
               email: true,
               role: true,
               profileImage: true,
+              bio: true,
             },
           },
           subpackage: {
@@ -180,6 +181,7 @@ export class OrderService {
                 email: true,
                 role: true,
                 profileImage: true,
+                bio: true,
               },
             },
           },
@@ -193,6 +195,7 @@ export class OrderService {
                 email: true,
                 role: true,
                 profileImage: true,
+                bio: true,
               },
             },
           },
