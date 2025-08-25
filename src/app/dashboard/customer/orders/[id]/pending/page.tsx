@@ -16,6 +16,8 @@ import {
   ArrowRight,
   Sparkles,
   FileText,
+  Crown,
+  Target,
 } from "lucide-react";
 import SafeImage from "@/components/ui/SafeImage";
 
@@ -37,6 +39,10 @@ export interface Subpackage {
   name: string;
   price: number;
   requiredProviders: number;
+  dynamicPricing?: boolean;
+  basePricePerELO?: number | null;
+  minELO?: number | null;
+  maxELO?: number | null;
   service: Service;
 }
 
@@ -77,6 +83,8 @@ export interface Order {
   subpackage: Subpackage;
   assignments: OrderAssignment[];
   updatedAt: string;
+  gamesCount?: number | null;
+  rank?: { name?: string; additionalCost?: number } | null;
 }
 
 // --- API RESPONSE TYPES ---
@@ -396,7 +404,9 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [processingAssignmentId, setProcessingAssignmentId] = useState<string | null>(null);
+  const [processingAssignmentId, setProcessingAssignmentId] = useState<
+    string | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchOrder = useCallback(
@@ -404,7 +414,10 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
       if (showRefreshLoader) {
         setIsRefreshing(true);
       } else {
-        setIsLoading(true);
+        // Only show the full-page skeleton on the very first load
+        if (!order) {
+          setIsLoading(true);
+        }
       }
       setError(null);
 
@@ -439,13 +452,18 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
         setIsRefreshing(false);
       }
     },
-    [orderId]
+    [orderId, order]
   );
 
   useEffect(() => {
     if (orderId) {
       fetchOrder();
     }
+    // Auto refresh new applicants / approvals every 10s as a safe fallback
+    const interval = setInterval(() => {
+      fetchOrder(true);
+    }, 10000);
+    return () => clearInterval(interval);
   }, [orderId, fetchOrder]);
 
   const handleRefresh = () => {
@@ -632,19 +650,6 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
             {order.subpackage.service.game.name} - {order.subpackage.name}
           </p>
         </div>
-        <Button
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          variant="outline"
-          className="border-purple-500/50 bg-purple-900/20 hover:bg-purple-800/30"
-        >
-          {isRefreshing ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
-          )}
-          Refresh Latest
-        </Button>
       </div>
 
       {/* Order Notes */}
@@ -661,6 +666,51 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
             requiredCount={order.requiredCount}
           />
 
+          {/* Extra Order Details (Games, Teammates, Rank, ELO) */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-4 rounded-lg bg-gray-900/40 border border-gray-700/50">
+              <p className="text-xs text-gray-300 mb-1">Games</p>
+              <p className="text-white font-semibold text-lg">
+                {order?.gamesCount != null && order.gamesCount > 0
+                  ? order.gamesCount
+                  : "-"}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-gray-900/40 border border-gray-700/50">
+              <p className="text-xs text-gray-300 mb-1">Teammates</p>
+              <p className="text-white font-semibold text-lg">
+                {order?.requiredCount != null ? order.requiredCount : "-"}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-gray-900/40 border border-gray-700/50">
+              <p className="text-xs text-gray-300 mb-1 flex items-center gap-1">
+                <Crown className="w-4 h-4 text-purple-300" /> Rank
+              </p>
+              <p className="text-white font-semibold text-lg truncate">
+                {order?.rank?.name
+                  ? `${order.rank.name}${
+                      typeof order?.rank?.additionalCost === "number" &&
+                      order.rank.additionalCost > 0
+                        ? ` +$${order.rank.additionalCost}`
+                        : ""
+                    }`
+                  : "-"}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-gray-900/40 border border-gray-700/50">
+              <p className="text-xs text-gray-300 mb-1 flex items-center gap-1">
+                <Target className="w-4 h-4 text-cyan-300" /> ELO
+              </p>
+              <p className="text-white font-semibold text-lg">
+                {order?.subpackage?.dynamicPricing &&
+                order?.subpackage?.minELO != null &&
+                order?.subpackage?.maxELO != null
+                  ? `${order.subpackage.minELO}-${order.subpackage.maxELO}`
+                  : "-"}
+              </p>
+            </div>
+          </div>
+
           {/* Pending Applicants */}
           <div className="space-y-6">
             {pendingApplicants.map((assignment) => (
@@ -670,7 +720,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
                 onAccept={handleAccept}
                 onDecline={handleDecline}
                 rerollsLeft={order.rerollsLeft}
-                isProcessing={processingAssignmentId === assignment.id}
+                isProcessing={Boolean(processingAssignmentId)}
               />
             ))}
           </div>
