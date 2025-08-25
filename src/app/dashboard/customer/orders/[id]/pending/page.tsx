@@ -459,12 +459,7 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
     if (orderId) {
       fetchOrder();
     }
-    // Auto refresh new applicants / approvals every 10s as a safe fallback
-    const interval = setInterval(() => {
-      fetchOrder(true);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [orderId, fetchOrder]);
+  }, []);
 
   const handleRefresh = () => {
     fetchOrder(true);
@@ -650,6 +645,19 @@ const CustomerPendingOrderPage = ({ orderId }: { orderId: string }) => {
             {order.subpackage.service.game.name} - {order.subpackage.name}
           </p>
         </div>
+        <Button
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          variant="outline"
+          className="border-purple-500/50 bg-purple-900/20 hover:bg-purple-800/30"
+        >
+          {isRefreshing ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4 mr-2" />
+          )}
+          Refresh Assignments
+        </Button>
       </div>
 
       {/* Order Notes */}

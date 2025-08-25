@@ -316,14 +316,42 @@ export class OrderService {
     assignmentId: string,
     data: AssignmentUpdateRequest
   ): Promise<boolean> {
+    console.log("Updating assignment:", assignmentId, data);
     try {
+      if (!assignmentId) {
+        throw new Error("Missing assignmentId");
+      }
+
+      // Coerce plain string status to valid uppercase enum string
+      const updateData: any = { ...data };
+      if (typeof updateData.status === "string") {
+        const upper = updateData.status.toUpperCase();
+        const valid = [
+          "REPLACED",
+          "PENDING",
+          "APPROVED",
+          "COMPLETED",
+          "VERIFIED",
+        ];
+        if (!valid.includes(upper)) {
+          throw new Error(`Invalid status value: ${updateData.status}`);
+        }
+        updateData.status = upper;
+      }
+
       await prisma.orderAssignment.update({
         where: { id: assignmentId },
-        data,
+        data: updateData,
       });
       return true;
     } catch (error) {
-      console.error("Error updating assignment:", error);
+      const anyErr: any = error as any;
+      console.error(
+        "Error updating assignment:",
+        anyErr?.code || anyErr?.name || "",
+        anyErr?.meta || "",
+        anyErr?.message || anyErr
+      );
       return false;
     }
   }
