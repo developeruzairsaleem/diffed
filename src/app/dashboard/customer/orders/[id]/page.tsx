@@ -18,6 +18,7 @@ import {
   DollarSign,
   Calendar,
   Target,
+  Crown,
 } from "lucide-react";
 import Link from "next/link";
 import ChatInterface from "@/components/chat/ChatInterface";
@@ -41,17 +42,17 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const [approvingId, setApprovingId] = useState<string | null>(null);
-  
+
   // Add wallet refetch function
   const fetchWallet = async () => {
     try {
-      const response = await fetch('/api/wallet/');
+      const response = await fetch("/api/wallet/");
       const walletData = await response.json();
       if (walletData && !walletData.error) {
         store.setWallet(walletData);
       }
     } catch (error) {
-      console.error('Failed to fetch wallet:', error);
+      console.error("Failed to fetch wallet:", error);
     }
   };
 
@@ -126,10 +127,10 @@ export default function OrderDetailPage() {
       fetchWallet();
     };
 
-    window.addEventListener('focus', handleFocus);
-    
+    window.addEventListener("focus", handleFocus);
+
     return () => {
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -433,6 +434,62 @@ export default function OrderDetailPage() {
                       </p>
                     </div>
                   )}
+
+                  {order.notes && (
+                    <div>
+                      <h4 className="font-medium mb-2">Notes</h4>
+                      <p className="text-white text-sm whitespace-pre-wrap">
+                        {order.notes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Extra Order Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                    <div className="p-4 rounded-lg bg-gray-50/20">
+                      <p className="text-xs text-gray-300 mb-1">Games</p>
+                      <p className="text-white font-semibold text-lg">
+                        {order?.gamesCount != null && order.gamesCount > 0
+                          ? order.gamesCount
+                          : "-"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-gray-50/20">
+                      <p className="text-xs text-gray-300 mb-1">Teammates</p>
+                      <p className="text-white font-semibold text-lg">
+                        {order?.requiredCount != null
+                          ? order.requiredCount
+                          : "-"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-gray-50/20">
+                      <p className="text-xs text-gray-300 mb-1 flex items-center gap-1">
+                        <Crown className="w-4 h-4 text-purple-300" /> Rank
+                      </p>
+                      <p className="text-white font-semibold text-lg truncate">
+                        {order?.rank?.name
+                          ? `${order.rank.name}${
+                              typeof order?.rank?.additionalCost === "number" &&
+                              order.rank.additionalCost > 0
+                                ? ` +$${order.rank.additionalCost}`
+                                : ""
+                            }`
+                          : "-"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-gray-50/20">
+                      <p className="text-xs text-gray-300 mb-1 flex items-center gap-1">
+                        <Target className="w-4 h-4 text-cyan-300" /> ELO
+                      </p>
+                      <p className="text-white font-semibold text-lg">
+                        {order?.subpackage?.dynamicPricing &&
+                        order?.subpackage?.minELO != null &&
+                        order?.subpackage?.maxELO != null
+                          ? `${order.subpackage.minELO}-${order.subpackage.maxELO}`
+                          : "-"}
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

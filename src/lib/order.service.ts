@@ -221,6 +221,10 @@ export class OrderService {
         name: order.subpackage.name,
         description: order.subpackage.description,
         price: order.subpackage.price,
+        dynamicPricing: order.subpackage.dynamicPricing ?? undefined,
+        basePricePerELO: order.subpackage.basePricePerELO ?? undefined,
+        minELO: order.subpackage.minELO ?? null,
+        maxELO: order.subpackage.maxELO ?? null,
         requiredProviders: order.subpackage.requiredProviders,
         duration: order.subpackage.duration || undefined,
         service: {
@@ -248,6 +252,11 @@ export class OrderService {
       ),
       requiredCount: order.requiredCount,
       stripeSessId: order.stripeSessId || undefined,
+      gamesCount: (order as any)?.gamesCount as any,
+      rank: (order as any)?.rank as any,
+      // include ELO values when present on order
+      // provider components already use these fields similarly
+      // so we expose them for customer detail too
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       assignments: order.assignments.map((assignment) => ({
@@ -285,8 +294,6 @@ export class OrderService {
         },
       })),
     };
-
-
   }
 
   static async updateOrder(
@@ -305,7 +312,6 @@ export class OrderService {
     return this.getOrderById(updatedOrder.id);
   }
 
-
   static async updateAssignment(
     assignmentId: string,
     data: AssignmentUpdateRequest
@@ -322,13 +328,11 @@ export class OrderService {
     }
   }
 
-  static async getAssignment(
-    assignmentId: string,
-  ): Promise<any> {
+  static async getAssignment(assignmentId: string): Promise<any> {
     try {
-       const assignment = await prisma.orderAssignment.findUnique({
+      const assignment = await prisma.orderAssignment.findUnique({
         where: { id: assignmentId },
-        include: {provider: true}
+        include: { provider: true },
       });
       return assignment;
     } catch (error) {
@@ -450,6 +454,10 @@ export class OrderService {
         description: order.subpackage.description,
         price: order.subpackage.price,
         duration: order.subpackage.duration || undefined,
+        dynamicPricing: order.subpackage.dynamicPricing ?? undefined,
+        basePricePerELO: order.subpackage.basePricePerELO ?? undefined,
+        minELO: order.subpackage.minELO ?? null,
+        maxELO: order.subpackage.maxELO ?? null,
         requiredProviders: order.subpackage.requiredProviders,
         service: {
           id: order.subpackage.service.id,
@@ -475,6 +483,8 @@ export class OrderService {
       rerollsLeft: order.rerollsLeft,
       approvedCount: order.approvedCount,
       requiredCount: order.requiredCount,
+      gamesCount: order.gamesCount as any,
+      rank: (order.rank as any) || null,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     }));
