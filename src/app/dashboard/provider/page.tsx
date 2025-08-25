@@ -39,6 +39,19 @@ import ProviderSetupPage from "./components/order-detail";
 // This is the new dashboard component
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Listen for custom event to switch tab from child components
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      if (e.detail?.tab) {
+        setActiveTab(e.detail.tab);
+      }
+    };
+    window.addEventListener("provider-dashboard-switch-tab", handler as EventListener);
+    return () => {
+      window.removeEventListener("provider-dashboard-switch-tab", handler as EventListener);
+    };
+  }, []);
   const { user } = useStore();
   const TABS = [
     { value: "overview", label: "Overview", icon: LayoutGrid },

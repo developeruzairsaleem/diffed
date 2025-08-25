@@ -47,7 +47,7 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { username, email } = await request.json();
+    const { username, email, bio } = await request.json();
 
     if (!username || !email) {
       return NextResponse.json(
@@ -85,6 +85,7 @@ export const POST = async (request: NextRequest) => {
       data: {
         username,
         email,
+        bio
       },
       select: { username: true, email: true }, // Return the updated data
     });

@@ -24,7 +24,8 @@ export const POST = async (request: NextRequest) => {
 
     // the body which contains the packageId which user wants to buy
     const body = await request.json();
-  const { subpackageId, selectedRank, numberOfGames, numberOfTeammates } = body || {};
+    const { subpackageId, currentELO, targetELO, selectedRank, numberOfGames, numberOfTeammates } = body || {};
+    console.log("back shabir body", body);
 
     if (!subpackageId) {
       return NextResponse.json(
@@ -56,12 +57,10 @@ export const POST = async (request: NextRequest) => {
         price: true,
         dynamicPricing: true,
         basePricePerELO: true,
-
         minELO: true,
         maxELO: true,
         requiredProviders: true,
-        ranks: true,
-        type: true,
+
       },
     });
 
@@ -74,16 +73,50 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // New price calculation logic
-    let basePrice = Number(subpackage.price);
-    let additionalCost = 0;
-    if (selectedRank && typeof selectedRank.additionalCost === "number") {
-      additionalCost = Number(selectedRank.additionalCost);
+    // Determine final price
+    let finalPriceNumber: number;
+
+    if (subpackage.dynamicPricing) {
+      // Validate input for ELO-based pricing
+      if (
+        typeof currentELO !== "number" ||
+        typeof targetELO !== "number" ||
+        subpackage.basePricePerELO == null
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Dynamic pricing requires valid currentELO, targetELO, and basePricePerELO",
+            success: false,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate ELO range if min/max set
+      const min = subpackage.minELO ?? 0;
+      const max = subpackage.maxELO ?? Number.MAX_SAFE_INTEGER;
+      if (
+        currentELO < min ||
+        targetELO < min ||
+        currentELO > max ||
+        targetELO > max
+      ) {
+        return NextResponse.json(
+          {
+            error: `ELO values must be within range ${min} - ${max}`,
+            success: false,
+          },
+          { status: 400 }
+        );
+      }
+
+      const eloDiff = Math.abs(targetELO - currentELO);
+      const additionalCost = eloDiff * Number(subpackage.basePricePerELO);
+      finalPriceNumber = Number(subpackage.price) + additionalCost;
+    } else {
+      finalPriceNumber = Number(subpackage.price);
     }
-    let priceWithRank = basePrice + additionalCost;
-    let games = typeof numberOfGames === "number" ? numberOfGames : 1;
-    let teammates = subpackage.type==="perteammate"? numberOfTeammates : subpackage.requiredProviders;
-    let finalPriceNumber = priceWithRank * games * teammates;
 
     // Ensure wallet has enough balance
     if (userWallet.balance.toNumber() < finalPriceNumber) {
@@ -104,10 +137,13 @@ export const POST = async (request: NextRequest) => {
         discordTag: "#1234",
         discordUsername: "ase_1234",
         isInQueue: true,
-        rank: selectedRank ? selectedRank : null,
-        gamesCount: typeof numberOfGames === "number" ? numberOfGames : 1,
-        requiredCount: subpackage.type==="perteammate"? Number(numberOfTeammates) : subpackage.requiredProviders,
-        packageType: subpackage.type,
+        requiredCount: subpackage.requiredProviders,
+        currentELO: subpackage.dynamicPricing
+          ? Math.trunc(currentELO as number)
+          : undefined,
+        targetELO: subpackage.dynamicPricing
+          ? Math.trunc(targetELO as number)
+          : undefined,
       },
     });
 
