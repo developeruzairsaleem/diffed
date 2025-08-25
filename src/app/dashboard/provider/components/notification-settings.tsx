@@ -22,6 +22,7 @@ export function SettingsTab() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    bio: "",
   });
 
   // Fetch initial data
@@ -32,9 +33,13 @@ export function SettingsTab() {
         const response = await fetch("/api/profile-settings");
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        setFormData({ username: data.username, email: data.email });
+        setFormData({
+          username: data.username,
+          email: data.email,
+          bio: data.bio || "",
+        });
       } catch (error) {
-        message.error(error?.message || "Failed to load your settings.");
+      message.error((error as any)?.message || "Failed to load your settings.");
       } finally {
         setLoading(false);
       }
@@ -42,25 +47,32 @@ export function SettingsTab() {
     fetchSettings();
   }, []);
 
-  const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    console.log('Input changed:', formData)
   };
 
-  const handleFormSubmit = async (e) => {
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     try {
+      // Only send username, email, bio as expected by the API
+      const { username, email, bio } = formData;
       const response = await fetch("/api/profile-settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ username, email, bio }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
+      // Optionally update local state with returned user data
+      if (data.user) {
+        setFormData((prev) => ({ ...prev, ...data.user }));
+      }
       message.success("Profile updated successfully!");
     } catch (error) {
-      message.error(error?.message || "Failed to update profile.");
+      message.error((error as any)?.message || "Failed to update profile.");
     } finally {
       setSaving(false);
     }
@@ -87,7 +99,7 @@ export function SettingsTab() {
               Update your account details here.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 mt-12">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-white/80">
                 Username
@@ -96,6 +108,18 @@ export function SettingsTab() {
                 id="username"
                 name="username"
                 value={formData.username}
+                onChange={handleInputChange}
+                className="bg-black/30 border-white/20 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bio" className="text-white/80">
+                Bio
+              </Label>
+              <Input
+                id="bio"
+                name="bio"
+                value={formData.bio}
                 onChange={handleInputChange}
                 className="bg-black/30 border-white/20 text-white"
               />

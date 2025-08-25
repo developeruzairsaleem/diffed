@@ -47,6 +47,8 @@ export async function GET(req: NextRequest) {
         },
       },
     });
+
+    console.log("Backend Fetched Subpackage:", subpackage);
     // if no package found return
     if (!subpackage) {
       return NextResponse.json(

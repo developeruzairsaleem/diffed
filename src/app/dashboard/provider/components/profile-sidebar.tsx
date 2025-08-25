@@ -84,7 +84,7 @@ export function ProfileSidebar() {
   };
 
   return (
-    <Card className="w-80 flex-shrink-0 h-full bg-black/30 backdrop-blur-sm border-none shadow-2xl overflow-hidden">
+    <Card className="fixed w-80 flex-shrink-0 h-full bg-black/30 backdrop-blur-sm border-none shadow-2xl overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-transparent to-pink-900/10"></div>
       <CardContent className="p-6 relative">
         <div className="text-center">

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         isInQueue: true,
       },
       orderBy: {
-        updatedAt: "asc", // First-in, first-out
+        updatedAt: "desc", // First-in, first-out
       },
       include: {
         // Include any relevant data providers need to see before applying

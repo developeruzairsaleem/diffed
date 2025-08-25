@@ -45,16 +45,38 @@ const GamesComponent = () => {
   const calculateTotalPrice = () => {
     if (!selectedSubpackage) return 0;
 
+    let basePrice = selectedSubpackage.price;
+
+    // Add selected rank additional cost if a rank is selected
+    if (
+      Array.isArray(selectedSubpackage.ranks) &&
+      selectedSubpackage.ranks.length > 0 &&
+      selectedRank && typeof selectedRank.additionalCost === 'number'
+    ) {
+      basePrice += selectedRank.additionalCost;
+    }
+
+    // Multiply by number of games if > 1
+    if (numGamesMap[selectedSubpackage.id] > 1) {
+      basePrice *= numGamesMap[selectedSubpackage.id];
+    }
+
+    // Multiply by number of teammates if > 1
+    if (numTeammatesMap[selectedSubpackage.id] > 1) {
+      basePrice *= numTeammatesMap[selectedSubpackage.id];
+    }
+
+    // Dynamic pricing logic
     if (
       selectedSubpackage.dynamicPricing &&
       selectedSubpackage.basePricePerELO
     ) {
       const eloDifference = Math.abs(targetELO - currentELO);
       const eloCost = eloDifference * selectedSubpackage.basePricePerELO;
-      return selectedSubpackage.price + eloCost;
+      return basePrice + eloCost;
     }
 
-    return selectedSubpackage.price;
+    return basePrice;
   };
 
   // fetching games
@@ -94,13 +116,17 @@ const GamesComponent = () => {
   }, []);
 
   const handleQuickPay = (subpackage: any) => {
-    // setSelectedRank(null);
+    if (selectedSubpackage?.id !== subpackage.id) {
+      setSelectedRank(null); // Only reset rank if switching subpackage
+    }
     setSelectedSubpackage(subpackage);
     setIsModalOpen(true);
   };
 
   const handleCheckout = (subpackage: any) => {
-    // setSelectedRank(null);
+    if (selectedSubpackage?.id !== subpackage.id) {
+      setSelectedRank(null); // Only reset rank if switching subpackage
+    }
     const choosedPackage = { ...subpackage };
     console.log("choosedPackage", choosedPackage);
     console.log("no of games", numGamesMap);
@@ -110,9 +136,11 @@ const GamesComponent = () => {
   const confirmCheckout = () => {
     if (!selectedSubpackage) return;
   
-    router.push(`/dashboard/customer/checkout/${selectedSubpackage.id}?rankName=${selectedRank?.name || ''}?numberOfGames=${numGamesMap[selectedSubpackage.id] || 1}&numberOfTeammates=${numTeammatesMap[selectedSubpackage.id] || 1}`);
+    router.push(`/dashboard/customer/checkout/${selectedSubpackage.id}?rankName=${selectedRank?.name || ''}&numberOfGames=${numGamesMap[selectedSubpackage.id] || 1}&numberOfTeammates=${numTeammatesMap[selectedSubpackage.id] || 1}`);
     
   };
+
+
   const confirmQuickPay = async () => {
     if (!selectedSubpackage) return;
 
@@ -129,6 +157,12 @@ const GamesComponent = () => {
             ? currentELO
             : undefined,
           targetELO: selectedSubpackage.dynamicPricing ? targetELO : undefined,
+            // Send selected rank if any
+            selectedRank: selectedRank ? selectedRank : undefined,
+            // Send number of games and teammates
+            numberOfGames: numGamesMap[selectedSubpackage.id] || 1,
+            numberOfTeammates: numTeammatesMap[selectedSubpackage.id] || 1,
+          
         }),
       });
 
@@ -650,6 +684,33 @@ const GamesComponent = () => {
                         </span>
                       </div>
 
+                       {/* Selected Rank Details */}
+                      {Array.isArray(selectedSubpackage.ranks) && selectedSubpackage.ranks.length > 0 && selectedRank && (
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-gray-300 text-sm">Selected Rank</span>
+                          <span className="text-pink-400 font-semibold">
+                            {selectedRank.name} <span className="text-cyan-400">(+${selectedRank.additionalCost})</span>
+                          </span>
+                        </div>
+                      )}
+                      {/* Always show number of games */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">No. of Games</span>
+                        <span className="text-pink-400 font-semibold">{numGamesMap[selectedSubpackage.id] || 1}</span>
+                      </div>
+                      {/* Always show number of teammates */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">No. of Teammates</span>
+                        <span className="text-pink-400 font-semibold">{numTeammatesMap[selectedSubpackage.id] || 1}</span>
+                      </div>
+                       {/* Conditionally show ELO range if dynamicPricing is true and minELO/maxELO are present */}
+                       {selectedSubpackage.dynamicPricing && typeof selectedSubpackage.minELO === 'number' && typeof selectedSubpackage.maxELO === 'number' && (
+                         <div className="flex items-center justify-between mb-3">
+                           <span className="text-cyan-400 text-sm font-semibold">ELO Range</span>
+                           <span className="text-cyan-300 font-bold">{selectedSubpackage.minELO} - {selectedSubpackage.maxELO}</span>
+                         </div>
+                       )}
+
                       {/* Dynamic Pricing ELO Sliders */}
                       {selectedSubpackage.dynamicPricing &&
                         selectedSubpackage.basePricePerELO && (
@@ -847,8 +908,25 @@ const GamesComponent = () => {
                           </span>
                         </div>
                       )}
+                      {/* Always show number of games */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">No. of Games</span>
+                        <span className="text-pink-400 font-semibold">{numGamesMap[selectedSubpackage.id] || 1}</span>
+                      </div>
+                      {/* Always show number of teammates */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-300 text-sm">No. of Teammates</span>
+                        <span className="text-pink-400 font-semibold">{numTeammatesMap[selectedSubpackage.id] || 1}</span>
+                      </div>
+                       {/* Conditionally show ELO range if dynamicPricing is true and minELO/maxELO are present */}
+                       {selectedSubpackage.dynamicPricing && typeof selectedSubpackage.minELO === 'number' && typeof selectedSubpackage.maxELO === 'number' && (
+                         <div className="flex items-center justify-between mb-3">
+                           <span className="text-cyan-400 text-sm font-semibold">ELO Range</span>
+                           <span className="text-cyan-300 font-bold">{selectedSubpackage.minELO} - {selectedSubpackage.maxELO}</span>
+                         </div>
+                       )}
                       {/* Dynamic Pricing ELO Sliders */}
-                      {selectedSubpackage.dynamicPricing &&
+                      {/* {selectedSubpackage.dynamicPricing &&
                         selectedSubpackage.basePricePerELO && (
                           <div className="space-y-4 pt-3 border-t border-gray-600/50">
                             <div className="text-center">
@@ -858,7 +936,6 @@ const GamesComponent = () => {
                               </span>
                             </div>
 
-                            {/* Current ELO Slider */}
                             <div>
                               <div className="flex justify-between text-sm text-gray-300 mb-2">
                                 <span>Current ELO</span>
@@ -881,7 +958,7 @@ const GamesComponent = () => {
                               />
                             </div>
 
-                            {/* Target ELO Slider */}
+                           
                             <div>
                               <div className="flex justify-between text-sm text-gray-300 mb-2">
                                 <span>Target ELO</span>
@@ -904,7 +981,7 @@ const GamesComponent = () => {
                               />
                             </div>
 
-                            {/* ELO Difference and Additional Cost */}
+                            
                             <div className="bg-gray-800/50 rounded-lg p-3">
                               <div className="flex justify-between text-sm mb-1">
                                 <span className="text-gray-300">
@@ -928,7 +1005,7 @@ const GamesComponent = () => {
                               </div>
                             </div>
                           </div>
-                        )}
+                        )} */}
 
                       {/* Total Price */}
                       <div className="pt-3 border-t border-gray-600/50">

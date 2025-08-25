@@ -20,7 +20,9 @@ export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [currentELO, setCurrentELO] = useState(0);
   const [targetELO, setTargetELO] = useState(0);
-  const [subpackage, setSubpackage] = useState({});
+  // const [subpackage, setSubpackage] = useState({});
+
+  const [subpackage, setSubpackage] = useState<{ price?: number } | any>({});
   const [finalPrice, setFinalPrice] = useState(0);
   const router = useRouter();
   const store = useStore();
@@ -32,6 +34,12 @@ export default function CheckoutPage() {
   useEffect(() => {
     // Only fetch if email is available just checking for loggedin status
     if (!store.user?.email) return;
+
+    console.log("Fetching package and creating intent...", searchParams?.get("rankName"));
+    console.log("Fetching package and creating intent...", searchParams?.get("numberOfGames"));
+    console.log("Fetching package and creating intent...", searchParams?.get("numberOfTeammates"));
+
+
 
     async function fetchPackageAndCreateIntent() {
       setLoading(true);
@@ -60,6 +68,7 @@ export default function CheckoutPage() {
         }
         setClientSecret(intentResponse.data.clientSecret);
         setSubpackage(intentResponse.data.subpackage);
+        console.log('fetched subpackage:', subpackage);
         if (intentResponse.data.currentELO || intentResponse.data.targetELO) {
           setCurrentELO(intentResponse.data.currentELO);
           setTargetELO(intentResponse.data.targetELO);
@@ -156,32 +165,66 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {(currentELO || targetELO) && (
-            <div className="sm:pl-6 text-[22px] my-7">
-              <div className="mb-4">Current ELO: {currentELO}</div>
-              <div>Target ELO: {targetELO}</div>
-            </div>
-          )}
+
 
           {/* Price breakdown info */}
           <div className="sm:pl-6 text-[24px] mt-12">
             <h4 className="mb-6">Price Breakdown:</h4>
             <div className="flex justify-between w-[20rem]">
               <ul className="pl-5 list-disc" style={{ lineHeight: "230%" }}>
+                {subpackage.dynamicPricing && (
+                  <li>
+                    ELO Range:
+                  </li>
+                )}
                 <li>Base Service:</li>
-                <li>Add-Ons:</li>
+                {/* <li>Add-Ons:</li> */}
+                {/* Show rankName, numberOfGames, numberOfTeammates inside the ul */}
+                {searchParams?.get("rankName") && (
+                  <li>Rank Name: </li>
+                )}
+                <li>No. of Games:</li>
+                <li>No. of Teammates:</li>
                 <li>Total:</li>
               </ul>
               <ul style={{ lineHeight: "230%" }}>
                 {/* @ts-ignore */}
+                {subpackage.dynamicPricing && (
+                  <li>
+                    {Number(subpackage.maxELO) - Number(subpackage.minELO)}
+                  </li>
+                )}
                 <li>${subpackage.price}</li>
-                <li>
-                  {/* @ts-ignore */}$
+                {/* <li>
+                  $
                   {currentELO || targetELO ? finalPrice - subpackage.price : 0}
-                </li>
+                </li> */}
+                {searchParams?.get("rankName") && (
+                  <li>{searchParams.get("rankName")}</li>
+                )}
+                <li> {searchParams?.get("numberOfGames") || "1"}</li>
+                <li> {searchParams?.get("numberOfTeammates") || "1"}</li>
                 <li>
                   {/* @ts-ignore */}$
-                  {currentELO || targetELO ? finalPrice : subpackage.price}
+                  {/* {currentELO || targetELO ? finalPrice : subpackage.price} */}
+
+                  {(() => {
+                    // Get rankName and amounts
+                    const rankName = searchParams?.get("rankName");
+                    let rankAmount = 0;
+                    if (subpackage.ranks && rankName) {
+                      const foundRank = subpackage.ranks.find((r: any) => r.name === rankName);
+                      rankAmount = foundRank?.additionalCost || 0;
+                    }
+                    // Get number of games and teammates
+                    const numGames = Number(searchParams?.get("numberOfGames")) || 1;
+                    const numTeammates = Number(searchParams?.get("numberOfTeammates")) || 1;
+                    // Calculate base price
+                    const basePrice = (Number(subpackage.price) || 0) + rankAmount;
+                    // Multiply if more than 1
+                    const totalPrice = basePrice * (numGames > 1 ? numGames : 1) * (numTeammates > 1 ? numTeammates : 1);
+                    return totalPrice.toFixed(2);
+                  })()}
                 </li>
               </ul>
             </div>

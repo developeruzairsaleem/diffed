@@ -6,13 +6,26 @@ import { message } from "antd";
 import { OverviewSkeleton } from "@/components/ui/OverviewSkeleton";
 import { lato, orbitron } from "@/fonts/fonts";
 import SafeImage from "@/components/ui/SafeImage";
+import { QueueOverview } from "./QueueOverview";
 
 // --- Sub-Components for the page ---
 
-const StatCard = ({ icon: Icon, title, value, description }) => (
+type StatCardProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  value: string | number;
+  description: string;
+  onClick?: () => void;
+};
+
+const StatCard = ({ icon: Icon, title, value, description, onClick }: StatCardProps) => (
   <div
-    style={{ borderColor: "#EE2C81" }}
-    className="bg-black/30 backdrop-blur-sm p-6 rounded-lg border-l-4 shadow-lg  "
+    style={{ borderColor: "#EE2C81", cursor: onClick ? "pointer" : "default" }}
+    className={`bg-black/30 backdrop-blur-sm p-6 rounded-lg border-l-4 shadow-lg transition-all duration-200 ${onClick ? "hover:shadow-pink-500/30 hover:bg-black/40" : ""}`}
+    onClick={onClick}
+    tabIndex={onClick ? 0 : undefined}
+    role={onClick ? "button" : undefined}
+    aria-label={onClick ? `Go to ${title} tab` : undefined}
   >
     <div className="flex items-center justify-between">
       <h3 className="text-sm font-medium text-white/70">{title}</h3>
@@ -27,7 +40,15 @@ const StatCard = ({ icon: Icon, title, value, description }) => (
   </div>
 );
 
-const GameStatCard = ({ game }) => (
+type GameStat = {
+  gameImage: string;
+  gameName: string;
+  completed: number;
+  verified: number;
+  earnings: string;
+};
+
+const GameStatCard = ({ game }: { game: GameStat }) => (
   <div className="bg-[#3A0F2A]/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 flex items-center space-x-4 ">
     <SafeImage
       src={game.gameImage}
@@ -103,24 +124,23 @@ export default function ProviderOverviewPage() {
   const { provider, totalEarnings, totalCompleted, totalVerified, gameStats } =
     overviewData;
 
+  // Handlers for stat cards to switch tabs
+  interface SwitchTabEventDetail {
+    tab: string;
+  }
+
+  type TabName = "earnings" | "orders" | string;
+
+  const handleGoToTab = (tab: TabName) => {
+    window.dispatchEvent(
+      new CustomEvent<SwitchTabEventDetail>("provider-dashboard-switch-tab", { detail: { tab } })
+    );
+  };
+
   return (
     <div className={`p-4 md:p-6 ${lato.className}`}>
       {/* Header */}
-      <div className="flex items-center space-x-4 mb-10">
-        <SafeImage
-          // @ts-ignore
-          src={provider?.profileImage || "/images/default-avatar.png"}
-          alt="Provider"
-          className="w-16 h-16 rounded-full border-2 border-pink-500"
-          placeholder="/images/placeholder.png"
-        />
-        <div>
-          <p className="text-md text-white/70">Welcome back,</p>
-          <h1 className={`text-4xl font-bold text-white ${orbitron.className}`}>
-            {provider?.username}
-          </h1>
-        </div>
-      </div>
+      {/* ...existing code... */}
 
       {/* Main Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -129,22 +149,30 @@ export default function ProviderOverviewPage() {
           title="Total Earnings"
           value={`$${parseFloat(totalEarnings).toFixed(2)}`}
           description="Earnings from all verified orders"
+          onClick={() => handleGoToTab("earnings")}
         />
         <StatCard
           icon={CheckCircle}
           title="Completed Orders"
           value={totalCompleted}
           description="All orders marked as complete"
+          onClick={() => handleGoToTab("orders")}
         />
         <StatCard
           icon={Award}
           title="Verified Orders"
           value={totalVerified}
           description="Orders verified and paid out"
+          onClick={() => handleGoToTab("orders")}
         />
       </div>
 
-      {/* Game-by-Game Performance */}
+
+      <div>
+        <QueueOverview />
+      </div>
+
+       {/* Game-by-Game Performance */}
       <div>
         <h2
           className={`text-2xl font-bold text-white mb-6 ${orbitron.className}`}
@@ -166,6 +194,7 @@ export default function ProviderOverviewPage() {
           </div>
         )}
       </div>
+      
     </div>
   );
 }
